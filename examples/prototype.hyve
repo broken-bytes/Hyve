@@ -1,0 +1,16 @@
+// Prototypes are similar to abstract classes
+prototype Animal {
+    func doNoise() {
+        print("Noise")
+    }
+}
+    
+// Extending a prototype
+class Dog: Animal {
+    // Override keyword is needed
+    override func doNoise() {
+        print("Bark")
+        // Calling the prototype method is done via `prototype` instead of `self`
+        prototype.doNoise()
+    }
+}

@@ -1,0 +1,13 @@
+// Protocols are like Swift protocols or Kotlin interfaces
+protocol Vehicle {
+    // Default implementation are forbidden in protocols
+    func drive()
+}
+    
+// Extending a prototype
+class Car: Vehicle {
+    // Override keyword is *not* needed
+    func doNoise() {
+        print("Fast")
+    }
+}

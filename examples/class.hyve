@@ -1,0 +1,22 @@
+// Open class allows for inheritance
+open class Example(let username: String, let string: String) {
+    init { 
+
+    }
+}
+
+// Inheriting from a class
+class Example2(let username: String, let string: String): Example(username: username, password: password) {
+    init { 
+        
+    }
+}
+
+//
+class Example3(let username: String, let string: String) {
+    // Init block with parameters
+    init(username: String, string: String, password: String) : self(username: username, string: string) { 
+        
+    }
+}
+
