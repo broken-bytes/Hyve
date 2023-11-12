@@ -6,7 +6,10 @@ prototype Animal {
     func doNoise() {
         var noise = ""
         noise = "Noise"
-        print(noise)
+        var db = 23x
+        db = 20
+        db += 5
+        print(noise + db)
     }
 }
     

@@ -332,6 +332,11 @@ namespace Hyve::Lexer {
         }
     }
 
+    void Erase(std::string& source, size_t count, uint64_t& columnCounter) {
+        columnCounter += count;
+        source.erase(0, count);
+    }
+
     // Gets the next string from current point until next whitespace and removes the whitespace
     std::tuple<std::string, bool> HLexer::NextToken(std::string& source) {
         std::string next;
@@ -349,7 +354,7 @@ namespace Hyve::Lexer {
             // Edge case: Empty string, thus check if the next char is a quote as well
             if(source[1] == Symbols::SYMBOL_QUOTE[0]) {
                 _state = LexerState::NONE;
-                source.erase(0, 2);
+                Erase(source, 2, _currentColumn);
                 return { "" , true };
             }
 
@@ -358,21 +363,64 @@ namespace Hyve::Lexer {
                 if(source[x] == Symbols::SYMBOL_QUOTE[0]) {
                     _state = LexerState::NONE;
                     next = source.substr(1, x);
-                    source.erase(0, x + 1);
+                    Erase(source, x + 1, _currentColumn);
                     return { next , true };
                 }
             }
 
             if(_state == LexerState::STRINGLITERAL) {
-                source.erase(0, source.length());
+                Erase(source, source.length(), _currentColumn);
                 throw HLexerError("Unterminated string literal");
             }
         }
 
         // If not, check for linebreaks before anything else
         if(source[0] == '\n') {
-            source.erase(0, 1);
+            Erase(source, 1, _currentColumn);
             return { "\n" , false };
+        }
+
+        // At last, check for number literal
+        if(std::isdigit(source[0])) {
+            bool isDoubleLiteral = false;
+            bool isBinOrHex = false;
+
+            // Number literal, keep going until we reach whitespace, or any character
+            for(int offset = 0; offset < source.length(); offset++) {
+                // We hit a guaranteed literal end via whitespace
+                if (std::isspace(source[offset])) {
+                    next = source.substr(0, offset);
+                    Erase(source, offset + 1, _currentColumn);
+
+                    return {next, false};
+                }
+
+                // If we receive a dot we are in a string literal
+                if(!std::isdigit(source[offset]) && source[offset] == '.') {
+                    if(isBinOrHex) {
+                        Erase(source, offset + 1, _currentColumn);
+                        throw HLexerError("Binary or hex numbers cannot be doubles");
+                    }
+                    isDoubleLiteral = true;
+                    continue;
+                }
+                // Only the second character is allowed to be x or b, but only if first char is 0
+                if (offset == 1  && (source[1] == 'b' || source[1] == 'x')) {
+                    isBinOrHex = true;
+                    continue;
+                }
+
+                // Invalid number literal
+                if(std::isalpha(source[offset])) {
+                    Erase(source, offset + 1, _currentColumn);
+
+                    if(!isDoubleLiteral) {
+                        throw HLexerError("Invalid integer literal");
+                    }
+
+                    throw HLexerError("Invalid double literal");
+                }
+            }
         }
 
         for(int offset = 0; offset < source.length(); offset++) {
@@ -380,7 +428,7 @@ namespace Hyve::Lexer {
             if (std::isalnum(source[offset]) || source[offset] == Symbols::SYMBOL_UNDERSCORE[0]) {
                 if (_state == LexerState::SYMBOL) {
                     next = source.substr(0, offset);
-                    source.erase(0, offset);
+                    Erase(source, offset, _currentColumn);
                     return { next , false };
                 }
                 _state = LexerState::VALUE;
@@ -390,24 +438,25 @@ namespace Hyve::Lexer {
                 // Edge case 1: If the line starts with a whitespace(not \n), remove it immediately
                 if(offset == 0) {
                     if(source[0] != '\n') {
-                        source.erase(0, 1);
+                        Erase(source, offset + 1, _currentColumn);
                         return NextToken(source);
                     } else {
-                        source.erase(0, 1);
+                        Erase(source, offset, _currentColumn);
                         return { "\n", false };
                     }
                 }
                 // If we hit a whitespace, we automatically end the Token if not in a string literal.
                 next = source.substr(0, offset);
                 // Edge case 2: If the character is a linebreak, we don't remove it from the source str as linebreaks are tokens
-                source.erase(0, offset + (source[offset] == '\n' ? 0 : 1));
+                Erase(source, offset + (source[offset] == '\n' ? 0 : 1), _currentColumn);
+
                 return { next , false };
             }
                 // We have symbol, now we need to check if it is a two or one chars symbol
             else {
                 if (_state == LexerState::VALUE) {
                     next = source.substr(0, offset);
-                    source.erase(0, offset);
+                    Erase(source, offset, _currentColumn);
                     return { next , false };
                 }
 
@@ -426,7 +475,7 @@ namespace Hyve::Lexer {
 
                 if(isTwoCharacters) {
                     next = source.substr(0, 2);
-                    source.erase(0, 2);
+                    Erase(source, 2, _currentColumn);
                     _state = LexerState::NONE;
 
                     // Extra check: Remove all characters until comments are ended if a comment is detected
@@ -444,7 +493,7 @@ namespace Hyve::Lexer {
                 } else {
                     if(TryGetSpecial(source.substr(0, offset + 1)) != HTokenType::INVALID) {
                         next = source.substr(0, 1);
-                        source.erase(0, 1);
+                        Erase(source, 1, _currentColumn);
                         _state = LexerState::NONE;
 
                         return { next, false };
@@ -452,7 +501,7 @@ namespace Hyve::Lexer {
 
                     if(TryGetOperator(source.substr(0, offset + 1)) != HTokenType::INVALID) {
                         next = source.substr(0, 1);
-                        source.erase(0, 1);
+                        Erase(source, 1, _currentColumn);
                         _state = LexerState::NONE;
 
                         return { next, false };
@@ -473,6 +522,7 @@ namespace Hyve::Lexer {
             HTokenType type,
             HTokenFamily family,
             std::string_view value,
+            std::string_view fileName,
             uint64_t line,
             uint64_t column,
             std::queue<HToken>& queue) {
@@ -480,6 +530,7 @@ namespace Hyve::Lexer {
                 .Family = family,
                 .Type = type,
                 .Value = std::string(value),
+                .FileName = std::string(fileName),
                 .Line = line,
                 .Column = column
         });
@@ -487,7 +538,7 @@ namespace Hyve::Lexer {
 
     HLexer::HLexer() = default;
 
-    std::queue<HToken> HLexer::Tokenize(std::string stream) {
+    std::queue<HToken> HLexer::Tokenize(std::string stream, std::string& fileName) {
         std::queue<HToken> tokens = {};
 
         _currentLine = 1;
@@ -506,8 +557,9 @@ namespace Hyve::Lexer {
             try {
                 currentToken = NextToken(content);
             } catch(std::exception& error) {
-                PushToken(HTokenType::ERROR, HTokenFamily::ERROR, error.what(), _currentLine, _currentColumn, tokens);
+                PushToken(HTokenType::ERROR, HTokenFamily::ERROR, error.what(), fileName, _currentLine, _currentColumn, tokens);
                 _state = LexerState::NONE;
+                continue;
             }
 
             // If we are in string mode the next sequence is guaranteed to be a string
@@ -517,6 +569,7 @@ namespace Hyve::Lexer {
                         HTokenType::STRING,
                         HTokenFamily::LITERAL,
                         std::get<0>(currentToken),
+                                fileName,
                                 _currentLine,
                                 _currentColumn, tokens
                                 );
@@ -529,9 +582,13 @@ namespace Hyve::Lexer {
                         HTokenType::LINEBREAK,
                         HTokenFamily::LINEBREAK,
                         std::get<0>(currentToken),
+                        fileName,
                         _currentLine,
                         _currentColumn, tokens
                 );
+
+                _currentLine++;
+                _currentColumn = 1;
 
                 continue;
             }
@@ -544,6 +601,7 @@ namespace Hyve::Lexer {
                         currentType,
                         HTokenFamily::KEYWORD,
                         std::get<0>(currentToken),
+                        fileName,
                         _currentLine,
                         _currentColumn, tokens
                 );
@@ -559,6 +617,7 @@ namespace Hyve::Lexer {
                         HTokenType::IDENTIFIER,
                         HTokenFamily::IDENTIFIER,
                         std::get<0>(currentToken),
+                        fileName,
                         _currentLine,
                         _currentColumn, tokens
                 );
@@ -574,6 +633,7 @@ namespace Hyve::Lexer {
                         currentType,
                         HTokenFamily::OPERATOR,
                         std::get<0>(currentToken),
+                        fileName,
                         _currentLine,
                         _currentColumn, tokens
                 );
@@ -585,14 +645,23 @@ namespace Hyve::Lexer {
 
             if(currentType != HTokenType::INVALID) {
                 // Edge case, if a string is detected, swap the lexer to string mode
-                if(currentType == HTokenType::STRING) {
-                    _state = LexerState::STRINGLITERAL;
-                    continue;
-                }
                 PushToken(
                         currentType,
-                        HTokenFamily::OPERATOR,
+                        HTokenFamily::SPECIAL,
                         std::get<0>(currentToken),
+                        fileName,
+                        _currentLine,
+                        _currentColumn, tokens
+                );
+                continue;
+            }
+
+            if(std::isdigit(std::get<0>(currentToken)[0])) {
+                PushToken(
+                        HTokenType::NUM,
+                        HTokenFamily::LITERAL,
+                        std::get<0>(currentToken),
+                        fileName,
                         _currentLine,
                         _currentColumn, tokens
                 );
@@ -605,6 +674,7 @@ namespace Hyve::Lexer {
                 HTokenType::END_OF_FILE,
                 HTokenFamily::END_OF_FILE,
                 "",
+                fileName,
                 _currentLine,
                 _currentColumn, tokens
         );
