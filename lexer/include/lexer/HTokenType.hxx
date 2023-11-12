@@ -9,7 +9,8 @@ namespace Hyve::Lexer {
         SPECIAL,
         COMMENT,
         ERROR,
-        LINEBREAK
+        LINEBREAK,
+        END_OF_FILE
     };
 
     enum class HTokenType {
@@ -99,7 +100,10 @@ namespace Hyve::Lexer {
         // CONSTANTS
         NUM, // 23
         STRING, // "test",
-        LINEBREAK, // \n
+        COMMENT, // //
+        MULTI_LINE_COMMENT, // */ ... /*
+        LINEBREAK, // \n,
+        END_OF_FILE, // the end of a file
         INVALID // Not a proper token
     };
 }

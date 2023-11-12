@@ -57,4 +57,7 @@ namespace Hyve::Lexer::Symbols {
     constexpr const char* SYMBOL_QUOTE = "\"";
     constexpr const char* SYMBOL_PIPE = "|";
     constexpr const char* SYMBOL_UNDERSCORE = "_";
+    constexpr const char* SYMBOL_COMMENT = "//";
+    constexpr const char* SYMBOL_MULTILINE_COMMENT_BEGIN = "/*";
+    constexpr const char* SYMBOL_MULTILINE_COMMENT_END = "*/";
 }

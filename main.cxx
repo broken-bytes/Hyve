@@ -102,8 +102,17 @@ int main(int argc, char** argv) {
 
     cli.ExecuteCommands();
 
+    std::queue<Hyve::Lexer::HToken> combinedTokes = {};
+
     for(auto& file: sourceFiles) {
         auto tokens = lexer.Tokenize(LoadSourceFile(file));
-        int x = 0;
+
+        while(!tokens.empty()) {
+            combinedTokes.push(tokens.front());
+            tokens.pop();
+        }
     }
+
+    int x = 0;
+
 }

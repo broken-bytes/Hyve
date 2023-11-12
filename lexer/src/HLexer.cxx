@@ -300,7 +300,36 @@ namespace Hyve::Lexer {
             return ARROW;
         }
 
+        if(source == Symbols::SYMBOL_COMMENT) {
+            return COMMENT;
+        }
+
+        if(source == Symbols::SYMBOL_MULTILINE_COMMENT_BEGIN) {
+            return MULTI_LINE_COMMENT;
+        }
+
         return INVALID;
+    }
+
+    void RemoveComment(std::string& source, bool multiLine) {
+        auto len = source.length();
+
+        if(multiLine) {
+            for(int offset = 0; offset < source.length(); offset++) {
+                if(source.substr(offset, 2) == Symbols::SYMBOL_MULTILINE_COMMENT_END) {
+                    source.erase(0, offset + 1);
+                    return;
+                }
+            }
+        } else {
+            for(int offset = 0; offset < source.length(); offset++) {
+                printf("Char: %c\n", source[offset]);
+                if (source[offset] == '\n') {
+                    source.erase(0, offset + 1);
+                    return;
+                }
+            }
+        }
     }
 
     // Gets the next string from current point until next whitespace and removes the whitespace
@@ -400,6 +429,17 @@ namespace Hyve::Lexer {
                     source.erase(0, 2);
                     _state = LexerState::NONE;
 
+                    // Extra check: Remove all characters until comments are ended if a comment is detected
+                    if(next == Symbols::SYMBOL_COMMENT) {
+                        RemoveComment(source, false);
+                        continue;
+                    }
+
+                    if(next == Symbols::SYMBOL_MULTILINE_COMMENT_BEGIN) {
+                        RemoveComment(source, true);
+                        continue;
+                    }
+
                     return { next, false };
                 } else {
                     if(TryGetSpecial(source.substr(0, offset + 1)) != HTokenType::INVALID) {
@@ -429,6 +469,22 @@ namespace Hyve::Lexer {
         return { next , false };
     }
 
+    void PushToken(
+            HTokenType type,
+            HTokenFamily family,
+            std::string_view value,
+            uint64_t line,
+            uint64_t column,
+            std::queue<HToken>& queue) {
+        queue.push(HToken{
+                .Family = family,
+                .Type = type,
+                .Value = std::string(value),
+                .Line = line,
+                .Column = column
+        });
+    }
+
     HLexer::HLexer() = default;
 
     std::queue<HToken> HLexer::Tokenize(std::string stream) {
@@ -450,39 +506,32 @@ namespace Hyve::Lexer {
             try {
                 currentToken = NextToken(content);
             } catch(std::exception& error) {
-                tokens.push(HToken{
-                        .Family = HTokenFamily::ERROR,
-                        .Type = HTokenType::ERROR,
-                        .Value = error.what(),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
+                PushToken(HTokenType::ERROR, HTokenFamily::ERROR, error.what(), _currentLine, _currentColumn, tokens);
                 _state = LexerState::NONE;
             }
 
             // If we are in string mode the next sequence is guaranteed to be a string
             if(std::get<1>(currentToken)) {
                 _state = LexerState::NONE;
-                tokens.push(HToken{
-                        .Family = HTokenFamily::LITERAL,
-                        .Type = HTokenType::STRING,
-                        .Value = std::get<0>(currentToken),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
-
+                PushToken(
+                        HTokenType::STRING,
+                        HTokenFamily::LITERAL,
+                        std::get<0>(currentToken),
+                                _currentLine,
+                                _currentColumn, tokens
+                                );
                 continue;
             }
 
             // Line break
             if(std::get<0>(currentToken)[0] == '\n') {
-                tokens.push(HToken{
-                        .Family = HTokenFamily::LINEBREAK,
-                        .Type = HTokenType::LINEBREAK,
-                        .Value = std::get<0>(currentToken),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
+                PushToken(
+                        HTokenType::LINEBREAK,
+                        HTokenFamily::LINEBREAK,
+                        std::get<0>(currentToken),
+                        _currentLine,
+                        _currentColumn, tokens
+                );
 
                 continue;
             }
@@ -491,13 +540,13 @@ namespace Hyve::Lexer {
 
             if (currentType != HTokenType::INVALID) {
                 _state = LexerState::KEYWORD;
-                tokens.push(HToken{
-                        .Family = HTokenFamily::KEYWORD,
-                        .Type = currentType,
-                        .Value = std::get<0>(currentToken),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
+                PushToken(
+                        currentType,
+                        HTokenFamily::KEYWORD,
+                        std::get<0>(currentToken),
+                        _currentLine,
+                        _currentColumn, tokens
+                );
 
                 continue;
             }
@@ -506,13 +555,13 @@ namespace Hyve::Lexer {
 
             if(currentType != HTokenType::INVALID) {
                 _state = LexerState::NONE;
-                tokens.push(HToken{
-                        .Family = HTokenFamily::IDENTIFIER,
-                        .Type = HTokenType::IDENTIFIER,
-                        .Value = std::get<0>(currentToken),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
+                PushToken(
+                        HTokenType::IDENTIFIER,
+                        HTokenFamily::IDENTIFIER,
+                        std::get<0>(currentToken),
+                        _currentLine,
+                        _currentColumn, tokens
+                );
 
                 continue;
             }
@@ -521,13 +570,14 @@ namespace Hyve::Lexer {
 
             if(currentType != HTokenType::INVALID) {
                 _state = LexerState::NONE;
-                tokens.push(HToken{
-                        .Family = HTokenFamily::OPERATOR,
-                        .Type = currentType,
-                        .Value = std::get<0>(currentToken),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
+                PushToken(
+                        currentType,
+                        HTokenFamily::OPERATOR,
+                        std::get<0>(currentToken),
+                        _currentLine,
+                        _currentColumn, tokens
+                );
+
                 continue;
             }
 
@@ -539,17 +589,25 @@ namespace Hyve::Lexer {
                     _state = LexerState::STRINGLITERAL;
                     continue;
                 }
-                tokens.push(HToken{
-                        .Family = HTokenFamily::OPERATOR,
-                        .Type = currentType,
-                        .Value = std::get<0>(currentToken),
-                        .Line = _currentLine,
-                        .Column = _currentColumn
-                });
+                PushToken(
+                        currentType,
+                        HTokenFamily::OPERATOR,
+                        std::get<0>(currentToken),
+                        _currentLine,
+                        _currentColumn, tokens
+                );
                 continue;
             }
 
         } while(!content.empty());
+
+        PushToken(
+                HTokenType::END_OF_FILE,
+                HTokenFamily::END_OF_FILE,
+                "",
+                _currentLine,
+                _currentColumn, tokens
+        );
 
         return tokens;
     }

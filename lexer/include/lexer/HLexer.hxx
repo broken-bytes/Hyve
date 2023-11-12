@@ -11,7 +11,9 @@ namespace Hyve::Lexer {
         IDENTIFIER,
         VALUE,
         STRINGLITERAL,
-        SYMBOL
+        SYMBOL,
+        COMMENT,
+        MULTILINE_COMMENT
     };
 
     class HLexer {

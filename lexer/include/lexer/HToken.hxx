@@ -8,6 +8,7 @@ namespace Hyve::Lexer {
         HTokenFamily Family;
         HTokenType Type;
         std::string Value;
+        std::string FileName;
         uint64_t Line;
         uint64_t Column;
     };

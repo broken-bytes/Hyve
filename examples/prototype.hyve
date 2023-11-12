@@ -1,5 +1,8 @@
 // Prototypes are similar to abstract classes
 prototype Animal {
+    /*
+    Default Method is implemented, can be overriden
+    */
     func doNoise() {
         var noise = ""
         noise = "Noise"
