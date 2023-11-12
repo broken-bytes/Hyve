@@ -1,106 +1,108 @@
 #include "lexer/HLexer.hxx"
+#include "lexer/HLexerError.hxx"
 #include "lexer/HToken.hxx"
 #include "lexer/HTokenKeywords.hxx"
 #include "lexer/HTokenSymbols.hxx"
 #include "lexer/HTokenType.hxx"
-#include "lexer/HTokenStream.hxx"
 #include <exception>
 #include <regex>
 #include <stdexcept>
 
 namespace Hyve::Lexer {
-    std::string identifierStr = "[a-zA-Z_]+[a-zA-Z0-9_]*";
-    std::regex identifierRegex(identifierStr);
+    const std::string identifierStr = "[a-zA-Z_]+[a-zA-Z0-9_]*";
+    const std::regex identifierRegex(identifierStr);
 
     [[nodiscard]] HTokenType TryGetKeyword(const std::string& source) {
-        if(source.contains(Keywords::KEYWORD_ACTOR)) {
-            return HTokenType::ACTOR;
+        using enum Hyve::Lexer::HTokenType;
+        if(source == Keywords::KEYWORD_ACTOR) {
+            return ACTOR;
         }
 
-        if(source.contains(Keywords::KEYWORD_CAPTURED)) {
-            return HTokenType::CAPTURED;
+        if(source == Keywords::KEYWORD_CAPTURED) {
+            return CAPTURED;
         }
 
-        if(source.contains(Keywords::KEYWORD_CATCH)) {
-            return HTokenType::CATCH;
+        if(source == Keywords::KEYWORD_CATCH) {
+            return CATCH;
         }
 
-        if(source.contains(Keywords::KEYWORD_CLASS)) {
-            return HTokenType::CLASS;
+        if(source == Keywords::KEYWORD_CLASS) {
+            return CLASS;
         }
 
-        if(source.contains(Keywords::KEYWORD_DEFER)) {
-            return HTokenType::DEFER;
+        if(source == Keywords::KEYWORD_DEFER) {
+            return DEFER;
         }
 
-        if(source.contains(Keywords::KEYWORD_DO)) {
-            return HTokenType::DO;
+        if(source == Keywords::KEYWORD_DO) {
+            return DO;
         }
 
-        if(source.contains(Keywords::KEYWORD_ELSE)) {
-            return HTokenType::ELSE;
+        if(source == Keywords::KEYWORD_ELSE) {
+            return ELSE;
         }
 
-        if(source.contains(Keywords::KEYWORD_FUNC)) {
-            return HTokenType::FUNC;
+        if(source == Keywords::KEYWORD_FUNC) {
+            return FUNC;
         }
 
-        if(source.contains(Keywords::KEYWORD_IF)) {
-            return HTokenType::IF;
+        if(source == Keywords::KEYWORD_IF) {
+            return IF;
         }
 
-        if(source.contains(Keywords::KEYWORD_LET)) {
-            return HTokenType::LET;
+        if(source == Keywords::KEYWORD_LET) {
+            return LET;
         }
 
-        if(source.contains(Keywords::KEYWORD_PROTOCOL)) {
-            return HTokenType::PROTOCOL;
+        if(source == Keywords::KEYWORD_PROTOCOL) {
+            return PROTOCOL;
         }
 
-        if(source.contains(Keywords::KEYWORD_PROTOTYPE)) {
-            return HTokenType::PROTOTYPE;
+        if(source == Keywords::KEYWORD_PROTOTYPE) {
+            return PROTOTYPE;
         }
 
-        if(source.contains(Keywords::KEYWORD_STRUCT)) {
-            return HTokenType::STRUCT;
+        if(source == Keywords::KEYWORD_STRUCT) {
+            return STRUCT;
         }
 
-        if(source.contains(Keywords::KEYWORD_WHEN)) {
-            return HTokenType::WHEN;
+        if(source == Keywords::KEYWORD_WHEN) {
+            return WHEN;
         }
 
-        if(source.contains(Keywords::KEYWORD_THROW)) {
-            return HTokenType::THROW;
+        if(source == Keywords::KEYWORD_THROW) {
+            return THROW;
         }
 
-        if(source.contains(Keywords::KEYWORD_THROWS)) {
-            return HTokenType::THROWS;
+        if(source == Keywords::KEYWORD_THROWS) {
+            return THROWS;
         }
 
-        if(source.contains(Keywords::KEYWORD_TRY)) {
-            return HTokenType::TRY;
+        if(source == Keywords::KEYWORD_TRY) {
+            return TRY;
         }
 
-        if(source.contains(Keywords::KEYWORD_UNTIL)) {
-            return HTokenType::UNTIL;
+        if(source == Keywords::KEYWORD_UNTIL) {
+            return UNTIL;
         }
 
-        if(source.contains(Keywords::KEYWORD_VAR)) {
-            return HTokenType::VAR;
+        if(source == Keywords::KEYWORD_VAR) {
+            return VAR;
         }
 
-        if(source.contains(Keywords::KEYWORD_OPEN)) {
-            return HTokenType::OPEN;
+        if(source == Keywords::KEYWORD_OPEN) {
+            return OPEN;
         }
 
-        return HTokenType::INVALID;
+        return INVALID;
     }
 
-    [[nodiscard]] HTokenType TryGetIdentifier(const std::string& source) {
-        std::sregex_iterator it(source.begin(), source.end(), identifierRegex);
-        std::sregex_iterator end;
+    [[nodiscard]] HTokenType TryGetIdentifier(const std::string_view source) {
+        std::string sourceStr(source.begin(), source.end()); // Convert to std::string
+        std::sregex_iterator it(sourceStr.begin(), sourceStr.end(), identifierRegex);
 
-        while (it != end) {
+
+        if (std::sregex_iterator end; it != end) {
             std::smatch match = *it;
             ++it;
 
@@ -111,192 +113,194 @@ namespace Hyve::Lexer {
     }
 
 
-    [[nodiscard]] HTokenType TryGetOperator(const std::string& source) {
+    [[nodiscard]] HTokenType TryGetOperator(const std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
         if(source == Symbols::SYMBOL_ASSIGN) {
-            return HTokenType::ASSIGNMENT;
+            return ASSIGNMENT;
         }
 
         if(source == Symbols::SYMBOL_PLUS) {
-            return HTokenType::PLUS;
+            return PLUS;
         }
 
         if(source == Symbols::SYMBOL_MINUS) {
-            return HTokenType::MINUS;
+            return MINUS;
         }
 
         if(source == Symbols::SYMBOL_MULTIPLY) {
-            return HTokenType::MULTIPLY;
+            return MULTIPLY;
         }
 
         if(source == Symbols::SYMBOL_DIVIDE) {
-            return HTokenType::DIVIDE;
+            return DIVIDE;
         }
 
         if(source == Symbols::SYMBOL_MODULO) {
-            return HTokenType::MODULO;
+            return MODULO;
         }
 
         if(source == Symbols::SYMBOL_EQUAL) {
-            return HTokenType::EQUAL;
+            return EQUAL;
         }
 
         if(source == Symbols::SYMBOL_NOT_EQUAL) {
-            return HTokenType::NOT_EQUAl;
+            return NOT_EQUAl;
         }
 
         if(source == Symbols::SYMBOL_GREATER_THAN) {
-            return HTokenType::GREATER;
+            return GREATER;
         }
 
         if(source == Symbols::SYMBOL_LESS_THAN) {
-            return HTokenType::LESS;
+            return LESS;
         }
 
         if(source == Symbols::SYMBOL_GREATER_THAN_OR_EQUAL) {
-            return HTokenType::GREATER_EQUAL;
+            return GREATER_EQUAL;
         }
 
         if(source == Symbols::SYMBOL_LESS_THAN_OR_EQUAL) {
-            return HTokenType::LESS_EQUAL;
+            return LESS_EQUAL;
         }
 
         if(source == Symbols::SYMBOL_AND) {
-            return HTokenType::AND;
+            return AND;
         }
 
         if(source == Symbols::SYMBOL_OR) {
-            return HTokenType::OR;
+            return OR;
         }
 
         if(source == Symbols::SYMBOL_NOT) {
-            return HTokenType::NOT;
+            return NOT;
         }
 
         if(source == Symbols::SYMBOL_BITWISE_AND) {
-            return HTokenType::BIT_AND;
+            return BIT_AND;
         }
 
         if(source == Symbols::SYMBOL_BITWISE_OR) {
-            return HTokenType::BIT_OR;
+            return BIT_OR;
         }
 
         if(source == Symbols::SYMBOL_BITWISE_XOR) {
-            return HTokenType::BIT_OR;
+            return BIT_OR;
         }
 
         if(source == Symbols::SYMBOL_BITWISE_NOT) {
-            return HTokenType::BIT_INVERSE;
+            return BIT_INVERSE;
         }
 
         if(source == Symbols::SYMBOL_BITWISE_LEFT_SHIFT) {
-            return HTokenType::BIT_LSHIFT;
+            return BIT_LSHIFT;
         }
 
         if(source == Symbols::SYMBOL_BITWISE_RIGHT_SHIFT) {
-            return HTokenType::BIT_RSHIFT;
+            return BIT_RSHIFT;
         }
 
         if(source == Symbols::SYMBOL_PLUS_ASSIGN) {
-            return HTokenType::PLUS_ASSIGN;
+            return PLUS_ASSIGN;
         }
 
         if(source == Symbols::SYMBOL_MINUS_ASSIGN) {
-            return HTokenType::MINUS_ASSIGN;
+            return MINUS_ASSIGN;
         }
 
         if(source == Symbols::SYMBOL_MULTIPLY_ASSIGN) {
-            return HTokenType::MULTIPLY_ASSIGN;
+            return MULTIPLY_ASSIGN;
         }
 
         if(source == Symbols::SYMBOL_DIVIDE_ASSIGN) {
-            return HTokenType::DIVIDE_ASSIGN;
+            return DIVIDE_ASSIGN;
         }
 
         if(source == Symbols::SYMBOL_MODULO_ASSIGN) {
-            return HTokenType::MOD_ASSIGN;
+            return MOD_ASSIGN;
         }
 
         if(source == Symbols::SYMBOL_ARROW) {
-            return HTokenType::ARROW;
+            return ARROW;
         }
 
         if(source == Symbols::SYMBOL_QUESTION_MARK) {
-            return HTokenType::OPTIONAL;
+            return OPTIONAL;
         }
 
         if(source == Symbols::EXCLAMATION_MARK) {
-            return HTokenType::FORCE_OPTIONAL;
+            return FORCE_OPTIONAL;
         }
 
         if(source == Symbols::SYMBOL_AT) {
-            return HTokenType::ANNOTATION;
+            return ANNOTATION;
         }
 
         if(source == Symbols::SYMBOL_DOLLAR) {
-            return HTokenType::BINDING;
+            return BINDING;
         }
 
         if(source == Symbols::SYMBOL_BACKTICK) {
-            return HTokenType::NAME_OVERRIDE;
+            return NAME_OVERRIDE;
         }
 
         if(source == Symbols::SYMBOL_QUOTE) {
-            return HTokenType::STRING;
+            return STRING;
         }
 
         if(source == Symbols::SYMBOL_PIPE) {
-            return HTokenType::PIPE;
+            return PIPE;
         }
 
-        return HTokenType::INVALID;
+        return INVALID;
     }
 
-    HTokenType TryGetSpecial(const std::string& source)  {
+    HTokenType TryGetSpecial(const std::string_view source)  {
+        using enum Hyve::Lexer::HTokenType;
         if(source == Symbols::SYMBOL_LEFT_BRACKET) {
-            return HTokenType::LBRACKET;
+            return LBRACKET;
         }
 
         if(source == Symbols::SYMBOL_RIGHT_BRACKET) {
-            return HTokenType::RBRACKET;
+            return RBRACKET;
         }
 
         if(source == Symbols::SYMBOL_LEFT_CURLY_BRACKET) {
-            return HTokenType::LCBRACKET;
+            return LCBRACKET;
         }
 
         if(source == Symbols::SYMBOL_RIGHT_CURLY_BRACKET) {
-            return HTokenType::RCBRACKET;
+            return RCBRACKET;
         }
 
         if(source == Symbols::SYMBOL_LEFT_SQUARE_BRACKET) {
-            return HTokenType::LSBRACKET;
+            return LSBRACKET;
         }
 
         if(source == Symbols::SYMBOL_RIGHT_SQUARE_BRACKET) {
-            return HTokenType::RSBRACKET;
+            return RSBRACKET;
         }
 
         if(source == Symbols::SYMBOL_COMMA) {
-            return HTokenType::COMMA;
+            return COMMA;
         }
 
         if(source == Symbols::SYMBOL_DOT) {
-            return HTokenType::DOT;
+            return DOT;
         }
 
         if(source == Symbols::SYMBOL_COLON) {
-            return HTokenType::COLON;
+            return COLON;
         }
 
         if(source == Symbols::SYMBOL_QUOTE) {
-            return HTokenType::STRING;
+            return STRING;
         }
 
         if(source == Symbols::SYMBOL_ARROW) {
-            return HTokenType::ARROW;
+            return ARROW;
         }
 
-        return HTokenType::INVALID;
+        return INVALID;
     }
 
     // Gets the next string from current point until next whitespace and removes the whitespace
@@ -332,7 +336,7 @@ namespace Hyve::Lexer {
 
             if(_state == LexerState::STRINGLITERAL) {
                 source.erase(0, source.length());
-                throw std::runtime_error("Unterminated string literal");
+                throw HLexerError("Unterminated string literal");
             }
         }
 
@@ -418,7 +422,7 @@ namespace Hyve::Lexer {
                 source.erase(0, 1);
                 _state = LexerState::NONE;
 
-                throw std::runtime_error("Undefined symbol");
+                throw HLexerError("Undefined symbol");
             }
         }
 
