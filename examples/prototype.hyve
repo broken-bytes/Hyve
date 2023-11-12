@@ -1,7 +1,9 @@
 // Prototypes are similar to abstract classes
 prototype Animal {
     func doNoise() {
-        print("Noise")
+        var noise = ""
+        noise = "Noise"
+        print(noise)
     }
 }
     
