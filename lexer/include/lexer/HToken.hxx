@@ -10,6 +10,7 @@ namespace Hyve::Lexer {
         std::string Value;
         std::string FileName;
         uint64_t Line;
-        uint64_t Column;
+        uint64_t ColumnStart;
+        uint64_t ColumnEnd;
     };
 }
