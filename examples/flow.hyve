@@ -1,0 +1,121 @@
+// If statements
+if condition {
+    // code
+}
+
+// If-Else statements
+if condition {
+    // code
+} else {
+    // code
+}
+
+// If-ElseIf-Else statements
+if condition1 {
+    // code
+} else if condition2 {
+    // code
+} else {
+    // code
+}
+
+// If-ElseIf-Else statements with ranges
+if value in 1...5 {
+    // code
+} else if value in 6...10 {
+    // code
+} else {
+    // code
+}
+
+// If-ElseIf-Else statements with where clauses
+if value in 1...5 where value % 2 == 0 {
+    // code
+} else if value in 6...10 where value % 2 == 0 {
+    // code
+} else {
+    // code
+}
+
+// If-ElseIf-Else statements with tuples
+if (value1, value2) == (1, 2) {
+    // code
+} else if (value1, value2) == (3, 4) {
+    // code
+} else {
+    // code
+}
+
+// If as an expression
+let result = if condition {
+    "true"
+} else {
+    "false"
+}
+
+// Range Loops
+for value in 0...5 {
+    print(value)
+}
+
+// Sequence Loops
+for item of sequence {
+    print(item)
+}
+
+// While loops
+while condition {
+    // code
+}
+
+// Until loops
+until condition {
+    // code
+}
+
+// Repeat-While loops
+repeat {
+    // code
+} while condition
+
+// Repeat-Until loops
+repeat {
+    // code
+} until condition
+
+// Switch statements
+switch value {
+    1 -> print("one")
+    2 -> print("two")
+    3 -> print("three")
+    else -> print("other")
+}
+
+// Switch statements with ranges
+switch value {
+    1...5 -> print("between 1 and 5")
+    6...10 -> print("between 6 and 10")
+    else -> print("other")
+}
+
+// Switch statements with where clauses
+switch value {
+    1...5 where value % 2 == 0 -> print("between 1 and 5 and even")
+    6...10 where value % 2 == 0 -> print("between 6 and 10 and even")
+    else -> print("other")
+}
+
+// Switch statements with tuples
+switch (value1, value2) {
+    (1, 2) -> print("one and two")
+    (3, 4) -> print("three and four")
+    else -> print("other")
+}
+
+// Switch as an expression
+let result = switch value {
+    1 -> "one"
+    2 -> "two"
+    3 -> "three"
+    else -> "other"
+}

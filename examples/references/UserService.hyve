@@ -1,0 +1,9 @@
+protocol UserService {
+    func getUser(username: String) -> User
+}
+
+class UserServiceImpl: UserService {
+    func getUser(username: String) -> User {
+        return User(username: username, age: 20)
+    }
+}

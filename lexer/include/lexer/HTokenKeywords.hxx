@@ -21,5 +21,17 @@ namespace Hyve::Lexer::Keywords {
     constexpr const char* KEYWORD_UNTIL = "until";
     constexpr const char* KEYWORD_VAR = "var";
     constexpr const char* KEYWORD_WHEN = "when";
+    constexpr const char* KEYWORD_WHILE = "while";
+    constexpr const char* KEYWORD_WITH = "with";
+    constexpr const char* KEYWORD_YIELD = "yield";
+    constexpr const char* KEYWORD_RETURN = "return";
+    constexpr const char* KEYWORD_IMPORT = "import";
+    constexpr const char* KEYWORD_AS = "as";
+    constexpr const char* KEYWORD_FROM = "from";
+    constexpr const char* KEYWORD_SELF = "self";
+    constexpr const char* KEYWORD_TASK = "task";
+    constexpr const char* KEYWORD_NULL = "null";
+    constexpr const char* KEYWORD_INIT = "init";
+
 
 }

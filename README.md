@@ -1,6 +1,3 @@
-Creating a README for a fictional programming language like Hyve can be an exciting task. Here's a template that you might find useful:
-
-```markdown
 # Hyve Programming Language
 
 ## Overview
@@ -56,6 +53,5 @@ Hyve is open-sourced under the MIT License. See the [LICENSE](https://github.com
 ---
 
 Happy Coding with Hyve!
-```
 
 Remember, since Hyve is a hobbyist language, expect missing features and bugs.

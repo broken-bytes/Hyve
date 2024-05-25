@@ -1,7 +1,6 @@
 SET(
     SRC
     src/HLexer.cxx
-    src/HTokenStream.cxx
 )
 
 add_library(Lexer STATIC ${SRC})

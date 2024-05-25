@@ -94,6 +94,46 @@ namespace Hyve::Lexer {
             return OPEN;
         }
 
+        if(source == Keywords::KEYWORD_WHILE) {
+            return WHILE;
+        }
+
+        if(source == Keywords::KEYWORD_WITH) {
+            return WITH;
+        }
+
+        if(source == Keywords::KEYWORD_YIELD) {
+            return YIELD;
+        }
+
+        if(source == Keywords::KEYWORD_RETURN) {
+            return RETURN;
+        }
+
+        if(source == Keywords::KEYWORD_IMPORT) {
+            return IMPORT;
+        }
+
+        if(source == Keywords::KEYWORD_AS) {
+            return AS;
+        }
+
+        if(source == Keywords::KEYWORD_SELF) {
+            return SELF;
+        }
+
+        if(source == Keywords::KEYWORD_TASK) {
+            return TASK;
+        }
+
+        if(source == Keywords::KEYWORD_NULL) {
+            return NULL_LITERAL;
+        }
+
+        if(source == Keywords::KEYWORD_INIT) {
+            return INIT;
+        }
+
         return INVALID;
     }
 
@@ -397,11 +437,11 @@ namespace Hyve::Lexer {
             for(int offset = 0; offset < source.length(); offset++) {
                 // We hit a guaranteed literal end via whitespace
                 if (std::isspace(source[offset])) {
-                    next = source.substr(0, offset);
-                    Erase(source, offset + 1);
+                    next = source.substr(0, offset - 1);
+                    Erase(source, offset - 1);
 
                     auto result = std::tuple<std::string, uint64_t, uint64_t> {
-                            next, _currentColumnStart, _currentColumnStart + offset
+                        next, _currentColumnStart, _currentColumnStart + offset
                     };
                     _currentColumnStart = _currentColumnStart + offset;
 
@@ -648,8 +688,8 @@ namespace Hyve::Lexer {
             uint64_t line,
             uint64_t columnStart,
             uint64_t columnEnd,
-            std::queue<HToken>& queue) {
-        queue.push(HToken{
+            std::vector<HToken>& queue) {
+        queue.push_back(HToken{
                 .Family = family,
                 .Type = type,
                 .Value = std::string(value),
@@ -662,8 +702,8 @@ namespace Hyve::Lexer {
 
     HLexer::HLexer() = default;
 
-    std::queue<HToken> HLexer::Tokenize(std::string stream, std::string& fileName) {
-        std::queue<HToken> tokens = {};
+    std::vector<HToken> HLexer::Tokenize(std::string stream, std::string& fileName) {
+        std::vector<HToken> tokens = {};
 
         _currentLine = 1;
         _currentColumnEnd = 1;

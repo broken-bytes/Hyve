@@ -23,6 +23,7 @@ namespace Hyve::Lexer {
         PROTOTYPE, // prototype
         STRUCT, // struct
         OPEN, // open
+        SELF, // self
 
         // Variables
         VAR, // var
@@ -46,6 +47,7 @@ namespace Hyve::Lexer {
         AND, // &&
         OR, // ||
         NOT, // !
+        XOR, // ^
         BIT_AND, // &
         BIT_OR, // |
         BIT_INVERSE, // ~
@@ -62,6 +64,7 @@ namespace Hyve::Lexer {
         IF, // if
         ELSE, // else
         WHEN, // when
+        INIT, // init
         FUNC, // func
         DEFER, // defer
         DO, // do
@@ -79,8 +82,17 @@ namespace Hyve::Lexer {
         ARROW, // ->
         OPTIONAL, // ?
         FORCE_OPTIONAL, // ?
+        WHILE, // while
+        FOR, // for
+        IN, // in
+        OF, // of
+        WITH, // with
+        YIELD, // yield
+        RETURN, // return
+        IMPORT, // import
 
         // OTHER OPERATORS
+        AS, // as
         DOT, // .
         COLON, // :,
         COMMA, // ,
@@ -97,10 +109,13 @@ namespace Hyve::Lexer {
         LSBRACKET, // [
         RSBRACKET, // ]
 
-        // CONSTANTS
+        // Literals
+        TRUE, // true,
+        FALSE, // false,
         NUM, // 23
         STRING, // "test",
         COMMENT, // //
+        NULL_LITERAL, // null
         MULTI_LINE_COMMENT, // */ ... /*
         LINEBREAK, // \n,
         END_OF_FILE, // the end of a file

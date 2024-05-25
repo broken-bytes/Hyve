@@ -102,15 +102,12 @@ int main(int argc, char** argv) {
 
     cli.ExecuteCommands();
 
-    std::queue<Hyve::Lexer::HToken> combinedTokes = {};
+    std::vector<std::shared_ptr<Hyve::Parser::HAstNode>> asts = {};
 
     for(auto& file: sourceFiles) {
         auto tokens = lexer.Tokenize(LoadSourceFile(file), file);
-
-        while(!tokens.empty()) {
-            combinedTokes.push(tokens.front());
-            tokens.pop();
-        }
+        auto ast = parser.Parse(tokens);
+        asts.push_back(ast);
     }
 
     int x = 0;

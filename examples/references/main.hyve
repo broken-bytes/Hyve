@@ -1,0 +1,6 @@
+func main(args: [String]) -> Int {
+    var service: UserService = UserServiceImpl()
+    var user = service.getUser(username: "John")
+
+    return user == null
+}

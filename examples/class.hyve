@@ -1,22 +1,49 @@
 // Open class allows for inheritance
-open class Example(let username: String, let string: String) {
+class Example {
+    var prop: String = "Test"
+    init(username: String, string: String, password: String) { 
+        
+    }
+}
+
+class Example1 {
     init { 
 
     }
 }
 
 // Inheriting from a class
-class Example2(let username: String, let string: String): Example(username: username, password: password) {
-    init { 
-        
+class Example2: Example {
+    var prop: String = "Test"
+
+    init {
+        prop = "Test" 
+        super.init()
+    }
+
+    init(prop: String) { 
+        self.prop = prop
+        self.init()
     }
 }
 
 //
-class Example3(let username: String, let string: String) {
+class Example3: Test {
     // Init block with parameters
-    init(username: String, string: String, password: String) : self(username: username, string: string) { 
+    init(username: String, string: String, password: String) { 
         
+    }
+
+    func setup(a: Int) -> String {
+        return "Test"
+    }
+
+    func test { 
+        var test = "Test"
+    }
+
+    func test() { 
+        var test = "Test"
     }
 }
 

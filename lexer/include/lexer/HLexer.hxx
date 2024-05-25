@@ -2,7 +2,7 @@
 
 #include "lexer/HToken.hxx"
 #include <queue>
-#include <string>
+#include <vector>
 
 namespace Hyve::Lexer {
     enum class LexerState {
@@ -19,7 +19,7 @@ namespace Hyve::Lexer {
     class HLexer {
         public:
         HLexer();
-        [[nodiscard]] std::queue<HToken> Tokenize(std::string stream, std::string& fileName);
+        [[nodiscard]] std::vector<HToken> Tokenize(std::string stream, std::string& fileName);
 
     private:
         LexerState _state;

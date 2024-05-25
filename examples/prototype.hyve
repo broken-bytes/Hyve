@@ -1,12 +1,12 @@
 // Prototypes are similar to abstract classes
 prototype Animal {
     /*
-    Default Method is implemented, can be overriden
+        Default Method is implemented, can be overriden
     */
     func doNoise() {
         var noise = ""
         noise = "Noise"
-        var db = 23x
+        var db = 23
         db = 20
         db += 5
         print(noise + db)
@@ -16,9 +16,9 @@ prototype Animal {
 // Extending a prototype
 class Dog: Animal {
     // Override keyword is needed
-    override func doNoise() {
+    override func doNoise() -> Void {
         print("Bark")
         // Calling the prototype method is done via `prototype` instead of `self`
-        prototype.doNoise()
+        protoype.doNoise()
     }
 }
