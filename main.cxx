@@ -109,7 +109,4 @@ int main(int argc, char** argv) {
         auto ast = parser.Parse(tokens);
         asts.push_back(ast);
     }
-
-    int x = 0;
-
 }

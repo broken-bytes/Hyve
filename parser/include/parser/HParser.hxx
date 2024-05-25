@@ -1,27 +1,29 @@
 #pragma once
 
-#include <lexer/HToken.hxx>
-#include <lexer/HTokenType.hxx>
 #include "parser/HAst.hxx"
 #include "parser/HAstNode.hxx"
+#include "parser/HParserContex.hxx"
+#include "parser/HAstOperatorType.hxx"
 #include "parser/nodes/HAstFuncDeclNode.hxx"
 #include "parser/nodes/HAstTypeNode.hxx"
 #include "parser/nodes/HAstExpressionNode.hxx"
 #include "parser/nodes/HAstFuncCallNode.hxx"
 #include "parser/nodes/HAstFuncBodyNode.hxx"
 #include "parser/nodes/HAstMemberAccessNode.hxx"
-#include "parser/HAstOperatorType.hxx"
-#include <queue>
-#include <string>
-#include <vector>
-
-#include "nodes/HAstPropAccessNode.hxx"
-#include "nodes/HAstVarDeclNode.hxx"
+#include "parser/nodes/HAstPropAccessNode.hxx"
+#include "parser/nodes/HAstVarDeclNode.hxx"
 #include "parser/nodes/HAstBinaryExpressionNode.hxx"
 #include "parser/nodes/HAstStatementNode.hxx"
 #include "parser/nodes/HAstReturnNode.hxx"
 #include "parser/nodes/HAstLiteralNode.hxx"
 #include "parser/nodes/HAstInheritanceNode.hxx"
+
+#include <lexer/HToken.hxx>
+#include <lexer/HTokenType.hxx>
+
+#include <queue>
+#include <string>
+#include <vector>
 
 namespace Hyve::Parser {
     class HParser {
@@ -33,6 +35,7 @@ namespace Hyve::Parser {
     private:
         std::vector<Lexer::HToken> _tokens;
         uint64_t _tokenIndex;
+        std::queue<HParserContext> _contextStack;
 
         // Condition Checks
         bool CanStartStatement();

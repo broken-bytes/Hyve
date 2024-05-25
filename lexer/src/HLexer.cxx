@@ -362,13 +362,18 @@ namespace Hyve::Lexer {
         source.erase(0, count);
     }
 
-    void RemoveComment(std::string& source, bool multiLine, uint64_t& currentLine, uint64_t& currentColumn) {
+    void HLexer::RemoveComment(
+        std::string& source, 
+        bool multiLine, 
+        uint64_t& currentLine, 
+        uint64_t& currentColumn
+    ) {
         auto len = source.length();
 
         if(multiLine) {
             for(int offset = 0; offset < source.length(); offset++) {
                 if(source.substr(offset, 2) == Symbols::SYMBOL_MULTILINE_COMMENT_END) {
-                    Erase(source, offset + 1);
+                    Erase(source, 2);
                     return;
                 } else if(source[offset] == '\n') {
                     currentLine++;
@@ -376,9 +381,12 @@ namespace Hyve::Lexer {
             }
         } else {
             for(int offset = 0; offset < source.length(); offset++) {
-                if (source[offset] == '\n') {
-                    Erase(source, offset);
-                    return;
+                if(NextIsLineBreak(source)) {
+					currentLine++;
+					return;
+                }
+                else {
+                    Erase(source, 1);
                 }
             }
         }
@@ -428,7 +436,7 @@ namespace Hyve::Lexer {
     }
 
     std::optional<std::tuple<std::string, uint64_t, uint64_t>> HLexer::ProcessNumberLiteral(std::string& source) {
-        if(std::isdigit(source[0])) {
+        if(std::isdigit(static_cast<int>(source[0]))) {
             std::string next;
             bool isDoubleLiteral = false;
             bool isBinOrHex = false;
@@ -436,9 +444,9 @@ namespace Hyve::Lexer {
             // Number literal, keep going until we reach whitespace, or any character
             for(int offset = 0; offset < source.length(); offset++) {
                 // We hit a guaranteed literal end via whitespace
-                if (std::isspace(source[offset])) {
-                    next = source.substr(0, offset - 1);
-                    Erase(source, offset - 1);
+                if (std::isspace(static_cast<int>(source[offset]))) {
+                    next = source.substr(0, offset);
+                    Erase(source, 1);
 
                     auto result = std::tuple<std::string, uint64_t, uint64_t> {
                         next, _currentColumnStart, _currentColumnStart + offset
@@ -448,10 +456,15 @@ namespace Hyve::Lexer {
                     return result;
                 }
 
-                // If we receive a dot we are in a string literal
+                // If we receive a numeric character, we are still in the number literal
+                if(std::isdigit(source[offset])) {
+					continue;
+				}
+
+                // If we receive a dot we are in a double literal
                 if(!std::isdigit(source[offset]) && source[offset] == '.') {
                     if(isBinOrHex) {
-                        Erase(source, offset + 1);
+                        Erase(source, 1);
                         _currentColumnStart = _currentColumnStart + offset + 1;
                         throw HLexerError("Binary or hex numbers cannot be doubles");
                     }
@@ -466,7 +479,7 @@ namespace Hyve::Lexer {
 
                 // Invalid number literal
                 if(std::isalpha(source[offset])) {
-                    Erase(source, offset + 1);
+                    Erase(source, 1);
                     _currentColumnStart = _currentColumnStart + offset + 1;
 
                     if(!isDoubleLiteral) {
@@ -475,23 +488,74 @@ namespace Hyve::Lexer {
 
                     throw HLexerError("Invalid double literal");
                 }
+
+                next = source.substr(0, offset);
             }
         }
 
         return std::nullopt;
     }
 
-    std::optional<std::tuple<std::string, uint64_t, uint64_t>> HLexer::ProcessLineBreak(std::string& source) {
-        if(source[0] == '\n') {
-            Erase(source, 1);
-            auto result = std::tuple<std::string, uint64_t, uint64_t> {
-                    "\n", _currentColumnStart, _currentColumnStart
-            };
-            _currentColumnStart = 1;
-            _currentLine++;
+    bool HLexer::NextIsLineBreak(std::string& source) {
+        // First check if we have two characters left, so we can check for \r\n or \n\r and remove both
+        bool checkForBoth = source.length() >= 2;
 
-            return result;
+        if (checkForBoth) {
+            if (source[0] == '\r' && source[1] == '\n') {
+                return true;
+            }
+
+            if (source[0] == '\n' && source[1] == '\r') {
+                return true;
+            }
         }
+        else {
+            if (source[0] == '\n') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    std::optional<std::tuple<std::string, uint64_t, uint64_t>> HLexer::ProcessLineBreak(std::string& source) {
+        // First check if we have two characters left, so we can check for \r\n or \n\r and remove both
+        bool checkForBoth = source.length() >= 2;
+
+        if(checkForBoth) {
+			if(source[0] == '\r' && source[1] == '\n') {
+				Erase(source, 2);
+				auto result = std::tuple<std::string, uint64_t, uint64_t> {
+						"\n", _currentColumnStart, _currentColumnStart
+				};
+				_currentColumnStart = 1;
+				_currentLine++;
+
+				return result;
+			}
+
+			if(source[0] == '\n' && source[1] == '\r') {
+				Erase(source, 2);
+				auto result = std::tuple<std::string, uint64_t, uint64_t> {
+						"\n", _currentColumnStart, _currentColumnStart
+				};
+				_currentColumnStart = 1;
+				_currentLine++;
+
+				return result;
+			}
+        } else {
+           if(source[0] == '\n') {
+			   Erase(source, 1);
+			   auto result = std::tuple<std::string, uint64_t, uint64_t> {
+					   "\n", _currentColumnStart, _currentColumnStart
+			   };
+			   _currentColumnStart = 1;
+			   _currentLine++;
+
+			   return result;
+		   }
+       }
 
         return std::nullopt;
     }

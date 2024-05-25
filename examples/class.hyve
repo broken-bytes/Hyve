@@ -47,3 +47,6 @@ class Example3: Test {
     }
 }
 
+func main(args: [String]) -> Int {
+    return 0
+}

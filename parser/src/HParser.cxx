@@ -38,7 +38,7 @@ namespace Hyve::Parser {
 
         auto ast = std::make_shared<HAstNode>();
         auto token = ParseNextNonLN();
-        token = Consume();
+        token = Peek();
 
         while(token.Type != Lexer::HTokenType::END_OF_FILE) {
             switch (token.Family) {
@@ -76,10 +76,10 @@ namespace Hyve::Parser {
                     }
 
                     token = ParseNextNonLN();
-                    token = Consume();
+                    token = Peek();
                     break;
                 }
-
+							 
                 default:
                     throw HParserError("Expecting a top level declaration");
             }
@@ -111,6 +111,8 @@ namespace Hyve::Parser {
             case Lexer::HTokenType::STRING:
             case Lexer::HTokenType::TRUE:
             case Lexer::HTokenType::FALSE:
+            case Lexer::HTokenType::NULL_LITERAL:
+            case Lexer::HTokenType::NUM:
                 return true;
             default:
                 return false;
@@ -209,6 +211,9 @@ namespace Hyve::Parser {
 
         // Ensure we have an init keyword
         token = Consume(Lexer::HTokenType::INIT, "Expected init keyword to start init block");
+        
+        _contextStack.push(HParserContext::Function);
+
         token = ParseNextNonLN();
 
         // We must check if the init block has any parameters. If it does, then we must parse them
@@ -219,6 +224,8 @@ namespace Hyve::Parser {
         token = ParseNextNonLN();
 
         node->Children.push_back(ParseFuncBody());
+
+        _contextStack.pop();
 
         return node;
     }
@@ -391,8 +398,13 @@ namespace Hyve::Parser {
     std::shared_ptr<HAstNode> HParser::ParseClassDecl() {
         auto node = std::make_shared<HAstClassNode>();
 
-        auto token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after class declaration");
+        // Ensure we have a class keyword
+        auto token = Consume(Lexer::HTokenType::CLASS, "Expected class keyword to start class declaration");
+
+        token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after class declaration");
         node->Name = token.Value;
+
+        _contextStack.push(HParserContext::Class);
 
         if(Peek().Type == Lexer::HTokenType::COLON) {
             node->Inheritance = ParseInheritanceList();
@@ -422,6 +434,8 @@ namespace Hyve::Parser {
         }
 
         token = Consume(Lexer::HTokenType::RCBRACKET, "Expected right curly bracket after class body");
+
+        _contextStack.pop();
 
         return node;
     }
