@@ -14,13 +14,16 @@ namespace Hyve::Typeck {
         /// <summary>
         /// Builds the type table from a given AST node.
         /// </summary>
-        /// <param name="code">The node to use</param>
-        /// <returns>The symbol table</returns>
-        [[nodiscard]] std::shared_ptr<HSymbol> BuildTypeTable(
+        /// <param name="ast">The node to use</param>
+        /// <param name="parent">The parent symbol to use</param>
+        std::shared_ptr<HSymbol> BuildTypeTable(
             const std::shared_ptr<Hyve::Parser::HAstNode>& ast,
-            const std::shared_ptr<HSymbol>& parent = nullptr
+            const std::shared_ptr<HSymbol>& parent
         );
 
-    private:
+        void InferTypes(
+            const std::vector<std::shared_ptr<HSymbol>>& symbols, 
+            const std::shared_ptr<Parser::HAstNode>& ast
+        );
     };
 }

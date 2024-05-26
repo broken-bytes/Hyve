@@ -132,7 +132,7 @@ namespace Hyve::Parser {
 
         if(Peek().Type == Lexer::HTokenType::COLON) {
             token = Consume();
-            ast->Type = ParseType();
+            ast->TypeNode = ParseType();
         }
         // Check if we have an assignment
         if(Peek().Type == Lexer::HTokenType::ASSIGNMENT) {
@@ -206,7 +206,7 @@ namespace Hyve::Parser {
     }
 
     std::shared_ptr<HAstNode> HParser::ParseInitDecl() {
-        auto node = std::make_shared<HAstInitNode>();
+        auto node = std::make_shared<HAstInitDeclNode>();
         auto token = ParseNextNonLN();
 
         // Ensure we have an init keyword

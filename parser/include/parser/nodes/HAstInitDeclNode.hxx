@@ -7,16 +7,11 @@
 #include <vector>
 
 namespace Hyve::Parser {
-    struct HAstFuncDeclNode : public HAstNode {
-        std::string Name;
-        bool InferReturnType;
-        std::string ReturnType;
+    struct HAstInitDeclNode : HAstNode {
         std::vector<HAstParamater> Parameters;
 
-        HAstFuncDeclNode() {
+        HAstInitDeclNode() {
             Type = HAstNodeType::Func;
-            InferReturnType = true;
-            ReturnType = "";
             Parameters = std::vector<HAstParamater>();
         }
     };

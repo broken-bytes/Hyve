@@ -14,7 +14,7 @@ class Example1 {
 
 // Inheriting from a class
 class Example2: Example {
-    var prop: String = "Test"
+    var prop = "Test"
 
     init {
         prop = "Test" 

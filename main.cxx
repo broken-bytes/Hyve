@@ -109,17 +109,24 @@ int main(int argc, char** argv) {
     for(auto& file: sourceFiles) {
         auto tokens = lexer.Tokenize(LoadSourceFile(file), file);
         auto ast = parser.Parse(tokens);
-        asts.emplace_back(std::pair { file, ast });
+        asts.emplace_back(file, ast);
     }
 
     Hyve::Typeck::HTypeck typeck;
 
     std::vector<std::shared_ptr<Hyve::Typeck::HSymbol>> symbols = {};
 
-    for(auto& ast: asts) {
-		auto astSymbols = typeck.BuildTypeTable(ast.second);
+    for(const auto& [name, ast]: asts) {
+        // Create a symbol table for each AST
+        auto table = std::make_shared<Hyve::Typeck::HSymbol>();
+
+		auto astSymbols = typeck.BuildTypeTable(ast, table);
         symbols.emplace_back(astSymbols);
 	}
+
+    for (const auto& [name, ast] : asts) {
+        typeck.InferTypes(symbols, ast);
+    }
 
     return 0;
 }
