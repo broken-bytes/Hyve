@@ -12,5 +12,12 @@ namespace Hyve::Parser {
         bool InferReturnType;
         std::string ReturnType;
         std::vector<HAstParamater> Parameters;
+
+        HAstFuncDeclNode() {
+            Type = HAstNodeType::Func;
+            InferReturnType = true;
+            ReturnType = "";
+            Parameters = std::vector<HAstParamater>();
+        }
     };
 }

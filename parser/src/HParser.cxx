@@ -369,10 +369,10 @@ namespace Hyve::Parser {
         // We expect an identifier -> Regular type
         if(token.Type == Lexer::HTokenType::IDENTIFIER) {
             auto type = std::make_shared<HAstTypeNode>();
-            type->Value = token.Value;
+            type->Name = token.Value;
 
             if(parent != nullptr) {
-                if(Peek().Type == Lexer::HTokenType::RSBRACKET && parent->Value == "Array") {
+                if(Peek().Type == Lexer::HTokenType::RSBRACKET && parent->Name == "Array") {
                     Consume();
                     std::shared_ptr<HAstArrayNode> array = dynamic_pointer_cast<HAstArrayNode>(parent);
                     array->Type = type;
@@ -387,7 +387,7 @@ namespace Hyve::Parser {
         // We expect an open bracket -> Array type
         else if(token.Type == Lexer::HTokenType::LSBRACKET) {
             auto array = std::make_shared<HAstArrayNode>();
-            array->Value = "Array";
+            array->Name = "Array";
             array->Type = ParseType(array);
             return array;
         } else {

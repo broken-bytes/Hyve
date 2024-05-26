@@ -7,8 +7,20 @@
 #include <vector>
 
 namespace Hyve::Parser {
-    struct HAstStructNode : HAstNode {
+    struct HAstStructNode : HAstTypeNode {
         std::string Name;
         std::shared_ptr<HAstInheritanceNode> Inheritance;
+
+        HAstStructNode() {
+            Name = "";
+            Inheritance = nullptr;
+            Type = HAstNodeType::NominalType;
+            Kind = HAstTypeKind::Struct;
+        }
+
+        HAstStructNode(std::string name, std::shared_ptr<HAstInheritanceNode> inheritance) : Name(name), Inheritance(inheritance) {
+            Type = HAstNodeType::NominalType;
+            Kind = HAstTypeKind::Struct;
+        }
     };
 }

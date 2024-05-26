@@ -2,6 +2,7 @@
 #include <cli/HCLIInvalidCommandException.hxx>
 #include <lexer/HLexer.hxx>
 #include <parser/HParser.hxx>
+#include <typeck/HTypeck.hxx>
 
 #include <cstdio>
 #include <filesystem>
@@ -102,11 +103,23 @@ int main(int argc, char** argv) {
 
     cli.ExecuteCommands();
 
-    std::vector<std::shared_ptr<Hyve::Parser::HAstNode>> asts = {};
+    // Name of the file, AST
+    std::vector<std::pair<std::string, std::shared_ptr<Hyve::Parser::HAstNode>>> asts = {};
 
     for(auto& file: sourceFiles) {
         auto tokens = lexer.Tokenize(LoadSourceFile(file), file);
         auto ast = parser.Parse(tokens);
-        asts.push_back(ast);
+        asts.emplace_back(std::pair { file, ast });
     }
+
+    Hyve::Typeck::HTypeck typeck;
+
+    std::vector<std::shared_ptr<Hyve::Typeck::HSymbol>> symbols = {};
+
+    for(auto& ast: asts) {
+		auto astSymbols = typeck.BuildTypeTable(ast.second);
+        symbols.emplace_back(astSymbols);
+	}
+
+    return 0;
 }
