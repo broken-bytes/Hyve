@@ -1,6 +1,7 @@
 #pragma once
 
 #include "typeck/HSymbol.hxx"
+#include "typeck/symbols/HStructSymbol.hxx"
 #include <parser/HAstNode.hxx>
 
 #include <memory>
@@ -21,9 +22,16 @@ namespace Hyve::Typeck {
             const std::shared_ptr<HSymbol>& parent
         );
 
+        std::vector<std::shared_ptr<HSymbol>> MergeSymbols(
+			const std::vector<std::shared_ptr<HSymbol>>& symbolTables
+		);
+
         void InferTypes(
-            const std::vector<std::shared_ptr<HSymbol>>& symbols, 
-            const std::shared_ptr<Parser::HAstNode>& ast
+            const std::vector<std::shared_ptr<HSymbol>>& symbols,
+            std::shared_ptr<Parser::HAstNode>& nodes
         );
+
+    private:
+        std::shared_ptr<HSymbol> _builtins;
     };
 }

@@ -21,9 +21,16 @@ namespace Hyve::Lexer {
         CLASS, // actor
         PROTOCOL, // protocol
         PROTOTYPE, // prototype
+        MODULE, // module
         STRUCT, // struct
-        OPEN, // open
         SELF, // self
+
+        // Access levels
+        PUBLIC, // public
+        INTERNAL, // internal
+        PRIVATE, // private
+        FILEPRIVATE, // fileprivate
+        OPEN, // open
 
         // Variables
         VAR, // var

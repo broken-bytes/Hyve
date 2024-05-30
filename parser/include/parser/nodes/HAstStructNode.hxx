@@ -8,7 +8,6 @@
 
 namespace Hyve::Parser {
     struct HAstStructNode : HAstTypeNode {
-        std::string Name;
         std::shared_ptr<HAstInheritanceNode> Inheritance;
 
         HAstStructNode() {
@@ -18,7 +17,8 @@ namespace Hyve::Parser {
             Kind = HAstTypeKind::Struct;
         }
 
-        HAstStructNode(std::string name, std::shared_ptr<HAstInheritanceNode> inheritance) : Name(name), Inheritance(inheritance) {
+        HAstStructNode(std::string name, std::shared_ptr<HAstInheritanceNode> inheritance) : Inheritance(inheritance) {
+            Name = name;
             Type = HAstNodeType::NominalType;
             Kind = HAstTypeKind::Struct;
         }

@@ -1,0 +1,5 @@
+module App
+
+fn main() -> Int {
+    var user: User = User()
+}

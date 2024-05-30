@@ -5,6 +5,5 @@
 
 namespace Hyve::Typeck {
     class HFileSymbol : public HSymbol {
-        std::string Name;
     };
 }

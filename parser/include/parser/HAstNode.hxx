@@ -1,7 +1,6 @@
 #pragma once
 
 #include "HAstNodeType.hxx"
-
 #include <memory>
 #include <vector>
 

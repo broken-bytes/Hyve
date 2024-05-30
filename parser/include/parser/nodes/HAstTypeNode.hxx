@@ -1,7 +1,7 @@
 #pragma once
 
 #include "parser/HAstNode.hxx"
-#include "parser/nodes/HAstTypeNode.hxx"
+#include <core/HAccessLevel.hxx>
 #include <string>
 
 namespace Hyve::Parser {

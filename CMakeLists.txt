@@ -16,6 +16,7 @@ project(Hyve)
 
 set_property(GLOBAL PROPERTY CXX_STANDARD 23)
 
+add_subdirectory(core)
 add_subdirectory(cli)
 add_subdirectory(lexer)
 add_subdirectory(parser)
@@ -24,6 +25,7 @@ add_subdirectory(hir)
 
 add_executable(Hyve main.cxx)
 
+set_property(TARGET Core PROPERTY CXX_STANDARD 23)
 set_property(TARGET CLI PROPERTY CXX_STANDARD 23)
 set_property(TARGET Lexer PROPERTY CXX_STANDARD 23)
 set_property(TARGET Parser PROPERTY CXX_STANDARD 23)

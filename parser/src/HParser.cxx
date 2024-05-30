@@ -4,6 +4,8 @@
 #include "parser/nodes/HAstUnaryExpressionNode.hxx"
 #include "parser/nodes/HAstStatementNode.hxx"
 #include "parser/nodes/HAstReturnNode.hxx"
+#include "parser/nodes/HAstFileNode.hxx"
+#include "parser/nodes/HAstModuleDeclNode.hxx"
 #include "parser/nodes/HAstFuncCallNode.hxx"
 #include "parser/nodes/HAstFuncDeclNode.hxx"
 #include "parser/nodes/HAstTypeNode.hxx"
@@ -25,6 +27,7 @@
 #include "parser/nodes/HAstInitNode.hxx"
 #include <lexer/HToken.hxx>
 #include <lexer/HTokenType.hxx>
+#include <core/HAccessLevel.hxx>
 
 #include <sstream>
 
@@ -33,42 +36,63 @@ namespace Hyve::Parser {
 
     }
 
-    std::shared_ptr<HAstNode> HParser::Parse(std::vector<Lexer::HToken>& tokens) {
+    std::shared_ptr<HAstNode> HParser::Parse(std::string fileName, std::vector<Lexer::HToken>& tokens) {
         _tokens = tokens;
 
-        auto ast = std::make_shared<HAstNode>();
+        auto ast = std::make_shared<HAstFileNode>();
+        ast->Name = fileName;
+        ast->Type = HAstNodeType::File;
         auto token = ParseNextNonLN();
         token = Peek();
+
+        Core::HAccessLevel accessLevel = Core::HAccessLevel::Internal;
 
         while(token.Type != Lexer::HTokenType::END_OF_FILE) {
             switch (token.Family) {
                 case Lexer::HTokenFamily::KEYWORD: {
                     switch(token.Type) {
+                        case Lexer::HTokenType::PUBLIC:
+                            accessLevel = Core::HAccessLevel::Public;
+                            // Consume the access level token
+                            token = Consume();
+							break;
+                        case Lexer::HTokenType::PRIVATE:
+                            accessLevel = Core::HAccessLevel::Private;
+                            // Consume the access level token
+                            token = Consume();
+                        case Lexer::HTokenType::INTERNAL:
+                            accessLevel = Core::HAccessLevel::Internal;
+                            // Consume the access level token
+                            token = Consume();
+                        case Lexer::HTokenType::MODULE: {
+							ast->Children.push_back(ParseModuleDecl());
+							break;
+						}
                         case Lexer::HTokenType::PROTOTYPE: {
-                            ast->Children.push_back(ParsePrototypeDecl());
+                            ast->Children.push_back(ParsePrototypeDecl(accessLevel));
                             break;
                         }
                         case Lexer::HTokenType::PROTOCOL: {
-                            ast->Children.push_back(ParseProtocolDecl());
+                            ast->Children.push_back(ParseProtocolDecl(accessLevel));
                             break;
                         }
                         case Lexer::HTokenType::STRUCT: {
-                            ast->Children.push_back(ParseStructDecl());
+                            ast->Children.push_back(ParseStructDecl(accessLevel));
                             break;
                         }
                         case Lexer::HTokenType::CLASS: {
-                            ast->Children.push_back(ParseClassDecl());
+                            ast->Children.push_back(ParseClassDecl(accessLevel));
                             break;
                         }
                         case Lexer::HTokenType::FUNC: {
-                            ast->Children.push_back(ParseFuncDecl());
+                            ast->Children.push_back(ParseFuncDecl(accessLevel));
                             break;
                         }
                         case Lexer::HTokenType::VAR:
-                            ast->Children.push_back(ParseVarDecl(true));
+                            ast->Children.push_back(ParseVarDecl(accessLevel, true));
                             break;
                         case Lexer::HTokenType::LET: {
-                            ast->Children.push_back(ParseVarDecl(false));
+                            ast->Children.push_back(ParseVarDecl(accessLevel, false));
                             break;
                         }
                         default:
@@ -119,10 +143,9 @@ namespace Hyve::Parser {
         }
     }
 
-    std::shared_ptr<HAstVarDeclNode> HParser::ParseVarDecl(bool isMutable) {
+    std::shared_ptr<HAstVarDeclNode> HParser::ParseVarDecl(Core::HAccessLevel accessLevel, bool isMutable) {
         auto ast = std::make_shared<HAstVarDeclNode>();
         ast->IsMutable = isMutable;
-
 
         // Ensure we have a var keyword. Let will be introduced later
         auto token = Consume(Lexer::HTokenType::VAR, "Expected var keyword to start variable declaration");
@@ -170,7 +193,7 @@ namespace Hyve::Parser {
         return ast;
     }
 
-    std::shared_ptr<HAstNode> HParser::ParseFuncDecl() {
+    std::shared_ptr<HAstNode> HParser::ParseFuncDecl(Core::HAccessLevel accessLevel) {
         // Func Root
         auto ast = std::make_shared<HAstFuncDeclNode>();
         ast->Children = {};
@@ -252,7 +275,7 @@ namespace Hyve::Parser {
                 if(token.Type == Lexer::HTokenType::RETURN) {
                     ast->Children.push_back(ParseReturnStatement());
                 } else if(token.Type == Lexer::HTokenType::VAR || token.Type == Lexer::HTokenType::LET) {
-                    ast->Children.push_back(ParseVarDecl(token.Type == Lexer::HTokenType::VAR));
+                    ast->Children.push_back(ParseVarDecl(Core::HAccessLevel::Internal, token.Type == Lexer::HTokenType::VAR));
                 } else if(token.Type == Lexer::HTokenType::SELF) {
                     // We need to check if we have an expression or a statement
                     if(
@@ -262,11 +285,11 @@ namespace Hyve::Parser {
                         || tokens[1].Type == Lexer::HTokenType::MULTIPLY_ASSIGN 
                         || tokens[1].Type == Lexer::HTokenType::DIVIDE_ASSIGN
                     ) {
-                        ast->Children.push_back(ParseStatement());
+                        ast->Children.push_back(ParseStatement(Core::HAccessLevel::Internal));
                     } else if(tokens[1].Type == Lexer::HTokenType::DOT) {
                         ParseExpression();
                     } else {
-                        ast->Children.push_back(ParseStatement());
+                        ast->Children.push_back(ParseStatement(Core::HAccessLevel::Internal));
                     }
                     ast->Children.push_back(ParseExpression());
                 } else {
@@ -395,7 +418,7 @@ namespace Hyve::Parser {
         }
      }
 
-    std::shared_ptr<HAstNode> HParser::ParseClassDecl() {
+    std::shared_ptr<HAstNode> HParser::ParseClassDecl(Core::HAccessLevel accessLevel) {
         auto node = std::make_shared<HAstClassNode>();
 
         // Ensure we have a class keyword
@@ -415,15 +438,26 @@ namespace Hyve::Parser {
         auto body = std::make_shared<HAstClassBodyNode>();
         node->Children.push_back(body);
 
+        Core::HAccessLevel currentAccessLevel = Core::HAccessLevel::Internal;
+
         token = ParseNextNonLN();
 
         while(token.Type != Lexer::HTokenType::RCBRACKET) {
-            if(token.Type == Lexer::HTokenType::END_OF_FILE) {
+            if (token.Type == Lexer::HTokenType::PUBLIC) {
+				currentAccessLevel = Core::HAccessLevel::Public;
+				token = Consume();
+			} else if(token.Type == Lexer::HTokenType::PRIVATE) {
+				currentAccessLevel = Core::HAccessLevel::Private;
+				token = Consume();
+            } else if (token.Type == Lexer::HTokenType::INTERNAL) {
+                currentAccessLevel = Core::HAccessLevel::Internal;
+                token = Consume();
+            } else if(token.Type == Lexer::HTokenType::END_OF_FILE) {
                 throw HParserError("Unexpected end of file in class body");
             } else if(token.Type == Lexer::HTokenType::VAR || token.Type == Lexer::HTokenType::LET) {
-                body->Children.push_back(ParseVarDecl(token.Type == Lexer::HTokenType::VAR));
+                body->Children.push_back(ParseVarDecl(currentAccessLevel, token.Type == Lexer::HTokenType::VAR));
             } else if(token.Type == Lexer::HTokenType::FUNC) {
-                body->Children.push_back(ParseFuncDecl());
+                body->Children.push_back(ParseFuncDecl(currentAccessLevel));
             } else if (token.Type == Lexer::HTokenType::INIT) {
                 body->Children.push_back(ParseInitDecl());
             } else {
@@ -505,7 +539,7 @@ namespace Hyve::Parser {
             auto binaryNode = std::dynamic_pointer_cast<HAstBinaryExpressionNode>(node);
             binaryNode->LHS = node;
             binaryNode->RHS = rhs;
-            binaryNode->Operator = HAstBinaryOperator(op);
+            binaryNode->Operator = HAstBinaryOperator { op };
         }
 
         return node;
@@ -521,7 +555,7 @@ namespace Hyve::Parser {
                 // Handle identifiers (variables, function calls, etc.)
                 if(Peek(2)[1].Type == Lexer::HTokenType::DOT) {
                     node = ParseMemberAccess();
-                } else if(Peek().Type == Lexer::HTokenType::LBRACKET) {
+                } else if(Peek(2)[1].Type == Lexer::HTokenType::LBRACKET) {
                     node = ParseFuncCall();
                 } else {
                     node = ParsePropAccess();
@@ -598,7 +632,7 @@ namespace Hyve::Parser {
         return exp;
     }
 
-    std::shared_ptr<HAstStatementNode> HParser::ParseStatement() {
+    std::shared_ptr<HAstStatementNode> HParser::ParseStatement(Core::HAccessLevel accessLevel) {
         auto ast = std::make_shared<HAstStatementNode>();
 
         auto token = Consume();
@@ -609,10 +643,10 @@ namespace Hyve::Parser {
                 break;
             }
             case Lexer::HTokenType::VAR:
-                ast->Children.push_back(ParseVarDecl(true));
+                ast->Children.push_back(ParseVarDecl(accessLevel, true));
                 break;
             case Lexer::HTokenType::LET: {
-                ast->Children.push_back(ParseVarDecl(false));
+                ast->Children.push_back(ParseVarDecl(accessLevel, false));
                 break;
             }
             default:
@@ -697,10 +731,12 @@ namespace Hyve::Parser {
         }
     }
 
-    std::shared_ptr<HAstNode> HParser::ParseStructDecl() {
+    std::shared_ptr<HAstNode> HParser::ParseStructDecl(Core::HAccessLevel accessLevel) {
         auto node = std::make_shared<HAstStructNode>();
 
-        auto token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after struct declaration");
+        auto token = Consume(Lexer::HTokenType::STRUCT, "Expected struct keyword to start struct declaration");
+            
+        token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after struct declaration");
         node->Name = token.Value;
 
         if(Peek().Type == Lexer::HTokenType::COLON) {
@@ -713,15 +749,28 @@ namespace Hyve::Parser {
         node->Children.push_back(body);
 
         token = ParseNextNonLN();
-        token = Consume();
+        token = ParseNextNonLN();
+
+        Core::HAccessLevel currentAccessLevel = Core::HAccessLevel::Internal;
 
         while(token.Type != Lexer::HTokenType::RCBRACKET) {
-            if(token.Type == Lexer::HTokenType::END_OF_FILE) {
+            if (token.Type == Lexer::HTokenType::PUBLIC) {
+                currentAccessLevel = Core::HAccessLevel::Public;
+                token = Consume();
+            }
+            else if (token.Type == Lexer::HTokenType::PRIVATE) {
+                currentAccessLevel = Core::HAccessLevel::Private;
+                token = Consume();
+            }
+            else if (token.Type == Lexer::HTokenType::INTERNAL) {
+                currentAccessLevel = Core::HAccessLevel::Internal;
+                token = Consume();
+            } else if(token.Type == Lexer::HTokenType::END_OF_FILE) {
                 throw HParserError("Unexpected end of file in struct body");
             } else if(token.Type == Lexer::HTokenType::VAR || token.Type == Lexer::HTokenType::LET) {
-                body->Children.push_back(ParseVarDecl(token.Type == Lexer::HTokenType::VAR));
+                body->Children.push_back(ParseVarDecl(currentAccessLevel, token.Type == Lexer::HTokenType::VAR));
             } else if(token.Type == Lexer::HTokenType::FUNC) {
-                body->Children.push_back(ParseFuncDecl());
+                body->Children.push_back(ParseFuncDecl(currentAccessLevel));
             } else if(token.Type == Lexer::HTokenType::INIT) {
                 body->Children.push_back(ParseInitDecl());
             } else {
@@ -729,15 +778,14 @@ namespace Hyve::Parser {
             }
 
             token = ParseNextNonLN();
-            token = Consume();
         }
 
-        token = Consume(Lexer::HTokenType::RCBRACKET, "Expected right curly bracket after class body");
+        token = Consume(Lexer::HTokenType::RCBRACKET, "Expected right curly bracket after struct body");
 
         return node;
     }
 
-    std::shared_ptr<HAstNode> HParser::ParseProtocolDecl() {
+    std::shared_ptr<HAstNode> HParser::ParseProtocolDecl(Core::HAccessLevel accessLevel) {
         auto node = std::make_shared<HAstProtocolNode>();
 
         auto token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after protocol declaration");
@@ -762,7 +810,7 @@ namespace Hyve::Parser {
             } else if(token.Type == Lexer::HTokenType::VAR || token.Type == Lexer::HTokenType::LET) {
                 throw HParserError("Unexpected variable declaration in protocol body");
             } else if(token.Type == Lexer::HTokenType::FUNC) {
-                body->Children.push_back(ParseFuncDecl());
+                body->Children.push_back(ParseFuncDecl(accessLevel));
             } else {
                 throw HParserError("Unexpected token in protocol body");
             }
@@ -775,7 +823,7 @@ namespace Hyve::Parser {
         return node;
     }
 
-    std::shared_ptr<HAstNode> HParser::ParsePrototypeDecl() {
+    std::shared_ptr<HAstNode> HParser::ParsePrototypeDecl(Core::HAccessLevel accessLevel) {
         auto node = std::make_shared<HAstPrototypeNode>();
 
         auto token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after prototype declaration");
@@ -789,13 +837,24 @@ namespace Hyve::Parser {
 
         auto body = std::make_shared<HAstPrototypeBodyNode>();
 
+        Core::HAccessLevel currentAccessLevel = Core::HAccessLevel::Internal;
+
         while(token.Type != Lexer::HTokenType::RCBRACKET) {
-            if(token.Type == Lexer::HTokenType::END_OF_FILE) {
+            if (token.Type == Lexer::HTokenType::PUBLIC) {
+                currentAccessLevel = Core::HAccessLevel::Public;
+                token = Consume();
+            } else if (token.Type == Lexer::HTokenType::PRIVATE) {
+                currentAccessLevel = Core::HAccessLevel::Private;
+                token = Consume();
+            } else if (token.Type == Lexer::HTokenType::INTERNAL) {
+                currentAccessLevel = Core::HAccessLevel::Internal;
+                token = Consume();
+            } else if(token.Type == Lexer::HTokenType::END_OF_FILE) {
                 throw HParserError("Unexpected end of file in prototype body");
             } else if(token.Type == Lexer::HTokenType::VAR || token.Type == Lexer::HTokenType::LET) {
-                body->Children.push_back(ParseVarDecl(token.Type == Lexer::HTokenType::VAR));
+                body->Children.push_back(ParseVarDecl(currentAccessLevel, token.Type == Lexer::HTokenType::VAR));
             } else if(token.Type == Lexer::HTokenType::FUNC) {
-                body->Children.push_back(ParseFuncDecl());
+                body->Children.push_back(ParseFuncDecl(currentAccessLevel));
             } else {
                 throw HParserError("Unexpected token in prototype body");
             }
@@ -890,6 +949,57 @@ namespace Hyve::Parser {
         }
 
         return memberAccess;
+    }
+
+    [[nodiscard]] std::shared_ptr<HAstModuleDeclNode> HParser::ParseModuleDecl() {
+        auto node = std::make_shared<HAstModuleDeclNode>();
+
+		auto token = Consume(Lexer::HTokenType::MODULE, "Expected module keyword to start module declaration");
+
+		token = Consume(Lexer::HTokenType::IDENTIFIER, "Expected identifier after module declaration");
+		node->Name = token.Value;
+
+        token = ParseNextNonLN();
+        token = Peek();
+
+        _contextStack.push(HParserContext::Module);
+
+        Core::HAccessLevel currentAccessLevel = Core::HAccessLevel::Internal;
+
+        while (token.Type != Lexer::HTokenType::END_OF_FILE) {
+            if (token.Type == Lexer::HTokenType::PUBLIC) {
+                currentAccessLevel = Core::HAccessLevel::Public;
+                token = Consume();
+            }
+            else if (token.Type == Lexer::HTokenType::PRIVATE) {
+                currentAccessLevel = Core::HAccessLevel::Private;
+                token = Consume();
+            }
+            else if (token.Type == Lexer::HTokenType::INTERNAL) {
+                currentAccessLevel = Core::HAccessLevel::Internal;
+                token = Consume();
+            } else if (token.Type == Lexer::HTokenType::CLASS) {
+                node->Children.push_back(ParseClassDecl(currentAccessLevel));
+            } 
+            else if(token.Type == Lexer::HTokenType::STRUCT) {
+                node->Children.push_back(ParseStructDecl(currentAccessLevel));
+            } else if (token.Type == Lexer::HTokenType::VAR || token.Type == Lexer::HTokenType::LET) {
+                node->Children.push_back(ParseVarDecl(currentAccessLevel, token.Type == Lexer::HTokenType::VAR));
+            }
+            else if (token.Type == Lexer::HTokenType::FUNC) {
+                node->Children.push_back(ParseFuncDecl(currentAccessLevel));
+            }
+            else {
+                throw HParserError("Unexpected token in module");
+            }
+
+            token = ParseNextNonLN();
+            token = Peek();
+        }
+
+        _contextStack.pop();
+
+		return node;
     }
 
     std::shared_ptr<HAstExpressionNode> HParser::ParseLiteral() {

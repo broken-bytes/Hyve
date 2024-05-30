@@ -1,13 +1,14 @@
 #pragma once
 
 #include "parser/HAstNode.hxx"
+#include "parser/nodes/HAstWithAccessLevelNode.hxx"
 #include "parser/nodes/HAstTypeNode.hxx"
 #include "parser/nodes/HAstExpressionNode.hxx"
 #include <memory>
 #include <string>
 
 namespace Hyve::Parser {
-    struct HAstVarDeclNode : HAstNode {
+    struct HAstVarDeclNode : public HAstWithAccessLevelNode {
         std::string Name;
         bool IsMutable;
         std::shared_ptr<HAstTypeNode> TypeNode;
@@ -18,6 +19,7 @@ namespace Hyve::Parser {
             IsMutable = false;
             Initializer = nullptr;
             Type = HAstNodeType::Decl;
+            TypeNode = nullptr;
         }
     };
 }

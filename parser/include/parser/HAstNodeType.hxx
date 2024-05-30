@@ -19,6 +19,7 @@ namespace Hyve::Parser {
         ReturnStatement,
         TryBlock,
         CatchBlock,
+        File,
         Module,
         Namespace,
         Annotation,
@@ -28,9 +29,10 @@ namespace Hyve::Parser {
 
     enum class HAstTypeKind {
         Class,
-        Struct,
-        Protocol,
         Enum,
-        Prototype
+        Protocol,
+        Prototype,
+        Struct,
+        Function,
     };
 }

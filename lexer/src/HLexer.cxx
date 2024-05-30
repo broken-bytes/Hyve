@@ -54,6 +54,10 @@ namespace Hyve::Lexer {
             return LET;
         }
 
+        if (source == Keywords::KEYWORD_MODULE) {
+            return MODULE;
+        }
+
         if(source == Keywords::KEYWORD_PROTOCOL) {
             return PROTOCOL;
         }
@@ -133,6 +137,22 @@ namespace Hyve::Lexer {
         if(source == Keywords::KEYWORD_INIT) {
             return INIT;
         }
+
+        if(source == Keywords::KEYWORD_PUBLIC) {
+			return PUBLIC;
+		}
+
+        if(source == Keywords::KEYWORD_INTERNAL) {
+			return INTERNAL;
+		}
+
+        if(source == Keywords::KEYWORD_PRIVATE) {
+            return PRIVATE;
+        }
+
+        if(source == Keywords::KEYWORD_OPEN) {
+			return OPEN;
+		}
 
         return INVALID;
     }

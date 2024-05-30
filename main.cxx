@@ -14,8 +14,6 @@
 constexpr const char* VERSION = "0.0.1a";
 
 Hyve::CLI::HCLI cli(VERSION);
-Hyve::Lexer::HLexer lexer;
-Hyve::Parser::HParser parser;
 std::vector<std::string> sourceFiles = {};
 
 void SetupCommands() {
@@ -104,27 +102,34 @@ int main(int argc, char** argv) {
     cli.ExecuteCommands();
 
     // Name of the file, AST
-    std::vector<std::pair<std::string, std::shared_ptr<Hyve::Parser::HAstNode>>> asts = {};
+    std::vector<std::shared_ptr<Hyve::Parser::HAstNode>> asts = {};
 
     for(auto& file: sourceFiles) {
+        Hyve::Lexer::HLexer lexer;
+        Hyve::Parser::HParser parser;
         auto tokens = lexer.Tokenize(LoadSourceFile(file), file);
-        auto ast = parser.Parse(tokens);
-        asts.emplace_back(file, ast);
+        auto ast = parser.Parse(file, tokens);
+        asts.emplace_back(ast);
     }
 
     Hyve::Typeck::HTypeck typeck;
 
+    // This is a per file symbol table. The root always is the module of the file
     std::vector<std::shared_ptr<Hyve::Typeck::HSymbol>> symbols = {};
 
-    for(const auto& [name, ast]: asts) {
+    for(const auto& ast: asts) {
         // Create a symbol table for each AST
-        auto table = std::make_shared<Hyve::Typeck::HSymbol>();
-
-		auto astSymbols = typeck.BuildTypeTable(ast, table);
+		auto astSymbols = typeck.BuildTypeTable(ast, nullptr);
         symbols.emplace_back(astSymbols);
 	}
 
-    for (const auto& [name, ast] : asts) {
+    // This is the global symbol table
+    // It contains all the symbols from all the files
+    // Again, each root is a module, but here a module contains all files that are part of the module
+    // We do this so each file symbo ltable can be constructed from another thread(Not yet)
+    auto symbolTable = typeck.MergeSymbols(symbols);
+
+    for (auto& ast : asts) {
         typeck.InferTypes(symbols, ast);
     }
 
