@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 
 constexpr const char* VERSION = "0.0.1a";
@@ -22,7 +23,7 @@ void SetupCommands() {
             .LongName = "--help",
             .Alias = "Help",
             .Help = "Displays help for Hyve",
-            .Handler = [](const std::string& data) { }
+            .Handler = [](const std::string_view data) { }
     };
 
     auto compile = Hyve::CLI::HCLICommand {

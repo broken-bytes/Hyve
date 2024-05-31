@@ -44,5 +44,6 @@ namespace Hyve::Parser {
     struct HAstExpressionNode : HAstNode {
         ~HAstExpressionNode() override = default;
         ExpressionType ExpressionType;
+        std::shared_ptr<HAstTypeNode> ReturnType;
     };
 }

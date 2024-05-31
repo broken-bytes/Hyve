@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lexer/HTokenType.hxx"
+#include <cstdint>
 #include <string>
 
 namespace Hyve::Lexer {

@@ -4,6 +4,7 @@
 #include "parser/nodes/HAstWithAccessLevelNode.hxx"
 #include "parser/nodes/HAstTypeNode.hxx"
 #include "parser/nodes/HAstExpressionNode.hxx"
+#include "parser/nodes/HAstStatementNode.hxx"
 #include <memory>
 #include <string>
 

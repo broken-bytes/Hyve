@@ -9,7 +9,7 @@ namespace Hyve::Parser {
     struct HAstReturnNode : HAstStatementNode {
 
         HAstReturnNode() {
-            Type = StatementType::Return;
+            StatementType = StatementType::Return;
         }
     };
 }

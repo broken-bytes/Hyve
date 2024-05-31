@@ -5,6 +5,7 @@
 
 namespace Hyve::Parser {
     enum class StatementType {
+        Import,
         VariableDeclaration,
         VariableAssignment,
         Return,
@@ -16,6 +17,6 @@ namespace Hyve::Parser {
     };
 
     struct HAstStatementNode : HAstNode {
-        StatementType Type;
+        StatementType StatementType;
     };
 }

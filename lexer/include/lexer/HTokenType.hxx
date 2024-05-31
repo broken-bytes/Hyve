@@ -24,6 +24,7 @@ namespace Hyve::Lexer {
         MODULE, // module
         STRUCT, // struct
         SELF, // self
+        ENUM, // enum
 
         // Access levels
         PUBLIC, // public

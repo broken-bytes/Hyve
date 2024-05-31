@@ -2,6 +2,7 @@
 
 namespace Hyve::Parser {
     enum class HAstNodeType {
+        Assignment,
         Expression,
         Statement,
         NominalType,
