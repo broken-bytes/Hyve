@@ -28,51 +28,47 @@ namespace Hyve::Parser {
 		_structParser(structParser),
 		_varParser(varParser) { }
 
-	std::shared_ptr<HAstNode> HModuleParser::Parse(
-		std::string_view fileName,
-		std::vector<Lexer::HToken>& tokens
-	) {
+	std::shared_ptr<HAstNode> HModuleParser::Parse(Lexer::HTokenStream& stream) {
 		using enum Lexer::HTokenType;
 		using enum Core::HCompilerError::ErrorCode;
 
 		auto moduleNode = std::make_shared<HAstModuleDeclNode>();
 
-		auto token = Consume(MODULE);
+		auto token = stream.Consume(MODULE);
 
+		token = stream.Consume(IDENTIFIER);
 		moduleNode->Name = token.Value;
 
-		token = ParseNextNonLN();
-		token = Peek();
+		token = stream.PeekUntilNonLineBreak();
 
 		while (token.Type != END_OF_FILE) {
-			if (IsClass()) {
-				moduleNode->Children.push_back(_classParser->Parse(fileName, tokens));
-			} else if (IsFunc()) {
-				moduleNode->Children.push_back(_funcParser->Parse(fileName, tokens));
-			} else if(IsEnum()) {
-				moduleNode->Children.push_back(_enumParser->Parse(fileName, tokens));
-			} else if (IsProtocol()) {
-				moduleNode->Children.push_back(_protocolParser->Parse(fileName, tokens));
-			} else if(IsPrototype()) {
-				moduleNode->Children.push_back(_prototypeParser->Parse(fileName, tokens));
-			} else if (IsStruct()) {
-				moduleNode->Children.push_back(_structParser->Parse(fileName, tokens));
+			if (IsClass(stream)) {
+				moduleNode->Children.push_back(_classParser->Parse(stream));
+			} else if (IsFunc(stream)) {
+				moduleNode->Children.push_back(_funcParser->Parse(stream));
+			} else if(IsEnum(stream)) {
+				moduleNode->Children.push_back(_enumParser->Parse(stream));
+			} else if (IsProtocol(stream)) {
+				moduleNode->Children.push_back(_protocolParser->Parse(stream));
+			} else if(IsPrototype(stream)) {
+				moduleNode->Children.push_back(_prototypeParser->Parse(stream));
+			} else if (IsStruct(stream)) {
+				moduleNode->Children.push_back(_structParser->Parse(stream));
 			} else {
-				HandleErrorCase();
+				HandleErrorCase(stream);
 			}
-			token = ParseNextNonLN();
-			token = Peek();
+			token = stream.PeekUntilNonLineBreak();
 		}
 
 		return moduleNode;
 	}
 
-	void HModuleParser::HandleErrorCase() {
+	void HModuleParser::HandleErrorCase(Lexer::HTokenStream& stream) {
 		using enum Lexer::HTokenType;
 		using enum Core::HCompilerError::ErrorCode;
 
 		// We have an invalid token. Check which one for better error messages
-		auto token = Peek();
+		auto token = stream.Consume();
 
 		if (token.Type == MODULE) {
 			_errorHandler->AddError(INVALID_MODULE_DECLARATION, token.FileName, token.Line);

@@ -3,6 +3,7 @@
 #include "parser/IHParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
 #include "parser/parsers/HPropertyParser.hxx"
+#include <lexer/HTokenStream.hxx>
 
 namespace Hyve::Parser {
 	class HClassParser : public IHParser {
@@ -10,10 +11,7 @@ namespace Hyve::Parser {
 		HClassParser() = default;
 		~HClassParser() final = default;
 
-		virtual std::shared_ptr<HAstNode> Parse(
-			std::string_view fileName,
-			std::vector<Lexer::HToken>& tokens
-		) override;
+		virtual std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 		private:
 			// Different parsers per context

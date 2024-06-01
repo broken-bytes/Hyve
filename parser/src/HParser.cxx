@@ -39,42 +39,39 @@ namespace Hyve::Parser {
     ) : _errorHandler(errorHandler), _moduleParser(moduleParser) {
 	}
 
-    std::shared_ptr<HAstNode> HParser::Parse(
-        std::string_view fileName, 
-        std::vector<Lexer::HToken>& tokens
-    ) {
-        SetTokens(tokens);
+    std::shared_ptr<HAstNode> HParser::Parse(Lexer::HTokenStream& stream) {
+        auto token = stream.Peek();
 
         auto ast = std::make_shared<HAstFileNode>();
-        ast->Name = fileName;
+        ast->Name = token.FileName;
         ast->Type = HAstNodeType::File;
-        auto token = ParseNextNonLN();
-        token = Peek();
+        
+        token = stream.PeekUntilNonLineBreak();
 
         // A file may start with imports, so parse them first
         while (token.Type == Lexer::HTokenType::IMPORT) {
-            ast->Children.push_back(ParseImport());
+            ast->Children.push_back(ParseImport(stream));
 		}
 
         // Every file should start with a module declaration(or after the imports),
         // so we use the module parser
-        ast->Children.push_back(_moduleParser->Parse(fileName, tokens));
+        ast->Children.push_back(_moduleParser->Parse(stream));
 
         return ast;
     }
 
-    std::shared_ptr<HAstImportNode> HParser::ParseImport() {
+    std::shared_ptr<HAstImportNode> HParser::ParseImport(Lexer::HTokenStream& stream) const {
         using enum Lexer::HTokenType;
         using enum Core::HCompilerError::ErrorCode;
         auto importNode = std::make_shared<HAstImportNode>();
 
-        auto token = Consume(IMPORT);
+        auto token = stream.Consume(IMPORT);
 		
         if (token.Type != IMPORT) {
             throw Core::HCompilerError(UnexpectedToken, token.FileName, token.Line);
 		}
 
-		token = Consume(IDENTIFIER);
+		token = stream.Consume(IDENTIFIER);
 		
         if (token.Type != IDENTIFIER) {
             throw Core::HCompilerError(UnexpectedToken, token.FileName, token.Line);

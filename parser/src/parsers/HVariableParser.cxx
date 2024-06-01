@@ -1,10 +1,7 @@
 #include "parser/parsers/HVariableParser.hxx"
 
 namespace Hyve::Parser {
-	std::shared_ptr<HAstNode> HVariableParser::Parse(
-		std::string_view,
-		std::vector<Lexer::HToken>& tokens
-	) {
+	std::shared_ptr<HAstNode> HVariableParser::Parse(Lexer::HTokenStream& stream) {
 		return nullptr;
 	}
 }

@@ -1,10 +1,7 @@
 #include "parser/parsers/HProtocolParser.hxx"
 
 namespace Hyve::Parser {
-	std::shared_ptr<HAstNode> HProtocolParser::Parse(
-		std::string_view,
-		std::vector<Lexer::HToken>& tokens
-	) {
+	std::shared_ptr<HAstNode> HProtocolParser::Parse(Lexer::HTokenStream& stream) {
 		return nullptr;
 	}
 }

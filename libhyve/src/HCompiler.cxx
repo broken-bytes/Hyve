@@ -16,7 +16,7 @@ namespace Hyve {
         for(const auto& file : files) {
 			auto source = LoadSourceFile(file);
 			auto tokens = _lexer->Tokenize(source, file);
-			auto ast = _parser->Parse(file, tokens);
+			auto ast = _parser->Parse(tokens);
             asts.push_back(ast);
             auto symbolTable = _typeck->BuildTypeTable(ast, nullptr);
             symbols.push_back(symbolTable);

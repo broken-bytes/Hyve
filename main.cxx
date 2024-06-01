@@ -24,7 +24,6 @@ int SetupCli(Hyve::CLI::HCLI& cli, const std::vector<std::string>& arguments) {
         ss << cmdError.Command().c_str();
         cli.Write(Hyve::CLI::CLIColor::RED, ss.str());
         throw std::runtime_error(ss.str());
-        return 1;
     } catch(std::exception& error) {
         std::stringstream ss;
         ss << "Failed running Hyve: Unknown Error\n";

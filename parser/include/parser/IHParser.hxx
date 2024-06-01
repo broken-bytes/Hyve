@@ -6,6 +6,7 @@
 #include "parser/nodes/HAstLiteralNode.hxx"
 #include "parser/nodes/HAstTypeNode.hxx"
 #include <lexer/HToken.hxx>
+#include <lexer/HTokenStream.hxx>
 #include <memory>
 #include <string>
 
@@ -14,40 +15,35 @@ namespace Hyve::Parser {
 	public:
 		IHParser() = default;
 		virtual ~IHParser() = 0;
-		[[nodiscard]] virtual std::shared_ptr<HAstNode> Parse(
-			std::string_view fileName,
-			std::vector<Lexer::HToken>& tokens
-		) = 0;
+		[[nodiscard]] virtual std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) = 0;
 
 	protected:
-		void SetFile(std::string_view file);
-		void SetTokens(const std::vector<Lexer::HToken>& tokens);
-		[[nodiscard]] bool CanStartStatement();
-		[[nodiscard]] bool CanStartExpression();
-		[[nodiscard]] bool IsExpression();
-		[[nodiscard]] bool IsStatement();
-		[[nodiscard]] bool IsClass();
-		[[nodiscard]] bool IsEnum();
-		[[nodiscard]] bool IsFunc();
-		[[nodiscard]] bool IsProperty();
-		[[nodiscard]] bool IsProtocol();
-		[[nodiscard]] bool IsPrototype();
-		[[nodiscard]] bool IsStruct();
-		[[nodiscard]] bool IsVariable();
+		/// <summary>
+		/// Consumes all tokens until a token with the specified type is found.
+		/// </summary>
+		/// <param name=""></param>
+		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenType);
+		[[nodiscard]] bool CanStartStatement(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool CanStartExpression(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsProperty(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsProtocol(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsStruct(Lexer::HTokenStream& stream);
+		[[nodiscard]] bool IsVariable(Lexer::HTokenStream& stream);
 		[[nodiscard]] std::int8_t GetOperatorPrecedence(HAstOperatorType type) const;
 		[[nodiscard]] bool IsStatementOperator(HAstOperatorType type) const;
 		[[nodiscard]] bool IsUnaryOperator(HAstOperatorType type) const;
-		[[nodiscard]] Lexer::HToken& Consume(Lexer::HTokenFamily expected);
-		[[nodiscard]] Lexer::HToken& Consume(Lexer::HTokenType expected);
-		[[maybe_unused]] Lexer::HToken& Consume();
-		[[nodiscard]] Lexer::HToken ParseNextNonLN();
-		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral();
+		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream);
 		[[nodiscard]] std::shared_ptr<HAstLiteralNode> ParseString(std::string_view literal) const;
 		[[nodiscard]] std::shared_ptr<HAstTypeNode> ParseType(
+			Lexer::HTokenStream& stream,
 			std::shared_ptr<HAstTypeNode> parent = nullptr
 		);
-		[[nodiscard]] Lexer::HToken Peek() const;
-		[[nodiscard]] std::vector<Lexer::HToken> Peek(uint8_t offset) const;
 		[[nodiscard]] HParserContext GetContext() const;
 		void SetContext(HParserContext ctx);
 

@@ -11,10 +11,7 @@ namespace Hyve::Parser {
 		HPrototypeParser() = default;
 		~HPrototypeParser() final = default;
 
-		virtual std::shared_ptr<HAstNode> Parse(
-			std::string_view fileName,
-			std::vector<Lexer::HToken>& tokens
-		) override;
+		virtual std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		// Different parsers per context

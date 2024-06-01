@@ -47,14 +47,22 @@ namespace Hyve::Typeck {
 			return Parser::HAstTypeKind::Class;
 		case HSymbolType::Enum:
 			return Parser::HAstTypeKind::Enum;
+        case HSymbolType::File:
+			return Parser::HAstTypeKind::File;
 		case HSymbolType::Function:
 			return Parser::HAstTypeKind::Function;
+        case HSymbolType::Module:
+            return Parser::HAstTypeKind::Module;
 		case HSymbolType::Protocol:
 			return Parser::HAstTypeKind::Protocol;
-		case HSymbolType::Struct:
-			return Parser::HAstTypeKind::Struct;
 		case HSymbolType::Prototype:
 			return Parser::HAstTypeKind::Prototype;
+        case HSymbolType::Struct:
+            return Parser::HAstTypeKind::Struct;
+        case HSymbolType::Variable:
+			return Parser::HAstTypeKind::Variable;
+        default:
+            throw std::runtime_error("Unknown symbol type");
 		}
 	}
 

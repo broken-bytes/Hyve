@@ -31,9 +31,12 @@ namespace Hyve::Parser {
     enum class HAstTypeKind {
         Class,
         Enum,
+        File,
+        Module,
         Protocol,
         Prototype,
         Struct,
         Function,
+        Variable,
     };
 }

@@ -4,7 +4,9 @@
 #include "lexer/HTokenKeywords.hxx"
 #include "lexer/HTokenSymbols.hxx"
 #include "lexer/HTokenType.hxx"
+#include <core/HCompilerError.hxx>
 #include <exception>
+#include <optional>
 #include <regex>
 #include <stdexcept>
 
@@ -12,45 +14,30 @@ namespace Hyve::Lexer {
     const std::string identifierStr = "[a-zA-Z_]+[a-zA-Z0-9_]*";
     const std::regex identifierRegex(identifierStr);
 
-    [[nodiscard]] HTokenType TryGetKeyword(const std::string& source) {
+    /// <summary>
+    /// Tries to get a structural keyword from the source(Class, Struct, etc.)
+    /// </summary>
+    /// <returns></returns>
+    [[nodiscard]] static std::optional<HTokenType> TryGetStructural(std::string_view source) {
         using enum Hyve::Lexer::HTokenType;
-        if(source == Keywords::KEYWORD_ACTOR) {
+
+        if (source == Keywords::KEYWORD_ACTOR) {
             return ACTOR;
         }
 
-        if(source == Keywords::KEYWORD_CAPTURED) {
-            return CAPTURED;
-        }
-
-        if(source == Keywords::KEYWORD_CATCH) {
-            return CATCH;
-        }
-
-        if(source == Keywords::KEYWORD_CLASS) {
+        if (source == Keywords::KEYWORD_CLASS) {
             return CLASS;
         }
 
-        if(source == Keywords::KEYWORD_DEFER) {
-            return DEFER;
-        }
-
-        if(source == Keywords::KEYWORD_DO) {
-            return DO;
-        }
-
-        if(source == Keywords::KEYWORD_ELSE) {
-            return ELSE;
-        }
-
-        if(source == Keywords::KEYWORD_FUNC) {
+        if (source == Keywords::KEYWORD_FUNC) {
             return FUNC;
         }
 
-        if(source == Keywords::KEYWORD_IF) {
-            return IF;
+        if (source == Keywords::KEYWORD_INIT) {
+            return INIT;
         }
 
-        if(source == Keywords::KEYWORD_LET) {
+        if (source == Keywords::KEYWORD_LET) {
             return LET;
         }
 
@@ -58,103 +45,153 @@ namespace Hyve::Lexer {
             return MODULE;
         }
 
-        if(source == Keywords::KEYWORD_PROTOCOL) {
+        if (source == Keywords::KEYWORD_PROTOCOL) {
             return PROTOCOL;
         }
 
-        if(source == Keywords::KEYWORD_PROTOTYPE) {
+        if (source == Keywords::KEYWORD_PROTOTYPE) {
             return PROTOTYPE;
         }
 
-        if(source == Keywords::KEYWORD_STRUCT) {
+        if (source == Keywords::KEYWORD_STRUCT) {
             return STRUCT;
         }
 
-        if(source == Keywords::KEYWORD_WHEN) {
-            return WHEN;
-        }
-
-        if(source == Keywords::KEYWORD_THROW) {
-            return THROW;
-        }
-
-        if(source == Keywords::KEYWORD_THROWS) {
-            return THROWS;
-        }
-
-        if(source == Keywords::KEYWORD_TRY) {
-            return TRY;
-        }
-
-        if(source == Keywords::KEYWORD_UNTIL) {
-            return UNTIL;
-        }
-
-        if(source == Keywords::KEYWORD_VAR) {
+        if (source == Keywords::KEYWORD_VAR) {
             return VAR;
         }
 
-        if(source == Keywords::KEYWORD_OPEN) {
+		return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetModifier(std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+
+        if (source == Keywords::KEYWORD_INTERNAL) {
+            return INTERNAL;
+        }
+
+        if (source == Keywords::KEYWORD_OPEN) {
             return OPEN;
         }
 
-        if(source == Keywords::KEYWORD_WHILE) {
-            return WHILE;
-        }
-
-        if(source == Keywords::KEYWORD_WITH) {
-            return WITH;
-        }
-
-        if(source == Keywords::KEYWORD_YIELD) {
-            return YIELD;
-        }
-
-        if(source == Keywords::KEYWORD_RETURN) {
-            return RETURN;
-        }
-
-        if(source == Keywords::KEYWORD_IMPORT) {
-            return IMPORT;
-        }
-
-        if(source == Keywords::KEYWORD_AS) {
-            return AS;
-        }
-
-        if(source == Keywords::KEYWORD_SELF) {
-            return SELF;
-        }
-
-        if(source == Keywords::KEYWORD_TASK) {
-            return TASK;
-        }
-
-        if(source == Keywords::KEYWORD_NULL) {
-            return NULL_LITERAL;
-        }
-
-        if(source == Keywords::KEYWORD_INIT) {
-            return INIT;
-        }
-
-        if(source == Keywords::KEYWORD_PUBLIC) {
-			return PUBLIC;
-		}
-
-        if(source == Keywords::KEYWORD_INTERNAL) {
-			return INTERNAL;
-		}
-
-        if(source == Keywords::KEYWORD_PRIVATE) {
+        if (source == Keywords::KEYWORD_PRIVATE) {
             return PRIVATE;
         }
 
-        if(source == Keywords::KEYWORD_OPEN) {
-			return OPEN;
+        if (source == Keywords::KEYWORD_PUBLIC) {
+            return PUBLIC;
+        }
+
+        return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetControlFlow(std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+
+        if (source == Keywords::KEYWORD_CATCH) {
+            return CATCH;
+        }
+
+        if (source == Keywords::KEYWORD_DEFER) {
+            return DEFER;
+        }
+
+        if (source == Keywords::KEYWORD_DO) {
+            return DO;
+        }
+
+        if (source == Keywords::KEYWORD_ELSE) {
+            return ELSE;
+        }
+
+        if (source == Keywords::KEYWORD_IF) {
+            return IF;
+        }
+
+        if (source == Keywords::KEYWORD_RETURN) {
+            return RETURN;
+        }
+
+        if (source == Keywords::KEYWORD_THROW) {
+            return THROW;
+        }
+
+        if (source == Keywords::KEYWORD_TRY) {
+            return TRY;
+        }
+
+        if (source == Keywords::KEYWORD_UNTIL) {
+            return UNTIL;
+        }
+
+        if (source == Keywords::KEYWORD_WHEN) {
+            return WHEN;
+        }
+
+        if (source == Keywords::KEYWORD_WHILE) {
+            return WHILE;
+        }
+
+        return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetOthers(std::string_view source) {
+		using enum Hyve::Lexer::HTokenType;
+
+        if (source == Keywords::KEYWORD_AS) {
+            return AS;
+        }
+
+        if (source == Keywords::KEYWORD_CAPTURED) {
+            return CAPTURED;
+        }
+
+        if (source == Keywords::KEYWORD_IMPORT) {
+            return IMPORT;
+        }
+
+        if (source == Keywords::KEYWORD_NULL) {
+            return NULL_LITERAL;
+        }
+
+        if (source == Keywords::KEYWORD_SELF) {
+            return SELF;
+        }
+
+        if (source == Keywords::KEYWORD_TASK) {
+            return TASK;
+        }
+
+        if (source == Keywords::KEYWORD_THROWS) {
+            return THROWS;
+        }
+
+        if (source == Keywords::KEYWORD_WITH) {
+            return WITH;
+        }
+
+        if (source == Keywords::KEYWORD_YIELD) {
+            return YIELD;
+        }
+
+		return std::nullopt;
+	}
+
+    [[nodiscard]] static HTokenType TryGetKeyword(std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+        
+        if(auto result = TryGetStructural(source); result.has_value()) {
+			return result.value();
+		} else if (result = TryGetModifier(source); result.has_value()) {
+            return result.value();
+        } else if (result = TryGetControlFlow(source); result.has_value()) {
+			return result.value();
+		} else if (result = TryGetOthers(source); result.has_value()) {
+			return result.value();
 		}
 
-        return INVALID;
+		return INVALID;
     }
 
     [[nodiscard]] HTokenType TryGetIdentifier(const std::string_view source) {
@@ -172,145 +209,188 @@ namespace Hyve::Lexer {
         return HTokenType::INVALID;
     }
 
-
-    [[nodiscard]] HTokenType TryGetOperator(const std::string_view source) {
+    [[nodiscard]] std::optional<HTokenType> static TryGetCompoundOperator(const std::string_view source) {
         using enum Hyve::Lexer::HTokenType;
-        if(source == Symbols::SYMBOL_ASSIGN) {
+
+        if (source == Symbols::SYMBOL_ASSIGN) {
             return ASSIGNMENT;
         }
 
-        if(source == Symbols::SYMBOL_PLUS) {
-            return PLUS;
-        }
-
-        if(source == Symbols::SYMBOL_MINUS) {
-            return MINUS;
-        }
-
-        if(source == Symbols::SYMBOL_MULTIPLY) {
-            return MULTIPLY;
-        }
-
-        if(source == Symbols::SYMBOL_DIVIDE) {
-            return DIVIDE;
-        }
-
-        if(source == Symbols::SYMBOL_MODULO) {
-            return MODULO;
-        }
-
-        if(source == Symbols::SYMBOL_EQUAL) {
-            return EQUAL;
-        }
-
-        if(source == Symbols::SYMBOL_NOT_EQUAL) {
-            return NOT_EQUAl;
-        }
-
-        if(source == Symbols::SYMBOL_GREATER_THAN) {
-            return GREATER;
-        }
-
-        if(source == Symbols::SYMBOL_LESS_THAN) {
-            return LESS;
-        }
-
-        if(source == Symbols::SYMBOL_GREATER_THAN_OR_EQUAL) {
-            return GREATER_EQUAL;
-        }
-
-        if(source == Symbols::SYMBOL_LESS_THAN_OR_EQUAL) {
-            return LESS_EQUAL;
-        }
-
-        if(source == Symbols::SYMBOL_AND) {
-            return AND;
-        }
-
-        if(source == Symbols::SYMBOL_OR) {
-            return OR;
-        }
-
-        if(source == Symbols::SYMBOL_NOT) {
-            return NOT;
-        }
-
-        if(source == Symbols::SYMBOL_BITWISE_AND) {
-            return BIT_AND;
-        }
-
-        if(source == Symbols::SYMBOL_BITWISE_OR) {
-            return BIT_OR;
-        }
-
-        if(source == Symbols::SYMBOL_BITWISE_XOR) {
-            return BIT_OR;
-        }
-
-        if(source == Symbols::SYMBOL_BITWISE_NOT) {
-            return BIT_INVERSE;
-        }
-
-        if(source == Symbols::SYMBOL_BITWISE_LEFT_SHIFT) {
-            return BIT_LSHIFT;
-        }
-
-        if(source == Symbols::SYMBOL_BITWISE_RIGHT_SHIFT) {
-            return BIT_RSHIFT;
-        }
-
-        if(source == Symbols::SYMBOL_PLUS_ASSIGN) {
-            return PLUS_ASSIGN;
-        }
-
-        if(source == Symbols::SYMBOL_MINUS_ASSIGN) {
-            return MINUS_ASSIGN;
-        }
-
-        if(source == Symbols::SYMBOL_MULTIPLY_ASSIGN) {
-            return MULTIPLY_ASSIGN;
-        }
-
-        if(source == Symbols::SYMBOL_DIVIDE_ASSIGN) {
+        if (source == Symbols::SYMBOL_DIVIDE_ASSIGN) {
             return DIVIDE_ASSIGN;
         }
 
-        if(source == Symbols::SYMBOL_MODULO_ASSIGN) {
+        if (source == Symbols::SYMBOL_MINUS_ASSIGN) {
+            return MINUS_ASSIGN;
+        }
+
+        if (source == Symbols::SYMBOL_MODULO_ASSIGN) {
             return MOD_ASSIGN;
         }
 
-        if(source == Symbols::SYMBOL_ARROW) {
+        if (source == Symbols::SYMBOL_MULTIPLY_ASSIGN) {
+            return MULTIPLY_ASSIGN;
+        }
+
+        if (source == Symbols::SYMBOL_PLUS_ASSIGN) {
+            return PLUS_ASSIGN;
+        }
+
+        return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetBasicMathOperator(const std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+
+        if (source == Symbols::SYMBOL_PLUS) {
+            return PLUS;
+        }
+
+        if (source == Symbols::SYMBOL_MINUS) {
+            return MINUS;
+        }
+
+        if (source == Symbols::SYMBOL_MULTIPLY) {
+            return MULTIPLY;
+        }
+
+        if (source == Symbols::SYMBOL_DIVIDE) {
+            return DIVIDE;
+        }
+
+        if (source == Symbols::SYMBOL_MODULO) {
+            return MODULO;
+        }
+
+        return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetComparisonOperator(const std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+
+        if (source == Symbols::SYMBOL_EQUAL) {
+            return EQUAL;
+        }
+
+        if (source == Symbols::SYMBOL_NOT_EQUAL) {
+            return NOT_EQUAl;
+        }
+
+        if (source == Symbols::SYMBOL_GREATER_THAN) {
+            return GREATER;
+        }
+
+        if (source == Symbols::SYMBOL_LESS_THAN) {
+            return LESS;
+        }
+
+        if (source == Symbols::SYMBOL_GREATER_THAN_OR_EQUAL) {
+            return GREATER_EQUAL;
+        }
+
+        if (source == Symbols::SYMBOL_LESS_THAN_OR_EQUAL) {
+            return LESS_EQUAL;
+        }
+
+        return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetLogicalOperator(const std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+
+        if (source == Symbols::SYMBOL_AND) {
+            return AND;
+        }
+
+        if (source == Symbols::SYMBOL_OR) {
+            return OR;
+        }
+
+        if (source == Symbols::SYMBOL_NOT) {
+            return NOT;
+        }
+
+        if (source == Symbols::SYMBOL_BITWISE_AND) {
+            return BIT_AND;
+        }
+
+        if (source == Symbols::SYMBOL_BITWISE_OR) {
+            return BIT_OR;
+        }
+
+        if (source == Symbols::SYMBOL_BITWISE_XOR) {
+            return BIT_OR;
+        }
+
+        if (source == Symbols::SYMBOL_BITWISE_NOT) {
+            return BIT_INVERSE;
+        }
+
+        if (source == Symbols::SYMBOL_BITWISE_LEFT_SHIFT) {
+            return BIT_LSHIFT;
+        }
+
+        if (source == Symbols::SYMBOL_BITWISE_RIGHT_SHIFT) {
+            return BIT_RSHIFT;
+        }
+
+        return std::nullopt;
+    }
+
+    [[nodiscard]] static std::optional<HTokenType> TryGetSpecialOperator(const std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+
+        if (source == Symbols::SYMBOL_ARROW) {
             return ARROW;
         }
 
-        if(source == Symbols::SYMBOL_QUESTION_MARK) {
+        if (source == Symbols::SYMBOL_QUESTION_MARK) {
             return OPTIONAL;
         }
 
-        if(source == Symbols::EXCLAMATION_MARK) {
+        if (source == Symbols::EXCLAMATION_MARK) {
             return FORCE_OPTIONAL;
         }
 
-        if(source == Symbols::SYMBOL_AT) {
+        if (source == Symbols::SYMBOL_AT) {
             return ANNOTATION;
         }
 
-        if(source == Symbols::SYMBOL_DOLLAR) {
+        if (source == Symbols::SYMBOL_DOLLAR) {
             return BINDING;
         }
 
-        if(source == Symbols::SYMBOL_BACKTICK) {
+        if (source == Symbols::SYMBOL_BACKTICK) {
             return NAME_OVERRIDE;
         }
 
-        if(source == Symbols::SYMBOL_QUOTE) {
+        if (source == Symbols::SYMBOL_QUOTE) {
             return STRING;
         }
 
-        if(source == Symbols::SYMBOL_PIPE) {
+        if (source == Symbols::SYMBOL_PIPE) {
             return PIPE;
         }
 
+        return std::nullopt;
+    }
+
+
+    [[nodiscard]] HTokenType static TryGetOperator(const std::string_view source) {
+        using enum Hyve::Lexer::HTokenType;
+       
+        if(auto result = TryGetCompoundOperator(source); result.has_value()) {
+			return result.value();
+		} else if (result = TryGetBasicMathOperator(source); result.has_value()) {
+			return result.value();
+		} else if (result = TryGetComparisonOperator(source); result.has_value()) {
+            return result.value();
+        } else if (result = TryGetLogicalOperator(source); result.has_value()) {
+			return result.value();
+		} else if (result = TryGetSpecialOperator(source); result.has_value()) {
+            return result.value();
+        }
+       
         return INVALID;
     }
 
@@ -383,32 +463,39 @@ namespace Hyve::Lexer {
     }
 
     void HLexer::RemoveComment(
-        std::string& source, 
-        bool multiLine, 
-        uint64_t& currentLine, 
-        uint64_t& currentColumn
-    ) {
-        auto len = source.length();
+        std::string& source,
+        bool multiLine,
+        uint64_t& currentLine,  // Pass by reference to update the line
+        uint64_t& currentColumn // Pass by reference to update the column
+    ) const {
+        if (multiLine) {
+            auto endPos = source.find(Symbols::SYMBOL_MULTILINE_COMMENT_END);
+            if (endPos == std::string::npos) {
+                // Handle the case where the comment is not closed
+                return;
+            }
 
-        if(multiLine) {
-            for(int offset = 0; offset < source.length(); offset++) {
-                if(source.substr(offset, 2) == Symbols::SYMBOL_MULTILINE_COMMENT_END) {
-                    Erase(source, 2);
-                    return;
-                } else if(source[offset] == '\n') {
+            // Count the number of newlines within the comment
+            for (size_t i = 0; i < endPos; ++i) {
+                if (source[i] == '\n') {
                     currentLine++;
+                    currentColumn = 0; // Reset column at the start of a new line
+                }
+                else if (source[i] == '\r') {
+                    // Handle carriage returns if present in your source
                 }
             }
-        } else {
-            for(int offset = 0; offset < source.length(); offset++) {
-                if(NextIsLineBreak(source)) {
-					currentLine++;
-					return;
-                }
-                else {
-                    Erase(source, 1);
-                }
+
+            source.erase(0, endPos + 2);  // Erase up to and including the delimiter
+        }
+        else {
+            auto endPos = source.find_first_of("\r\n"); // Find the first line break
+            if (endPos != std::string::npos) {
+                currentLine++;
+                currentColumn = 0; // Reset column at the start of a new line
             }
+
+            source.erase(0, endPos);  // Erase up to the line break
         }
     }
 
@@ -432,18 +519,20 @@ namespace Hyve::Lexer {
             }
 
             // Go over the whole string until we hit a quote or EOF, which would result in an error
-            for(int x = 1; x < source.length(); x++) {
-                if(source[x] == Symbols::SYMBOL_QUOTE[0]) {
+            size_t x = 1;
+            while (x < source.length()) {
+                if (source[x] == Symbols::SYMBOL_QUOTE[0]) {
                     _state = LexerState::NONE;
                     next = source.substr(1, x);
-                    Erase(source, x + 1);
-                    auto result = std::tuple<std::string, uint64_t, uint64_t> {
-                            next, _currentColumnStart, _currentColumnStart + x
+                    auto result = std::tuple<std::string, uint64_t, uint64_t>{
+                        next, _currentColumnStart, _currentColumnStart + x
                     };
                     _currentColumnStart = _currentColumnStart + x + 1;
 
+                    source.erase(0, x + 1);
                     return result;
                 }
+                x++;
             }
 
             if(_state == LexerState::STRINGLITERAL) {
@@ -786,7 +875,7 @@ namespace Hyve::Lexer {
 
     HLexer::HLexer() = default;
 
-    std::vector<HToken> HLexer::Tokenize(std::string stream, const std::string& fileName) {
+    HTokenStream HLexer::Tokenize(std::string stream, const std::string& fileName) {
         std::vector<HToken> tokens = {};
 
         _currentLine = 1;
@@ -949,6 +1038,6 @@ namespace Hyve::Lexer {
                 tokens
         );
 
-        return tokens;
+        return HTokenStream(tokens);
     }
 }

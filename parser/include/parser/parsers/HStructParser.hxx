@@ -3,20 +3,19 @@
 #include "parser/IHParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
 #include "parser/parsers/HVariableParser.hxx"
+#include <core/HErrorHandler.hxx>
 #include <memory>
 
 namespace Hyve::Parser {
 	class HStructParser : public IHParser {
 	public:
-		HStructParser() = default;
+		explicit HStructParser(std::shared_ptr<Core::HErrorHandler> errorHandler);
 		~HStructParser() final = default;
 
-		virtual std::shared_ptr<HAstNode> Parse(
-			std::string_view fileName,
-			std::vector<Lexer::HToken>& tokens
-		) override;
+		std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
+		std::shared_ptr<Core::HErrorHandler> _errorHandler;
 		// Different parsers per context
 		std::shared_ptr<HFuncParser> _funcParser;
 		std::shared_ptr<HVariableParser> _varParser;

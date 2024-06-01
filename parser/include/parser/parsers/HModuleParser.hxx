@@ -27,10 +27,7 @@ namespace Hyve::Parser {
 		);
 		~HModuleParser() final = default;
 
-		std::shared_ptr<HAstNode> Parse(
-			std::string_view fileName,
-			std::vector<Lexer::HToken>& tokens
-		) override;
+		std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;
@@ -44,6 +41,6 @@ namespace Hyve::Parser {
 		std::shared_ptr<HStructParser> _structParser;
 		std::shared_ptr<HVariableParser> _varParser;
 
-		void HandleErrorCase();
+		void HandleErrorCase(Lexer::HTokenStream& stream);
 	};
 }

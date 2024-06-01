@@ -5,6 +5,7 @@
 #include "parser/parsers/HModuleParser.hxx"
 #include "parser/nodes/HAstImportNode.hxx"
 #include <lexer/HToken.hxx>
+#include <lexer/HTokenStream.hxx>
 #include <lexer/HTokenType.hxx>
 #include <core/HAccessLevel.hxx>
 #include <core/HErrorHandler.hxx>
@@ -22,15 +23,12 @@ namespace Hyve::Parser {
         );
         ~HParser() final = default;
 
-        std::shared_ptr<HAstNode> Parse(
-            std::string_view fileName, 
-            std::vector<Lexer::HToken>& tokens
-        ) override;
+        std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
         private:
             std::shared_ptr<Core::HErrorHandler> _errorHandler;
             // Different parsers for each context
             std::shared_ptr<HModuleParser> _moduleParser;
-            std::shared_ptr<HAstImportNode> ParseImport();
+            std::shared_ptr<HAstImportNode> ParseImport(Lexer::HTokenStream& stream) const;
     };
 }
