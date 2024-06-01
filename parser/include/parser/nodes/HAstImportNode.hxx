@@ -10,7 +10,7 @@ namespace Hyve::Parser {
         std::string Target;
 
         HAstImportNode() {
-            StatementType = ExpressionType::Import;
+            StatementType = StatementType::Import;
         }
     };
 }

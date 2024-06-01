@@ -14,6 +14,7 @@ namespace Hyve::Core {
             UnexpectedToken = 1000,
             UnexpectedEndOfFile = 1001,
             UnexpectedCharacter = 1002,
+			INVALID_MODULE_DECLARATION = 1003,
 
             // Type Errors (2xxx)
             TypeMismatch = 2000,

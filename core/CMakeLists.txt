@@ -7,6 +7,7 @@ SET(
     HEADERS
     include/core/HAccessLevel.hxx
     include/core/HCompilerError.hxx
+    include/core/HErrorHandler.hxx
 )
 
 add_library(Core STATIC ${SRC} ${HEADERS})

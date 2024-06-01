@@ -3,6 +3,14 @@ SET(
     src/HCLI.cxx
 )
 
-add_library(CLI STATIC ${SRC})
+SET(
+    HEADERS
+    include/cli/HCLI.hxx
+)
+
+add_library(CLI STATIC ${SRC} ${HEADERS})
 
 target_include_directories(CLI PUBLIC include)
+target_include_directories(CLI PUBLIC ${CMAKE_SOURCE_DIR}/libhyve/include)
+
+target_link_libraries(CLI PUBLIC libhyve)

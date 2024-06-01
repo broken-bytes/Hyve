@@ -773,20 +773,20 @@ namespace Hyve::Lexer {
             uint64_t columnStart,
             uint64_t columnEnd,
             std::vector<HToken>& queue) {
-        queue.push_back(HToken{
-                .Family = family,
-                .Type = type,
-                .Value = std::string(value),
-                .FileName = std::string(fileName),
-                .Line = line,
-                .ColumnStart = columnStart,
-                .ColumnEnd = columnEnd
-        });
+        queue.emplace_back(
+                family,
+                type,
+                std::string(value),
+                std::string(fileName),
+                line,
+                columnStart,
+                columnEnd
+        );
     }
 
     HLexer::HLexer() = default;
 
-    std::vector<HToken> HLexer::Tokenize(std::string stream, std::string& fileName) {
+    std::vector<HToken> HLexer::Tokenize(std::string stream, const std::string& fileName) {
         std::vector<HToken> tokens = {};
 
         _currentLine = 1;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "parser/IHParser.hxx"
+#include "parser/parsers/HVariableParser.hxx"
 
 namespace Hyve::Parser {
 	class HFuncParser : public IHParser {

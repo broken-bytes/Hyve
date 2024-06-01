@@ -7,6 +7,7 @@
 #include <lexer/HToken.hxx>
 #include <lexer/HTokenType.hxx>
 #include <core/HAccessLevel.hxx>
+#include <core/HErrorHandler.hxx>
 #include <queue>
 #include <string>
 #include <string_view>
@@ -15,18 +16,21 @@
 namespace Hyve::Parser {
     class HParser : public IHParser {
         public:
-        HParser() = default;
+        HParser(
+            const std::shared_ptr<Core::HErrorHandler>& errorHandler,
+            const std::shared_ptr<HModuleParser> moduleParser
+        );
         ~HParser() final = default;
 
-        std::shared_ptr<HAstNode> Parse(std::string_view fileName, std::vector<Lexer::HToken>& tokens) override;
+        std::shared_ptr<HAstNode> Parse(
+            std::string_view fileName, 
+            std::vector<Lexer::HToken>& tokens
+        ) override;
 
         private:
+            std::shared_ptr<Core::HErrorHandler> _errorHandler;
             // Different parsers for each context
             std::shared_ptr<HModuleParser> _moduleParser;
-            std::shared_ptr<HClassParser> _classParser;
-
             std::shared_ptr<HAstImportNode> ParseImport();
     };
-
-    std::unique_ptr<HParser> Create();
 }

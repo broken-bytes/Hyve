@@ -33,7 +33,16 @@
 #include <sstream>
 
 namespace Hyve::Parser {
-    std::shared_ptr<HAstNode> HParser::Parse(std::string_view fileName, std::vector<Lexer::HToken>& tokens) {
+    HParser::HParser(
+        const std::shared_ptr<Core::HErrorHandler>& errorHandler,
+        const std::shared_ptr<HModuleParser> moduleParser
+    ) : _errorHandler(errorHandler), _moduleParser(moduleParser) {
+	}
+
+    std::shared_ptr<HAstNode> HParser::Parse(
+        std::string_view fileName, 
+        std::vector<Lexer::HToken>& tokens
+    ) {
         SetTokens(tokens);
 
         auto ast = std::make_shared<HAstFileNode>();
@@ -47,7 +56,8 @@ namespace Hyve::Parser {
             ast->Children.push_back(ParseImport());
 		}
 
-        // Every file should start with a module declaration(or after the imports), so we use the module parser
+        // Every file should start with a module declaration(or after the imports),
+        // so we use the module parser
         ast->Children.push_back(_moduleParser->Parse(fileName, tokens));
 
         return ast;
@@ -58,13 +68,13 @@ namespace Hyve::Parser {
         using enum Core::HCompilerError::ErrorCode;
         auto importNode = std::make_shared<HAstImportNode>();
 
-        auto token = Consume(IMPORT, "Unexpected token");
+        auto token = Consume(IMPORT);
 		
         if (token.Type != IMPORT) {
             throw Core::HCompilerError(UnexpectedToken, token.FileName, token.Line);
 		}
 
-		token = Consume(IDENTIFIER, "Unexpected token");
+		token = Consume(IDENTIFIER);
 		
         if (token.Type != IDENTIFIER) {
             throw Core::HCompilerError(UnexpectedToken, token.FileName, token.Line);
@@ -73,9 +83,5 @@ namespace Hyve::Parser {
         importNode->Target = token.Value;
 		
         return importNode;
-    }
-
-    std::unique_ptr<HParser> Create() {
-		return std::make_unique<HParser>();
     }
 }

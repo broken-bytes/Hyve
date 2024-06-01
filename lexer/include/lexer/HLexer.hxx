@@ -19,7 +19,7 @@ namespace Hyve::Lexer {
     class HLexer {
         public:
         HLexer();
-        [[nodiscard]] std::vector<HToken> Tokenize(std::string stream, std::string& fileName);
+        [[nodiscard]] std::vector<HToken> Tokenize(std::string stream, const std::string& fileName);
 
     private:
         LexerState _state;

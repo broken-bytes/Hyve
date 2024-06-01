@@ -2,6 +2,7 @@
 
 #include "cli/HCLICommand.hxx"
 #include "cli/HCLICommandParameter.hxx"
+#include <libhyve/HCompiler.hxx>
 #include <cstdint>
 #include <vector>
 
@@ -16,19 +17,22 @@ namespace Hyve::CLI {
 
     class HCLI {
         public:
-        HCLI(std::string  version);
+        explicit HCLI(std::string  version);
+        void SetupCommands();
         [[nodiscard]] std::vector<HCLICommandParameter> CommandParameters() const;
         void ExecuteCommands() const;
         void ProcessCommandParameters(const std::vector<std::string>& arguments);
         void SetAvailableParameters(std::vector<HCLICommand> availableCommands);
-        void Write(CLIColor color, const std::string& message);
+        void Write(CLIColor color, const std::string& message) const;
 
         private:
         std::string _version;
         std::vector<HCLICommand> _availableCommands;
         std::vector<HCLICommandParameter> _providedCommands;
+        std::vector<std::string> _sourceFiles;
+        std::unique_ptr<Hyve::HCompiler> _compiler;
 
-        [[nodiscard]] bool CheckIfCommand(const std::string& str) const;
-        [[nodiscard]] HCLICommand GetCommand(const std::string& str) const;
+        [[nodiscard]] bool CheckIfCommand(std::string_view str) const;
+        [[nodiscard]] HCLICommand GetCommand(std::string_view str) const;
     };
 }
