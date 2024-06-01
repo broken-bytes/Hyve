@@ -1,4 +1,4 @@
-func main(args: [String]) -> Int {
+fn main(args: [String]) -> Int {
     var service: UserService = UserServiceImpl()
     var user = service.getUser(username: "John")
 

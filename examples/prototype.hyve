@@ -3,7 +3,7 @@ prototype Animal {
     /*
         Default Method is implemented, can be overriden
     */
-    func doNoise() {
+    fn doNoise() {
         var noise = ""
         noise = "Noise"
         var db = 23
@@ -12,11 +12,11 @@ prototype Animal {
         print(noise + db)
     }
 }
-    
+
 // Extending a prototype
 class Dog: Animal {
     // Override keyword is needed
-    override func doNoise() -> Void {
+    override fn doNoise() -> Void {
         print("Bark")
         // Calling the prototype method is done via `prototype` instead of `self`
         protoype.doNoise()
