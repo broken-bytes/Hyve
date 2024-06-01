@@ -26,6 +26,7 @@ namespace Hyve::Parser {
 		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenFamily family) const;
 		[[nodiscard]] bool CanStartStatement(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool CanStartExpression(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsAccessLevel(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream) const;
@@ -41,6 +42,7 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsUnaryOperator(HAstOperatorType type) const;
 		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::shared_ptr<HAstLiteralNode> ParseString(std::string_view literal) const;
+		[[nodiscard]] Core::HAccessLevel ParseAccessLevel(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::shared_ptr<HAstTypeNode> ParseType(
 			Lexer::HTokenStream& stream,
 			std::shared_ptr<HAstTypeNode> parent = nullptr

@@ -57,6 +57,14 @@ namespace Hyve::Parser {
 			}
 		}
 
+		if (stream.Peek().Type == RCBRACKET) {
+			stream.Consume(RCBRACKET);
+		}
+		else {
+			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
+			Panic(stream, KEYWORD);
+		}
+
 		return structNode;
 	}
 }

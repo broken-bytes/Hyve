@@ -2,6 +2,7 @@
 #include "parser/HParser.hxx"
 #include "parser/parsers/HClassParser.hxx"
 #include "parser/parsers/HEnumParser.hxx"
+#include "parser/parsers/HExpressionParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
 #include "parser/parsers/HInheritanceParser.hxx"
 #include "parser/parsers/HModuleParser.hxx"
@@ -59,6 +60,22 @@ namespace Hyve::Parser {
 			case FALSE:
 			case NULL_LITERAL:
 			case NUM:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	bool IHParser::IsAccessLevel(Lexer::HTokenStream& stream) const {
+		using enum Lexer::HTokenType;
+
+		auto token = stream.PeekUntilNonLineBreak();
+
+		switch (token.Type) {
+			case PUBLIC:
+			case PRIVATE:
+			case INTERNAL:
+			case FILEPRIVATE:
 				return true;
 			default:
 				return false;
@@ -404,7 +421,36 @@ namespace Hyve::Parser {
 		return ast;
 	}
 
-	std::shared_ptr<HAstTypeNode> IHParser::ParseType(Lexer::HTokenStream& stream, std::shared_ptr<HAstTypeNode> parent) {
+	Core::HAccessLevel IHParser::IHParser::ParseAccessLevel(Lexer::HTokenStream& stream) const {
+		using enum Lexer::HTokenType;
+		using enum Core::HAccessLevel;
+
+		// Safeguard to we indeed have an access level
+		if(!IsAccessLevel(stream)) {
+			return Internal;
+		}
+
+		auto token = stream.Consume();
+
+		switch (token.Type) {
+			case PUBLIC:
+				return Public;
+			case PRIVATE:
+				return Private;
+			case INTERNAL:
+				return Internal;
+			case FILEPRIVATE:
+				return Fileprivate;
+			default:
+				// This should never happen
+				return Internal;
+		}
+	}
+
+	std::shared_ptr<HAstTypeNode> IHParser::ParseType(
+		Lexer::HTokenStream& stream, 
+		std::shared_ptr<HAstTypeNode> parent
+	) {
 		auto token = stream.Consume();
 
 		// We expect an identifier -> Regular type
@@ -458,9 +504,10 @@ namespace Hyve::Parser {
 		auto errorHandler = std::make_shared<Core::HErrorHandler>();
 		auto classParser = std::make_shared<HClassParser>();
 		auto enumParser = std::make_shared<HEnumParser>();
+		auto exprParser = std::make_shared<HExpressionParser>();
 		auto funcParser = std::make_shared<HFuncParser>();
 		auto inheritanceParser = std::make_shared<HInheritanceParser>(errorHandler);
-		auto propParser = std::make_shared<HPropertyParser>();
+		auto propParser = std::make_shared<HPropertyParser>(errorHandler, exprParser);
 		auto protocolParser = std::make_shared<HProtocolParser>();
 		auto prototypeParser = std::make_shared<HPrototypeParser>();
 		auto structParser = std::make_shared<HStructParser>(errorHandler, funcParser, inheritanceParser, propParser);

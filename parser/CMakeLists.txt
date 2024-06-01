@@ -59,6 +59,7 @@ SET(
     include/parser/nodes/HAstMemberAccessNode.hxx
     include/parser/nodes/HAstModuleDeclNode.hxx
     include/parser/nodes/HAstPropAccessNode.hxx
+    include/parser/nodes/HAstPropertyDeclNode.hxx
     include/parser/nodes/HAstProtocolBodyNode.hxx
     include/parser/nodes/HAstProtocolNode.hxx
     include/parser/nodes/HAstPrototypeBodyNode.hxx
