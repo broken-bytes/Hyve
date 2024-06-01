@@ -22,23 +22,24 @@ namespace Hyve::Parser {
 		/// Consumes all tokens until a token with the specified type is found.
 		/// </summary>
 		/// <param name=""></param>
-		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenType);
-		[[nodiscard]] bool CanStartStatement(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool CanStartExpression(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsProperty(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsProtocol(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsStruct(Lexer::HTokenStream& stream);
-		[[nodiscard]] bool IsVariable(Lexer::HTokenStream& stream);
+		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) const;
+		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenFamily family) const;
+		[[nodiscard]] bool CanStartStatement(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool CanStartExpression(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsProperty(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsProtocol(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsStruct(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsVariable(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::int8_t GetOperatorPrecedence(HAstOperatorType type) const;
 		[[nodiscard]] bool IsStatementOperator(HAstOperatorType type) const;
 		[[nodiscard]] bool IsUnaryOperator(HAstOperatorType type) const;
-		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream);
+		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::shared_ptr<HAstLiteralNode> ParseString(std::string_view literal) const;
 		[[nodiscard]] std::shared_ptr<HAstTypeNode> ParseType(
 			Lexer::HTokenStream& stream,

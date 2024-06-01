@@ -2,15 +2,11 @@
 
 namespace Hyve::Lexer {
     enum class HTokenFamily {
-        IDENTIFIER,
         KEYWORD,
         LITERAL,
         OPERATOR,
         SPECIAL,
-        COMMENT,
-        ERROR,
-        LINEBREAK,
-        END_OF_FILE
+        UNKNOWN
     };
 
     enum class HTokenType {
@@ -122,7 +118,6 @@ namespace Hyve::Lexer {
         FALSE, // false,
         NUM, // 23
         STRING, // "test",
-        COMMENT, // //
         NULL_LITERAL, // null
         MULTI_LINE_COMMENT, // */ ... /*
         LINEBREAK, // \n,

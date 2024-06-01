@@ -1,5 +1,5 @@
 #pragma once
 
 namespace Hyve::Parser {
-    enum class HParserContext { Global, Module, Class, Struct, Protocol, Function };
+    enum class HParserContext { Module, Class, Struct, Protocol, Function };
 }

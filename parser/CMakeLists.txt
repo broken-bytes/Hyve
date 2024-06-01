@@ -6,6 +6,7 @@ SET(
     src/parsers/HEnumParser.cxx
     src/parsers/HExpressionParser.cxx
     src/parsers/HFuncParser.cxx
+    src/parsers/HInheritanceParser.cxx
     src/parsers/HInitParser.cxx
     src/parsers/HModuleParser.cxx
     src/parsers/HPropertyParser.cxx
@@ -31,6 +32,7 @@ SET(
     include/parser/parsers/HEnumParser.hxx
     include/parser/parsers/HExpressionParser.hxx
     include/parser/parsers/HFuncParser.hxx
+    include/parser/parsers/HInheritanceParser.hxx
     include/parser/parsers/HInitParser.hxx
     include/parser/parsers/HModuleParser.hxx
     include/parser/parsers/HPropertyParser.hxx

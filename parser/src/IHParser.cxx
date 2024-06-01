@@ -3,6 +3,7 @@
 #include "parser/parsers/HClassParser.hxx"
 #include "parser/parsers/HEnumParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
+#include "parser/parsers/HInheritanceParser.hxx"
 #include "parser/parsers/HModuleParser.hxx"
 #include "parser/parsers/HPropertyParser.hxx"
 #include "parser/parsers/HProtocolParser.hxx"
@@ -10,19 +11,26 @@
 #include "parser/parsers/HStructParser.hxx"
 #include "parser/parsers/HVariableParser.hxx"
 #include "parser/nodes/HAstArrayNode.hxx"
+#include "parser/nodes/HAstInheritanceNode.hxx"
 #include <core/HCompilerError.hxx>
 #include <core/HErrorHandler.hxx>
 #include <sstream>
 #include <string_view>
 
 namespace Hyve::Parser {
-	void IHParser::Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) {
+	void IHParser::Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) const {
 		while(stream.Peek().Type != type) {
 			stream.Consume();
 		}
 	}
 
-	bool IHParser::CanStartStatement(Lexer::HTokenStream& stream) {
+	void IHParser::Panic(Lexer::HTokenStream& stream, Lexer::HTokenFamily family) const {
+		while (stream.Peek().Family != family) {
+			stream.Consume();
+		}
+	}
+
+	bool IHParser::CanStartStatement(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
 		auto token = stream.PeekUntilNonLineBreak();
@@ -39,7 +47,7 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::CanStartExpression(Lexer::HTokenStream& stream) {
+	bool IHParser::CanStartExpression(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
 		auto token = stream.PeekUntilNonLineBreak();
@@ -57,7 +65,7 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::IsExpression(Lexer::HTokenStream& stream) {
+	bool IHParser::IsExpression(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
 		if (!CanStartExpression(stream)) {
@@ -87,7 +95,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsStatement(Lexer::HTokenStream& stream) {
+	bool IHParser::IsStatement(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
 		if (!CanStartStatement(stream)) {
@@ -118,7 +126,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsClass(Lexer::HTokenStream& stream) {
+	bool IHParser::IsClass(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		auto token = stream.PeekUntilNonLineBreak();
 
@@ -138,7 +146,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsEnum(Lexer::HTokenStream& stream) {
+	bool IHParser::IsEnum(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		
 		auto token = stream.PeekUntilNonLineBreak();
@@ -159,7 +167,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsFunc(Lexer::HTokenStream& stream) {
+	bool IHParser::IsFunc(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		auto token = stream.PeekUntilNonLineBreak();
 
@@ -179,13 +187,13 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsProperty(Lexer::HTokenStream& stream) {
+	bool IHParser::IsProperty(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		using enum HParserContext;
 		
 		auto token = stream.PeekUntilNonLineBreak();
 
-		if (GetContext() != Class) {
+		if (GetContext() != Class && GetContext() != Struct) {
 			return false;
 		}
 
@@ -205,7 +213,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsProtocol(Lexer::HTokenStream& stream) {
+	bool IHParser::IsProtocol(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		
 		auto token = stream.PeekUntilNonLineBreak();
@@ -226,7 +234,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsPrototype(Lexer::HTokenStream& stream) {
+	bool IHParser::IsPrototype(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		
 		auto token = stream.PeekUntilNonLineBreak();
@@ -247,7 +255,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsStruct(Lexer::HTokenStream& stream) {
+	bool IHParser::IsStruct(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		
 		auto token = stream.PeekUntilNonLineBreak();
@@ -267,13 +275,13 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsVariable(Lexer::HTokenStream& stream) {
+	bool IHParser::IsVariable(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		using enum HParserContext;
 		
 		auto token = stream.PeekUntilNonLineBreak();
 
-		if (GetContext() == Class) {
+		if (GetContext() == Class || GetContext() == Struct) {
 			return false;
 		}
 
@@ -356,7 +364,7 @@ namespace Hyve::Parser {
 		}
 	}
 
-	std::shared_ptr<HAstExpressionNode> IHParser::ParseLiteral(Lexer::HTokenStream& stream) {
+	std::shared_ptr<HAstExpressionNode> IHParser::ParseLiteral(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
 		auto token = stream.Consume();
@@ -451,10 +459,11 @@ namespace Hyve::Parser {
 		auto classParser = std::make_shared<HClassParser>();
 		auto enumParser = std::make_shared<HEnumParser>();
 		auto funcParser = std::make_shared<HFuncParser>();
+		auto inheritanceParser = std::make_shared<HInheritanceParser>(errorHandler);
 		auto propParser = std::make_shared<HPropertyParser>();
 		auto protocolParser = std::make_shared<HProtocolParser>();
 		auto prototypeParser = std::make_shared<HPrototypeParser>();
-		auto structParser = std::make_shared<HStructParser>(errorHandler);
+		auto structParser = std::make_shared<HStructParser>(errorHandler, funcParser, inheritanceParser, propParser);
 		auto varParser = std::make_shared<HVariableParser>();
 		auto moduleParser = std::make_shared<HModuleParser>(
 			errorHandler,

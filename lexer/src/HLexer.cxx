@@ -440,10 +440,6 @@ namespace Hyve::Lexer {
             return ARROW;
         }
 
-        if(source == Symbols::SYMBOL_COMMENT) {
-            return COMMENT;
-        }
-
         if(source == Symbols::SYMBOL_MULTILINE_COMMENT_BEGIN) {
             return MULTI_LINE_COMMENT;
         }
@@ -896,7 +892,7 @@ namespace Hyve::Lexer {
             } catch(std::exception& error) {
                 PushToken(
                         HTokenType::ERROR,
-                        HTokenFamily::ERROR,
+                        HTokenFamily::UNKNOWN,
                         error.what(),
                         fileName,
                         _currentLine,
@@ -928,7 +924,7 @@ namespace Hyve::Lexer {
             if(std::get<0>(currentToken)[0] == '\n') {
                 PushToken(
                         HTokenType::LINEBREAK,
-                        HTokenFamily::LINEBREAK,
+                        HTokenFamily::UNKNOWN,
                         std::get<0>(currentToken),
                         fileName,
                         _currentLine,
@@ -964,7 +960,7 @@ namespace Hyve::Lexer {
                 _state = LexerState::NONE;
                 PushToken(
                         HTokenType::IDENTIFIER,
-                        HTokenFamily::IDENTIFIER,
+                        HTokenFamily::UNKNOWN,
                         std::get<0>(currentToken),
                         fileName,
                         _currentLine,
@@ -1029,7 +1025,7 @@ namespace Hyve::Lexer {
 
         PushToken(
                 HTokenType::END_OF_FILE,
-                HTokenFamily::END_OF_FILE,
+                HTokenFamily::UNKNOWN,
                 "",
                 fileName,
                 _currentLine,
