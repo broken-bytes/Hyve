@@ -2,6 +2,9 @@
 #include <parser/IHParser.hxx>
 #include <fstream>
 
+// TESTING ONLY
+#include <generator/HGenerator.hxx>
+
 namespace Hyve {
     HCompiler::HCompiler() {
         _lexer = std::make_shared<Lexer::HLexer>();
@@ -10,6 +13,13 @@ namespace Hyve {
     }
 
 	void HCompiler::Compile(const std::vector<std::string>& files) {
+        // TESTING ONLY
+        Generator::HGenerator generator;
+        generator.GenerateIR("");
+
+        // TESTING ONLY
+        return;
+
         std::vector<std::shared_ptr<Typeck::HSymbol>> symbols = {};
         std::vector<std::shared_ptr<Parser::HAstNode>> asts = {};
 
