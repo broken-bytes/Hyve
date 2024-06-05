@@ -54,6 +54,8 @@ namespace Hyve::Parser {
 				moduleNode->Children.push_back(_prototypeParser->Parse(stream));
 			} else if (IsStruct(stream)) {
 				moduleNode->Children.push_back(_structParser->Parse(stream));
+			} else if(IsVariable(stream)) {
+				moduleNode->Children.push_back(_varParser->Parse(stream));
 			} else {
 				HandleErrorCase(stream);
 				

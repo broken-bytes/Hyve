@@ -39,6 +39,14 @@ namespace Hyve::Parser {
 
 		structNode->Children.push_back(ParseStructBody(stream));
 
+		// Ensure we have a closing brace
+		token = stream.Consume();
+
+		// If we don't have a closing brace, emit an error but continue
+		if (token.Type != RCBRACKET) {
+			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
+		}
+
 		return structNode;
 	}
 

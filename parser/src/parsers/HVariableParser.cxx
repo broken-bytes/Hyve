@@ -19,6 +19,6 @@ namespace Hyve::Parser {
 		// Create a new variable node
 		auto variable = std::make_shared<HAstVarDeclNode>();
 
-		return nullptr;
+		return variable;
 	}
 }
