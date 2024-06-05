@@ -11,6 +11,7 @@ namespace Hyve::Parser {
 		if (auto token = stream.Peek(); token.Type != VAR && token.Type != LET) {
 			// Panic until keyword is found
 			Panic(stream, KEYWORD);
+			return nullptr;
 		}
 
 		// Consume the variable keyword
