@@ -10,7 +10,6 @@
 #include "parser/nodes/HAstFuncDeclNode.hxx"
 #include "parser/nodes/HAstTypeNode.hxx"
 #include "parser/nodes/HAstArrayNode.hxx"
-#include "parser/nodes/HAstFuncBodyNode.hxx"
 #include "parser/nodes/HAstMemberAccessNode.hxx"
 #include "parser/nodes/HAstVarDeclNode.hxx"
 #include "parser/nodes/HAstExpressionNode.hxx"

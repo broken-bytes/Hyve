@@ -32,7 +32,6 @@ namespace Hyve::Generator {
         InitializeNativeTargetAsmPrinter();
         InitializeNativeTargetAsmParser();
 
-
         // Create a context to hold the LLVM constructs
         LLVMContext Context;
 
@@ -72,9 +71,6 @@ namespace Hyve::Generator {
         Value* Arg2 = Builder.getInt32(0);
         // Call the function: myFunc(10, 20)
         Value* CallResult = Builder.CreateCall(ExternCFunc, { Arg1, Arg2 });
-
-        Arg1 = HelloWorld;
-        Arg2 = CallResult;
 
         // We want to check if the CFunc returned an even number, if yes we print 'even' else 'odd'. 
         // We create two basic blocks for this

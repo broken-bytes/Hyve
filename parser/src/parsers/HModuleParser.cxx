@@ -56,6 +56,8 @@ namespace Hyve::Parser {
 				moduleNode->Children.push_back(_structParser->Parse(stream));
 			} else {
 				HandleErrorCase(stream);
+				
+				return moduleNode;
 			}
 			token = stream.PeekUntilNonLineBreak();
 		}

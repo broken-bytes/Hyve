@@ -505,7 +505,7 @@ namespace Hyve::Parser {
 		auto classParser = std::make_shared<HClassParser>();
 		auto enumParser = std::make_shared<HEnumParser>();
 		auto exprParser = std::make_shared<HExpressionParser>();
-		auto funcParser = std::make_shared<HFuncParser>();
+		auto funcParser = std::make_shared<HFuncParser>(errorHandler);
 		auto inheritanceParser = std::make_shared<HInheritanceParser>(errorHandler);
 		auto propParser = std::make_shared<HPropertyParser>(errorHandler, exprParser);
 		auto protocolParser = std::make_shared<HProtocolParser>();

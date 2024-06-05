@@ -2,6 +2,14 @@ module App
 
 struct User {
     private var username: String
+
+    fn login(username: String, password: String) -> Bool {
+
+    }
+
+    fn logout() -> Void {
+
+    }
 }
 
 var user: User = User()

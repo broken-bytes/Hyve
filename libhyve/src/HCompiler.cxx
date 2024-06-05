@@ -17,9 +17,6 @@ namespace Hyve {
         Generator::HGenerator generator;
         generator.GenerateIR("");
 
-        // TESTING ONLY
-        return;
-
         std::vector<std::shared_ptr<Typeck::HSymbol>> symbols = {};
         std::vector<std::shared_ptr<Parser::HAstNode>> asts = {};
 

@@ -45,11 +45,11 @@ SET(
     include/parser/nodes/HAstArrayNode.hxx
     include/parser/nodes/HAstAssignmentNode.hxx
     include/parser/nodes/HAstBinaryExpressionNode.hxx
+    include/parser/nodes/HAstBlockNode.hxx
     include/parser/nodes/HAstClassBodyNode.hxx
     include/parser/nodes/HAstClassNode.hxx
     include/parser/nodes/HAstExpressionNode.hxx
     include/parser/nodes/HAstFileNode.hxx
-    include/parser/nodes/HAstFuncBodyNode.hxx
     include/parser/nodes/HAstFuncCallNode.hxx
     include/parser/nodes/HAstImportNode.hxx
     include/parser/nodes/HAstInheritanceNode.hxx
