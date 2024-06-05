@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://i.imgur.com/f7XHEDZ.png" style="height:250px;" />
+</p>
+
 # Hyve Programming Language
 
 ## Overview
