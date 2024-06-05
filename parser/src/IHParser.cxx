@@ -511,7 +511,7 @@ namespace Hyve::Parser {
 		auto protocolParser = std::make_shared<HProtocolParser>();
 		auto prototypeParser = std::make_shared<HPrototypeParser>();
 		auto structParser = std::make_shared<HStructParser>(errorHandler, funcParser, inheritanceParser, propParser);
-		auto varParser = std::make_shared<HVariableParser>();
+		auto varParser = std::make_shared<HVariableParser>(errorHandler, exprParser);
 		auto moduleParser = std::make_shared<HModuleParser>(
 			errorHandler,
 			classParser,
