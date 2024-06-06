@@ -3,6 +3,8 @@
 </p>
 
 # Hyve Programming Language
+![Static Badge](https://img.shields.io/badge/C%2B%2B-20-purple) ![GitHub Release](https://img.shields.io/github/v/release/broken-bytes/Hyve?include_prereleases&sort=semver&label=version)
+![GitHub branch check runs](https://img.shields.io/github/check-runs/broken-bytes/Hyve/main) 
 
 ## Overview
 Hyve is a modern, highly asynchronous programming language designed for building scalable and efficient software. Embracing the latest in concurrent programming paradigms, Hyve offers a unique blend of performance, simplicity, and flexibility for developers.
