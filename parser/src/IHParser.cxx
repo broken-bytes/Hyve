@@ -48,7 +48,7 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::CanStartExpression(Lexer::HTokenStream& stream) const {
+	bool IHParser::CanBeInExpression(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
 		auto token = stream.PeekUntilNonLineBreak();
@@ -85,7 +85,7 @@ namespace Hyve::Parser {
 	bool IHParser::IsExpression(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 
-		if (!CanStartExpression(stream)) {
+		if (!CanBeInExpression(stream)) {
 			return false;
 		}
 

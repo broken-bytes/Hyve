@@ -25,7 +25,7 @@ namespace Hyve::Parser {
 		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) const;
 		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenFamily family) const;
 		[[nodiscard]] bool CanStartStatement(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool CanStartExpression(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool CanBeInExpression(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsAccessLevel(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream) const;
