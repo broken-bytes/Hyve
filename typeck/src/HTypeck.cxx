@@ -279,128 +279,31 @@ namespace Hyve::Typeck {
         const std::vector<std::shared_ptr<HSymbol>>& symbols,
         std::shared_ptr<Parser::HAstNode>& nodes
     ) {
-        // Ensure we start with a file node
-        if (nodes->Type == Parser::HAstNodeType::File) {
-            auto fileNode = std::dynamic_pointer_cast<Parser::HAstFileNode>(nodes);
-            // Find the corresponding symbol in the symbol table
-            // We need to first get the module symbol from the file
+        using enum Parser::HAstNodeType;
+        // Files/Modules only need their children to be inferred
+        if (nodes->Type == File || nodes->Type == Module) {
+            for(auto& node: nodes->Children) {
+				InferTypes(symbols, node);
+			}
+        } else if (nodes->Type == NominalType || nodes->Type == Func) {
+            // Get the body node
+            if (nodes->Children.empty()) {
+                return;
+            }
+            auto bodyNode = nodes->Children[0];
+            for (auto& node : bodyNode->Children) {
+                InferTypes(symbols, node);
+            }
+        } else if (nodes->Type == PropertyDecl) {
+            auto declNode = std::dynamic_pointer_cast<Parser::HAstPropertyDeclNode>(nodes);
 
-            auto moduleNode = std::ranges::find_if(fileNode->Children, [](const std::shared_ptr<Parser::HAstNode>& node) {
-                return node->Type == Parser::HAstNodeType::Module;
+            // We only infer the type if the type node is null and the initializer is not null
+            if (declNode->TypeNode == nullptr) {
+                if (declNode->Initializer != nullptr) {
+
+                } else {
+					throw std::runtime_error("Property declaration does not have a type or initializer");
                 }
-            );
-
-            auto typedModuleNode = std::dynamic_pointer_cast<Parser::HAstModuleDeclNode>(*moduleNode);
-
-            if (moduleNode == fileNode->Children.end()) {
-                // Throw an error if the file does not have a module declaration for now
-                throw std::runtime_error("File does not have a module declaration");
-            }
-
-            // Find the corresponding symbol in the symbol table
-            auto moduleSymbol = std::ranges::find_if(
-                symbols,
-                [typedModuleNode](const std::shared_ptr<HSymbol>& symbol) {
-                    return symbol->Name == typedModuleNode->Name && symbol->SymbolType == HSymbolType::Module;
-                }
-            );
-
-            if (moduleSymbol == symbols.end()) {
-                throw std::runtime_error("Could not find symbol in symbol table");
-            }
-
-            if (auto fileSymbol = std::ranges::find_if(
-                (*moduleSymbol)->Children,
-                [fileNode](const std::shared_ptr<HSymbol>& symbol) {
-                    return symbol->Name == fileNode->Name && symbol->SymbolType == HSymbolType::File;
-                }
-            ); fileSymbol == (*moduleSymbol)->Children.end()) {
-                throw std::runtime_error("Could not find symbol in symbol table");
-            }
-
-            // Infer the types of the children
-            for (auto& child : nodes->Children) {
-                InferTypes(symbols, child);
-            }
-        } else if (nodes->Type == Parser::HAstNodeType::VariableDecl) {
-            auto declNode = std::dynamic_pointer_cast<Parser::HAstVarDeclNode>(nodes);
-
-			// Find the corresponding symbol in the symbol table
-			auto declSymbol = std::ranges::find_if(symbols, [declNode](const std::shared_ptr<HSymbol>& symbol) {
-					return symbol->Name == declNode->Name && symbol->SymbolType == HSymbolType::Variable;
-				}
-			);
-
-			if (declSymbol == symbols.end()) {
-				throw std::runtime_error("Could not find symbol in symbol table");
-			}
-
-            // We need to differentiate between a variable that already has a type and one that doesn't
-            if (declNode->TypeNode != nullptr) {
-				auto type = std::make_shared<HType>();
-				type->SymbolType = NodeTypeToSymbolType(declNode->TypeNode->Kind);
-				type->Name = declNode->TypeNode->Name;
-
-                // We need to find the corresponding symbol in the symbol table
-                auto typeSymbol = std::ranges::find_if(symbols, [type](const std::shared_ptr<HSymbol>& symbol) {
-						// Each symbol table is just a list of symbols per file, so we need to get its children
-                        auto children = symbol->Children;
-                        auto typeSymbol = std::ranges::find_if(children, [type](const std::shared_ptr<HSymbol>& symbol) {
-                            return symbol->Name == type->Name && symbol->SymbolType == type->SymbolType;
-                            }
-                        );
-
-                        return typeSymbol != children.end();
-					}
-				);
-
-                if (typeSymbol == symbols.end()) {
-					throw std::runtime_error("Could not find symbol in symbol table");
-				}
-
-                // Set the type of the variable
-				declNode->TypeNode = std::make_shared<Parser::HAstTypeNode>();
-                declNode->TypeNode->Name = type->Name;
-                declNode->TypeNode->Kind = SymbolTypeToNodeType(type->SymbolType);
-			}
-
-			// Infer the types of the children
-			for (auto& child : nodes->Children) {
-				InferTypes(symbols, child);
-			}
-		} else if (nodes->Type == Parser::HAstNodeType::Func) {
-			auto funcNode = std::dynamic_pointer_cast<Parser::HAstFuncDeclNode>(nodes);
-
-			// Find the corresponding symbol in the symbol table
-			auto funcSymbol = std::ranges::find_if(symbols, [funcNode](const std::shared_ptr<HSymbol>& symbol) {
-					return symbol->Name == funcNode->Name && symbol->SymbolType == HSymbolType::Function;
-				}
-			);
-
-			if (funcSymbol == symbols.end()) {
-				throw std::runtime_error("Could not find symbol in symbol table");
-			}
-
-			// Infer the types of the children
-			for (auto& child : nodes->Children) {
-				InferTypes(symbols, child);
-			}
-		} else if (nodes->Type == Parser::HAstNodeType::NominalType) {
-			auto typeNode = std::dynamic_pointer_cast<Parser::HAstTypeNode>(nodes);
-
-			// Find the corresponding symbol in the symbol table
-			auto typeSymbol = std::ranges::find_if(symbols, [typeNode](const std::shared_ptr<HSymbol>& symbol) {
-					return symbol->Name == typeNode->Name && symbol->SymbolType == NodeTypeToSymbolType(typeNode->Kind);
-				}
-			);
-
-			if (typeSymbol == symbols.end()) {
-				throw std::runtime_error("Could not find symbol in symbol table");
-			}
-
-			// Infer the types of the children
-			for (auto& child : nodes->Children) {
-				InferTypes(symbols, child);
 			}
         }
     }

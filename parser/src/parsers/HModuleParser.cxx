@@ -16,6 +16,7 @@ namespace Hyve::Parser {
 		const std::shared_ptr<HPropertyParser>& propParser,
 		const std::shared_ptr<HProtocolParser>& protocolParser,
 		const std::shared_ptr<HPrototypeParser>& prototypeParser,
+		const std::shared_ptr<HStatementParser>& statementParser,
 		const std::shared_ptr<HStructParser>& structParser,
 		const std::shared_ptr<HVariableParser>& varParser
 	) : _errorHandler(errorHandler),
@@ -25,6 +26,7 @@ namespace Hyve::Parser {
 		_propParser(propParser),
 		_protocolParser(protocolParser),
 		_prototypeParser(prototypeParser),
+		_stmtParser(statementParser),
 		_structParser(structParser),
 		_varParser(varParser) { }
 
@@ -56,6 +58,8 @@ namespace Hyve::Parser {
 				moduleNode->Children.push_back(_structParser->Parse(stream));
 			} else if(IsVariable(stream)) {
 				moduleNode->Children.push_back(_varParser->Parse(stream));
+			} else if (IsStatement(stream)) {
+				moduleNode->Children.push_back(_stmtParser->Parse(stream));
 			} else {
 				HandleErrorCase(stream);
 				

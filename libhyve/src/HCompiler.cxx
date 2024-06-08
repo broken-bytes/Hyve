@@ -30,7 +30,7 @@ namespace Hyve {
 		}
 
         // TODO: Merge the symbol tables
-        std::shared_ptr<Typeck::HSymbol> symbolTable = {};
+        std::vector<std::shared_ptr<Typeck::HSymbol>> symbolTable = _typeck->MergeSymbols(symbols);
 
         for (auto& ast : asts) {
             _typeck->InferTypes(symbols, ast);

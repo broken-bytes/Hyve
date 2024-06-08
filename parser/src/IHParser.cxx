@@ -121,23 +121,15 @@ namespace Hyve::Parser {
 
 		auto token = stream.PeekUntilNonLineBreak();
 
-		for (uint64_t x = _tokenIndex; x < _tokens.size(); x++) {
-			if (token.Type == DOT || token.Type == IDENTIFIER) {
-				// We have an identifier or member access, thus we need to proceed
-				continue;
-			}
-			else if (
-				token.Type == ASSIGNMENT ||
-				token.Type == PLUS_ASSIGN ||
-				token.Type == MINUS_ASSIGN ||
-				token.Type == MULTIPLY_ASSIGN ||
-				token.Type == DIVIDE_ASSIGN
-				) {
-				// Assignment, so this is a statement
+		// We only need to check for control structures and assignments
+		// TODO: Control structures
+		if (token.Type == IDENTIFIER) {
+			// Check if the next token is an assignment operator
+			auto next = stream.Peek(2)[1];
+
+			if (next.Type == ASSIGNMENT) {
 				return true;
 			}
-
-			token = stream.PeekUntilNonLineBreak();
 		}
 
 		return false;
@@ -571,6 +563,7 @@ namespace Hyve::Parser {
 		auto propParser = std::make_shared<HPropertyParser>(errorHandler, exprParser);
 		auto protocolParser = std::make_shared<HProtocolParser>();
 		auto prototypeParser = std::make_shared<HPrototypeParser>();
+		auto statementParser = std::make_shared<HStatementParser>(errorHandler, exprParser);
 		auto structParser = std::make_shared<HStructParser>(errorHandler, funcParser, inheritanceParser, propParser);
 		auto varParser = std::make_shared<HVariableParser>(errorHandler, exprParser);
 		auto moduleParser = std::make_shared<HModuleParser>(
@@ -581,6 +574,7 @@ namespace Hyve::Parser {
 			propParser,
 			protocolParser,
 			prototypeParser,
+			statementParser,
 			structParser,
 			varParser
 		);
