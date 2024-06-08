@@ -372,9 +372,35 @@ namespace Hyve::Parser {
 		using enum HAstOperatorType;
 
 		switch (type) {
+			case NOT:
+			case INCREMENT:
+			case DECREMENT:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	bool IHParser::IsBinaryOperator(HAstOperatorType type) const {
+		using enum HAstOperatorType;
+
+		switch (type) {
 			case ADD:
 			case SUBTRACT:
-			case BITWISE_NOT:
+			case MULTIPLY:
+			case DIVIDE:
+			case MODULO:
+			case LESS_THAN:
+			case GREATER_THAN:
+			case EQUAL:
+			case NOT_EQUAL:
+			case AND:
+			case OR:
+			case BITWISE_AND:
+			case BITWISE_OR:
+			case BITWISE_XOR:
+			case BITWISE_LEFT_SHIFT:
+			case BITWISE_RIGHT_SHIFT:
 				return true;
 			default:
 				return false;
