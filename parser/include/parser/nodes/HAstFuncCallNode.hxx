@@ -8,11 +8,11 @@
 namespace Hyve::Parser {
     struct HAstCallParamater {
         std::string Name;
-        std::shared_ptr<HAstNode> Value;
+        std::shared_ptr<HAstExpressionNode> Value;
     };
 
     struct HAstFuncCallNode : HAstExpressionNode {
-        std::string Name;
+        std::shared_ptr<HAstNode> Target;
         std::vector<HAstCallParamater> Parameters;
 
         HAstFuncCallNode() {

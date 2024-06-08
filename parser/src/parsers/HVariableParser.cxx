@@ -63,7 +63,7 @@ namespace Hyve::Parser {
 		// Check if we have an assignment
 		token = stream.Peek();
 
-		if (token.Type == EQUAL) {
+		if (token.Type == ASSIGNMENT) {
 			// Consume the equal sign
 			stream.Consume();
 

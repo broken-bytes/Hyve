@@ -7,7 +7,7 @@
 
 namespace Hyve::Parser {
     struct HAstMemberAccessNode : HAstExpressionNode {
-        std::string Target;
-        std::shared_ptr<HAstNode> Call;
+        std::shared_ptr<HAstExpressionNode> Target;
+        std::shared_ptr<HAstExpressionNode> Member;
     };
 }

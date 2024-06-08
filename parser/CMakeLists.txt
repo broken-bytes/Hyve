@@ -51,6 +51,7 @@ SET(
     include/parser/nodes/HAstExpressionNode.hxx
     include/parser/nodes/HAstFileNode.hxx
     include/parser/nodes/HAstFuncCallNode.hxx
+    include/parser/nodes/HAstIdentifierNode.hxx
     include/parser/nodes/HAstImportNode.hxx
     include/parser/nodes/HAstInheritanceNode.hxx
     include/parser/nodes/HAstInitBodyNode.hxx

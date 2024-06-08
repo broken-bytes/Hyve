@@ -353,6 +353,15 @@ namespace Hyve::Parser {
 		}
 	}
 
+	bool IHParser::IsOperator(Lexer::HTokenStream& stream) const {
+		using enum Lexer::HTokenType;
+
+		auto token = stream.PeekUntilNonLineBreak();
+		auto type = GetOperatorType(token);
+
+		return IsStatementOperator(type) || IsUnaryOperator(type) || IsBinaryOperator(type);
+	}
+
 	bool IHParser::IsStatementOperator(HAstOperatorType type) const {
 		using enum HAstOperatorType;
 
@@ -406,6 +415,32 @@ namespace Hyve::Parser {
 				return false;
 		}
 	}
+
+	HAstOperatorType IHParser::GetOperatorType(Lexer::HToken& token) const {
+		using enum Lexer::HTokenType;
+
+		switch (token.Type) {
+			case MULTIPLY:
+				return HAstOperatorType::MULTIPLY;
+			case DIVIDE:
+				return HAstOperatorType::DIVIDE;
+			case MODULO:
+				return HAstOperatorType::MODULO;
+			case PLUS:
+				return HAstOperatorType::ADD;
+			case MINUS:
+				return HAstOperatorType::SUBTRACT;
+			case LESS:
+				return HAstOperatorType::LESS_THAN;
+			case GREATER:
+				return HAstOperatorType::GREATER_THAN;
+			case EQUAL:
+				return HAstOperatorType::EQUAL;
+			default:
+				return HAstOperatorType::INVALID_OPERATOR;
+		}
+	}
+
 
 	std::shared_ptr<HAstExpressionNode> IHParser::ParseLiteral(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
@@ -530,7 +565,7 @@ namespace Hyve::Parser {
 		auto errorHandler = std::make_shared<Core::HErrorHandler>();
 		auto classParser = std::make_shared<HClassParser>();
 		auto enumParser = std::make_shared<HEnumParser>();
-		auto exprParser = std::make_shared<HExpressionParser>();
+		auto exprParser = std::make_shared<HExpressionParser>(errorHandler);
 		auto funcParser = std::make_shared<HFuncParser>(errorHandler);
 		auto inheritanceParser = std::make_shared<HInheritanceParser>(errorHandler);
 		auto propParser = std::make_shared<HPropertyParser>(errorHandler, exprParser);

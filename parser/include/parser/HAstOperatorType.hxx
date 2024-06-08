@@ -40,5 +40,6 @@ namespace Hyve::Parser {
         BITWISE_RIGHT_SHIFT_ASSIGN,
         INCREMENT,
         DECREMENT,
+        INVALID_OPERATOR
     };
 }

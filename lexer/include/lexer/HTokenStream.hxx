@@ -26,7 +26,8 @@ namespace Hyve::Lexer {
         // Consume (and remove) the token at the current position
         HToken Consume() {
             if (_currentPosition >= _tokens.size()) {
-                throw TokenStreamError("Peeked past end of token stream");
+                // Return the EOF token, no matter if it exists or not
+                return HToken { Lexer::HTokenFamily::UNKNOWN, Lexer::HTokenType::END_OF_FILE };
             }
             auto token = _tokens[_currentPosition];
             _currentPosition++;
@@ -36,7 +37,7 @@ namespace Hyve::Lexer {
 
         HToken Consume(Lexer::HTokenType type) {
             if (_currentPosition >= _tokens.size()) {
-                throw TokenStreamError("Peeked past end of token stream");
+                return HToken { Lexer::HTokenFamily::UNKNOWN, Lexer::HTokenType::END_OF_FILE };
             }
             auto token = _tokens[_currentPosition];
             _currentPosition++;
@@ -52,7 +53,7 @@ namespace Hyve::Lexer {
         HToken Peek() const {
             if (_currentPosition >= _tokens.size()) {
                 // Throw an error
-                throw TokenStreamError("Peeked past end of token stream");
+                return HToken{ Lexer::HTokenFamily::UNKNOWN, Lexer::HTokenType::END_OF_FILE };
             }
 
             return _tokens[_currentPosition];
@@ -61,7 +62,9 @@ namespace Hyve::Lexer {
         std::vector<HToken> Peek(uint64_t count) const {
             if (_currentPosition + count >= _tokens.size()) {
                 // Throw an error
-                throw TokenStreamError("Peeked past end of token stream");
+                auto first = Peek();
+
+                return { first, HToken { Lexer::HTokenFamily::UNKNOWN, Lexer::HTokenType::END_OF_FILE } };
             }
 
             return std::vector<HToken>(

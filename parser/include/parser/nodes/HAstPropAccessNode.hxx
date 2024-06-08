@@ -8,7 +8,6 @@
 
 namespace Hyve::Parser {
     struct HAstPropAccessNode : HAstExpressionNode {
-        std::string Name;
-        std::string Type;
+        std::shared_ptr<HAstNode> Target;
     };
 }

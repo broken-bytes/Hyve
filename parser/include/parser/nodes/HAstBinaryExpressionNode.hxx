@@ -9,13 +9,9 @@
 #include <vector>
 
 namespace Hyve::Parser {
-    struct HAstBinaryOperator {
-        HAstOperatorType Type;
-    };
-
     struct HAstBinaryExpressionNode : HAstExpressionNode {
         std::shared_ptr<HAstExpressionNode> LHS;
-        HAstBinaryOperator Operator;
+        HAstOperatorType Operator;
         std::shared_ptr<HAstExpressionNode> RHS;
     };
 }
