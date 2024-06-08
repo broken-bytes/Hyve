@@ -2,7 +2,6 @@
 
 enum class HSymbolType {
     File,
-    Unknown,
     Module,
     Function,
     Variable,
@@ -10,5 +9,6 @@ enum class HSymbolType {
     Enum,
     Protocol,
     Prototype,
-    Struct
+    Struct,
+    UnknownSymbol
 };

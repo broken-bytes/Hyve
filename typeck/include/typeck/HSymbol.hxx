@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace Hyve::Typeck {
-	class HSymbol {
+    struct HSymbol {
     public:
         std::string Name;
         HSymbolType SymbolType;

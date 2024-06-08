@@ -9,6 +9,10 @@ namespace Hyve::Parser {
         std::string Name;
         HAstTypeKind Kind;
 
+        HAstTypeNode() {
+            Kind = HAstTypeKind::UnknownKind;
+        }
+
         virtual ~HAstTypeNode() = default;
     };
 }

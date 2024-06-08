@@ -7,7 +7,8 @@ namespace Hyve::Parser {
         Statement,
         NominalType,
         Func,
-        Decl,
+        PropertyDecl,
+        VariableDecl,
         Literal,
         Identifier,
         Operator,
@@ -38,5 +39,6 @@ namespace Hyve::Parser {
         Struct,
         Function,
         Variable,
+        UnknownKind,
     };
 }

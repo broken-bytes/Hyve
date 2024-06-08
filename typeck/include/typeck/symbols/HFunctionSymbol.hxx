@@ -1,6 +1,7 @@
 #include "typeck/HSymbol.hxx"
+#include "typeck/symbols/HWithAccessLevelSymbol.hxx"
 
 namespace Hyve::Typeck {
-    class HFunctionSymbol : public HSymbol {
+    struct HFunctionSymbol : public HWithAccessLevelSymbol {
     };
 }

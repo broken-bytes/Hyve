@@ -2,11 +2,12 @@
 
 #include "typeck/HSymbol.hxx"
 #include "typeck/HType.hxx"
+#include <core/HAccessLevel.hxx>
 #include <memory>
 
 namespace Hyve::Typeck {
-    struct HVariableSymbol : public HSymbol {
+    struct HWithAccessLevelSymbol : public HSymbol {
     public:
-        std::shared_ptr<HType> Type;
+        Core::HAccessLevel AccessLevel;
     };
 }

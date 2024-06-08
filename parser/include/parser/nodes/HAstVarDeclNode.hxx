@@ -18,7 +18,7 @@ namespace Hyve::Parser {
             Name = "";
             IsMutable = false;
             Initializer = nullptr;
-            Type = HAstNodeType::Decl;
+            Type = HAstNodeType::VariableDecl;
             TypeNode = nullptr;
         }
     };

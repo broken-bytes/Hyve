@@ -1,6 +1,6 @@
 #include "typeck/HSymbol.hxx"
 
 namespace Hyve::Typeck {
-    class HProtocolSymbol : public HSymbol {
+    struct HProtocolSymbol : public HSymbol {
     };
 }

@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace Hyve::Typeck {
-	class HSymbolTable {
+    struct HSymbolTable {
     public:
         HSymbolTable() = default;
 
