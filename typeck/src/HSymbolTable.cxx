@@ -5,7 +5,9 @@
 namespace Hyve::Typeck {
     HSymbolTable::HSymbolTable(
         const std::vector<std::shared_ptr<HSymbol>>& children
-    ) : _children(children) {}
+    ) : _children(children) {
+        // TODO: Add the Builtin symbols
+    }
 
     std::shared_ptr<HSymbol> HSymbolTable::Find(std::vector<std::string_view> scope, std::string_view name) const {
         using enum HSymbolType;

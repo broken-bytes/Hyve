@@ -1,0 +1,20 @@
+use hyve.low_level
+
+module hyve.core
+
+struct Int8 {
+    private var value: int8
+}
+
+struct Int16 {
+    private var value: int16
+}
+
+struct Int32 {
+    private var value: int32
+}
+
+struct Int64 {
+    private var value: int64
+}
+

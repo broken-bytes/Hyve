@@ -1,0 +1,4 @@
+module hyve.core
+
+struct String {
+}

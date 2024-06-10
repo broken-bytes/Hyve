@@ -43,7 +43,7 @@ namespace Hyve::Parser {
 
         auto file = std::make_shared<HAstFileNode>();
         file->Name = token.FileName;
-        
+
         token = stream.PeekUntilNonLineBreak();
 
         // A file may start with imports, so parse them first

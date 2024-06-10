@@ -141,7 +141,7 @@ namespace Hyve::Typeck {
             fileSymbol->Parent = moduleSymbol;
             moduleSymbol->Children.push_back(fileSymbol);
 
-            BuildSymbolTable(moduleNode, fileSymbol);
+            BuildSymbolTable(typedFileNode, fileSymbol);
 
             return moduleSymbol;
         }
