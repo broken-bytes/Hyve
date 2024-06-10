@@ -1,0 +1,12 @@
+use hyve.builtins
+
+module hyve.core
+
+struct Int8 {
+    private var value: int8
+}
+
+fn initInt(value: _Int8) -> int8
+fn getIntValue(a: _Int8) -> int8
+fn setIntValue(a: _Int8, value: _Int8) -> Void
+fn addInt(a: _Int8, b: _Int8) -> Int8

@@ -1,6 +1,7 @@
 module App
 
 struct User {
+    private var id: Int = 0
     private var username: String
 
     fn login(username: String, password: String) -> Bool {
@@ -12,8 +13,12 @@ struct User {
     }
 }
 
-var user: User = User()
+func main() -> Void {
+    var user: User = User()
 
-var anotherUser = user
+    var anotherUser = user
 
-anotherUser = User()
+    anotherUser = User()
+
+    print(user.username)
+}

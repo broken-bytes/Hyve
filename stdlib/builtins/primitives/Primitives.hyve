@@ -1,0 +1,109 @@
+public struct _Int8 {
+    var value: int8
+
+    init(value: int8) {
+        self.value = value
+    }
+
+    public operator +(lhs: _Int8, rhs: _Int8) -> _Int8 {
+        var result = addInt8(a: lhs.value, b: rhs.value)
+    }
+}
+
+public struct _Int16 {
+    var value: int16
+
+    init(value: int16) {
+        self.value = value
+    }
+
+    public operator +(lhs: _Int16, rhs: _Int16) -> _Int16 {
+        var result = addInt16(a: lhs.value, b: rhs.value)
+    }
+}
+
+public struct _Int32 {
+    var value: int32
+
+    init(value: int32) {
+        self.value = value
+    }
+
+    public operator +(lhs: _Int32, rhs: _Int32) -> _Int32 {
+        var result = addInt32(a: lhs.value, b: rhs.value)
+    }
+}
+
+public struct _Int64 {
+    var value: int64
+
+    init(value: int64) {
+        self.value = value
+    }
+
+    public operator +(lhs: _Int64, rhs: _Int64) -> _Int64 {
+        var result = addInt64(a: lhs.value, b: rhs.value)
+    }
+}
+
+public struct _Float {
+    var value: float
+
+    init(value: float) {
+        self.value = value
+    }
+
+    public operator +(lhs: _Float, rhs: _Float) -> _Float {
+        var result = addFloat(a: lhs.value, b: rhs.value)
+    }
+}
+
+public struct _Double {
+    var value: double
+
+    init(value: double) {
+        self.value = value
+    }
+
+    public operator +(lhs: _Double, rhs: _Double) -> _Double {
+        var result = addFloat(a: lhs.value, b: rhs.value)
+    }
+}
+
+public struct _Char {
+    var value: char
+
+    init(value: char) {
+        self.value = value
+    }
+}
+
+public fn initInt8(value: int8) -> _Int8
+public fn getInt8Value(a: _Int8) -> int8
+public fn setInt8Value(a: _Int8, value: int8) -> void
+public fn addInt8(a: int8, b: int8) -> int8
+
+public fn initInt16(value: int16) -> _Int16
+public fn getInt16Value(a: _Int16) -> int16
+public fn setInt16Value(a: _Int16, value: int16) -> void
+public fn addInt16(a: int16, b: int16) -> _Int16
+
+public fn initInt32(value: int32) -> _Int32
+public fn getInt32Value(a: _Int32) -> int32
+public fn setInt32Value(a: _Int32, value: int32) -> void
+public fn addInt32(a: int32, b: int32) -> int32
+
+public fn initInt64(value: int64) -> _Int64
+public fn getInt64Value(a: _Int64) -> int64
+public fn setInt64Value(a: _Int64, value: int64) -> void
+public fn addInt64(a: int64, b: int64) -> int64
+
+public fn initFloat(value: float) -> _Float
+public fn getFloatValue(a: _Float) -> float
+public fn setFloatValue(a: _Float, value: float) -> void
+public fn addFloat(a: float, b: float) -> float
+
+public fn initDouble(value: double) -> _Double
+public fn getDoubleValue(a: _Double) -> double
+public fn setDoubleValue(a: _Double, value: double) -> void
+public fn addDouble(a: double, b: double) -> double

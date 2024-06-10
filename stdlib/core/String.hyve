@@ -1,4 +1,5 @@
+use hyve.low_level
+
 module hyve.core
 
-struct String {
-}
+struct String {}

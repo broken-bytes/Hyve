@@ -1,0 +1,11 @@
+use hyve.low_level
+
+module hyve.core
+
+struct Float {
+    private var value: float
+}
+
+struct Double {
+    private var value: double
+}
