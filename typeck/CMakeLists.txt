@@ -1,6 +1,7 @@
 SET(
     SRC
     src/HTypeck.cxx
+    src/HSymbolTable.cxx
     include/typeck/HTypeck.hxx
     include/typeck/HSymbolTable.hxx
     include/typeck/HSymbol.hxx

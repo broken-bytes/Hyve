@@ -3,6 +3,7 @@
 #include "typeck/HSymbol.hxx"
 #include "typeck/symbols/HStructSymbol.hxx"
 #include <parser/HAstNode.hxx>
+#include <parser/nodes/HAstTypeNode.hxx>
 
 #include <memory>
 #include <string>
@@ -33,5 +34,10 @@ namespace Hyve::Typeck {
 
     private:
         std::shared_ptr<HSymbol> _builtins;
+
+        std::shared_ptr<Parser::HAstTypeNode> CalculateExpressionType(
+			const std::shared_ptr<Parser::HAstNode>& node,
+			const std::shared_ptr<HSymbol>& symbol
+		);
     };
 }

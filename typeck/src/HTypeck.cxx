@@ -300,11 +300,27 @@ namespace Hyve::Typeck {
             // We only infer the type if the type node is null and the initializer is not null
             if (declNode->TypeNode == nullptr) {
                 if (declNode->Initializer != nullptr) {
-
+                    // Get the type of the initializer expression
+                    declNode->TypeNode = CalculateExpressionType(declNode->Initializer, nullptr);
                 } else {
 					throw std::runtime_error("Property declaration does not have a type or initializer");
                 }
 			}
         }
+    }
+
+    std::shared_ptr<Parser::HAstTypeNode> HTypeck::CalculateExpressionType(
+        const std::shared_ptr<Parser::HAstNode>& node,
+        const std::shared_ptr<HSymbol>& symbol
+    ) {
+        // TODO: Implement this
+        
+        // If we have just a literal node, we can return the type of the literal immediately
+        if (node->Type == Parser::HAstNodeType::Literal) {
+			auto literalNode = std::dynamic_pointer_cast<Parser::HAstLiteralNode>(node);
+			
+		}
+
+        return nullptr;
     }
 }

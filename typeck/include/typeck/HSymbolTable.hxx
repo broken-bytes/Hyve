@@ -2,14 +2,19 @@
 
 #include "typeck/HSymbol.hxx"
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace Hyve::Typeck {
     struct HSymbolTable {
     public:
-        HSymbolTable() = default;
+        explicit HSymbolTable(
+            std::vector<std::shared_ptr<HSymbol>> children = {}
+        );
+        
+        std::shared_ptr<HSymbol> Find(std::vector<std::string_view> scope, std::string_view name) const;
 
-        HSymbol* globalScope;
-        std::vector<std::unique_ptr<HSymbol>> children;
+    private:
+        std::vector<std::shared_ptr<HSymbol>> _children;
 	};
 }
