@@ -37,7 +37,10 @@ namespace Hyve::Parser {
 		structNode->Inheritance = std::dynamic_pointer_cast<HAstInheritanceNode>(_inheritanceParser->Parse(stream));
 		structNode->Name = name.Value;
 
-		structNode->Children.push_back(ParseStructBody(stream));
+		if(auto body = ParseStructBody(stream); body != nullptr) {
+			body->Parent = structNode;
+			structNode->Children.push_back(body);
+		}
 
 		// Ensure we have a closing brace
 		token = stream.Consume();
@@ -62,7 +65,7 @@ namespace Hyve::Parser {
 		if (token.Type != LCBRACKET) {
 			stream.Consume();
 
-			// We have something in fron of the opening brace, ignore it and continue
+			// We have something in front of the opening brace, ignore it and continue
 			if (stream.Peek().Type == LCBRACKET) {
 				stream.Consume();
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
@@ -88,9 +91,15 @@ namespace Hyve::Parser {
 
 		while (token.Type != RCBRACKET) {
 			if (IsProperty(stream)) {
-				bodyNode->Children.push_back(_propParser->Parse(stream));
+				if (auto prop = _propParser->Parse(stream); prop != nullptr) {
+					prop->Parent = bodyNode;
+					bodyNode->Children.push_back(prop);
+				}
 			} else if (IsFunc(stream)) {
-				bodyNode->Children.push_back(_funcParser->Parse(stream));
+				if(auto func = _funcParser->Parse(stream); func != nullptr) {
+					func->Parent = bodyNode;
+					bodyNode->Children.push_back(func);
+				}
 			} else {
 				// We have an unrevoered error, panic
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);

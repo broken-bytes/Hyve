@@ -41,22 +41,37 @@ namespace Hyve::Parser {
     std::shared_ptr<HAstNode> HParser::Parse(Lexer::HTokenStream& stream) {
         auto token = stream.Peek();
 
-        auto ast = std::make_shared<HAstFileNode>();
-        ast->Name = token.FileName;
-        ast->Type = HAstNodeType::File;
+        auto file = std::make_shared<HAstFileNode>();
+        file->Name = token.FileName;
         
         token = stream.PeekUntilNonLineBreak();
 
         // A file may start with imports, so parse them first
         while (token.Type == Lexer::HTokenType::IMPORT) {
-            ast->Children.push_back(ParseImport(stream));
+            file->Children.push_back(ParseImport(stream));
 		}
 
         // Every file should start with a module declaration(or after the imports),
         // so we use the module parser
-        ast->Children.push_back(_moduleParser->Parse(stream));
+        if (auto mod = _moduleParser->Parse(stream); mod != nullptr) {
+           // We need to set all children of the module to have the file as their parent
+            for (const auto& child : mod->Children) {
+				child->Parent = file;
+                file->Children.push_back(child);
+			}
 
-        return ast;
+            // Now set only the file as a child of the module
+            // We do this because each module can have multiple files
+            // but each file can only have one module
+            // Additionally, definitions aren't technically children of the module
+            mod->Children = {};
+            mod->Children.push_back(file);
+            file->Parent = mod;
+
+            return mod;
+        }
+
+        return nullptr;
     }
 
     std::shared_ptr<HAstImportNode> HParser::ParseImport(Lexer::HTokenStream& stream) const {
@@ -76,7 +91,7 @@ namespace Hyve::Parser {
             throw Core::HCompilerError(UnexpectedToken, token.FileName, token.Line);
         }
 
-        importNode->Target = token.Value;
+        importNode->Name = token.Value;
 		
         return importNode;
     }

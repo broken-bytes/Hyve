@@ -10,7 +10,6 @@
 
 namespace Hyve::Parser {
     struct HAstPropertyDeclNode : public HAstWithAccessLevelNode {
-        std::string Name;
         bool IsMutable;
         std::shared_ptr<HAstTypeNode> TypeNode;
         std::shared_ptr<HAstExpressionNode> Initializer;

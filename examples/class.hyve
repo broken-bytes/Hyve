@@ -16,5 +16,4 @@ var user: User = User()
 
 var anotherUser = user
 
-
 anotherUser = User()

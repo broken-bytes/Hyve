@@ -6,7 +6,6 @@
 
 namespace Hyve::Parser {
     struct HAstTypeNode : HAstNode {
-        std::string Name;
         HAstTypeKind Kind;
 
         HAstTypeNode() {

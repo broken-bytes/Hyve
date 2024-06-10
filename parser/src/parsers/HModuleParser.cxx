@@ -65,6 +65,8 @@ namespace Hyve::Parser {
 				
 				return moduleNode;
 			}
+			// Make module node the parent of the class node
+			moduleNode->Children.back()->Parent = moduleNode;
 			token = stream.PeekUntilNonLineBreak();
 		}
 

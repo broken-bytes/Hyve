@@ -9,7 +9,6 @@
 
 namespace Hyve::Parser {
     struct HAstVarDeclNode : public HAstNode {
-        std::string Name;
         bool IsMutable;
         std::shared_ptr<HAstTypeNode> TypeNode;
         std::shared_ptr<HAstExpressionNode> Initializer;

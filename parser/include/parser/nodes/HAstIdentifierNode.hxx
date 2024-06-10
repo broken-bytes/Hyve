@@ -9,8 +9,6 @@
 
 namespace Hyve::Parser {
     struct HAstIdentifierNode : HAstExpressionNode {
-        std::string Name;
-
         HAstIdentifierNode() {
             ExpressionType = ExpressionType::Identifier;
         }

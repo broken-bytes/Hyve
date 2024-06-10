@@ -7,8 +7,6 @@
 
 namespace Hyve::Parser {
     struct HAstImportNode : HAstStatementNode {
-        std::string Target;
-
         HAstImportNode() {
             StatementType = StatementType::Import;
         }

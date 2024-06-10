@@ -25,15 +25,15 @@ namespace Hyve {
 			auto tokens = _lexer->Tokenize(source, file);
 			auto ast = _parser->Parse(tokens);
             asts.push_back(ast);
-            auto symbolTable = _typeck->BuildTypeTable(ast, nullptr);
+            auto symbolTable = _typeck->BuildSymbolTable(ast, nullptr);
             symbols.push_back(symbolTable);
 		}
 
         // TODO: Merge the symbol tables
-        std::vector<std::shared_ptr<Typeck::HSymbol>> symbolTable = _typeck->MergeSymbols(symbols);
+        auto symbolTable = _typeck->MergeSymbols(symbols);
 
         for (auto& ast : asts) {
-            _typeck->InferTypes(symbols, ast);
+            _typeck->InferTypes(symbolTable, ast);
         }
 	}
 

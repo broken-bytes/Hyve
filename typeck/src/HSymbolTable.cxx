@@ -4,51 +4,53 @@
 
 namespace Hyve::Typeck {
     HSymbolTable::HSymbolTable(
-        std::vector<std::shared_ptr<HSymbol>> children = {}
+        const std::vector<std::shared_ptr<HSymbol>>& children
     ) : _children(children) {}
 
     std::shared_ptr<HSymbol> HSymbolTable::Find(std::vector<std::string_view> scope, std::string_view name) const {
+        using enum HSymbolType;
         // We need to check for each higher level scope if the symbol is there, if not we go one level up
-        // First we need to get all files that match the top level scope(module)
-        std::vector<std::shared_ptr<HSymbol>> files = {};
-
+        
         // Make sure scope is not empty
-        if (scope.size() == 0) {
+        if (scope.empty()) {
 			return nullptr;
 		}
 
-        auto scopeStart = scope.begin();
-
-        std::ranges::copy_if(
-            _children, 
-            std::back_inserter(files),
-            [scopeStart](const std::shared_ptr<HSymbol>& elem) {
-                return elem->Name == *scopeStart;
+        // We need to find the root scope which is the module
+        auto root = std::ranges::find_if(_children, [&](const auto& child) {
+                return child->Name == scope[0] && child->SymbolType == Module;
             }
         );
 
-        // If no files are found, we can return nullptr, because the module is empty
-        if (files.size() == 0) {
-			return nullptr;
+        // If we didn't find the root scope, return nullptr
+        if (root == _children.end()) {
+            return nullptr;
+        }
+
+        // We found the root scope, now we need to find the symbol in the scope
+        auto currentScope = *root;
+
+        for (size_t i = 1; i < scope.size(); i++) {
+			auto nextScope = FindInScope(currentScope, scope[i]);
+			if (nextScope == nullptr) {
+				return nullptr;
+			}
+
+			currentScope = nextScope;
 		}
 
-        std::shared_ptr<HSymbol> foundSymbol = nullptr;
-        // Now we need to check if the symbol is in the file
-		for (auto file : files) {
-            auto result = std::ranges::find_if(
-                file->Children,
-				[name](const std::shared_ptr<HSymbol>& elem) {
-					return elem->Name == name;
-				}
-            );
-
-            if (result != file->Children.end()) {
-                foundSymbol = *result;
-                break;
-            }
-		}
-
-        return foundSymbol;
+        // We found the scope, now we need to find the symbol in the scope
+		return FindInScope(currentScope, name);
     }
 
+    std::shared_ptr<HSymbol> HSymbolTable::FindInScope(std::shared_ptr<HSymbol> scope, std::string_view name) const {
+        // Find the first matching symbol in the scope
+        for (auto& child : scope->Children) {
+            if (child->Name == name) {
+                return child;
+			}
+        }
+
+        return nullptr;
+    }
 }

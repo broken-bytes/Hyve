@@ -74,7 +74,7 @@ namespace Hyve::Typeck {
         _builtins = std::make_shared<HSymbol>();
 	}
 
-    std::vector<std::shared_ptr<HSymbol>> HTypeck::MergeSymbols(
+    std::shared_ptr<HSymbolTable> HTypeck::MergeSymbols(
         const std::vector<std::shared_ptr<HSymbol>>& symbolTables
     ) {
 		std::vector<std::shared_ptr<HSymbol>> mergedSymbols;
@@ -107,52 +107,41 @@ namespace Hyve::Typeck {
 			}
         }
 
-		return mergedSymbols;
+		return std::make_shared<HSymbolTable>(mergedSymbols);
 	}
 
-    std::shared_ptr<HSymbol> HTypeck::BuildTypeTable(
+    std::shared_ptr<HSymbol> HTypeck::BuildSymbolTable(
         const std::shared_ptr<Hyve::Parser::HAstNode>& ast,
         const std::shared_ptr<HSymbol>& parent
     ) {
-        if (parent == nullptr && ast->Type == Hyve::Parser::HAstNodeType::File) {
-            auto fileNode = std::dynamic_pointer_cast<Hyve::Parser::HAstFileNode>(ast);
+        if (parent == nullptr && ast->Type == Hyve::Parser::HAstNodeType::Module) {
+            auto moduleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(ast);
 
             // Create the symbol
-            auto fileSymbol = std::make_shared<HFileSymbol>();
-            fileSymbol->Name = fileNode->Name;
-            fileSymbol->SymbolType = HSymbolType::File;
-
-            // Get the children of the the body node, if any
-            if (fileNode->Children.empty()) {
-                return fileSymbol;
-            }
-
-            // Check if the file has a module declaration, if so, create a module symbol. 
-            // Otherwise we need to add it to the unnamed module
-            auto moduleNode = std::ranges::find_if(
-                fileNode->Children, 
-                [](const std::shared_ptr<Hyve::Parser::HAstNode>& node) {
-					return node->Type == Hyve::Parser::HAstNodeType::Module;
-				}
-			);
-
-            auto typedModuleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(*moduleNode);
-
-            if (moduleNode == fileNode->Children.end()) {
-                // Throw an error if the file does not have a module declaration for now
-                throw std::runtime_error("File does not have a module declaration");
-            }
-
             auto moduleSymbol = std::make_shared<HModuleSymbol>();
-            moduleSymbol->Name = typedModuleNode->Name;
+            moduleSymbol->Name = moduleNode->Name;
 
-            // Set the parent of the file symbol to the module symbol
-            fileSymbol->Parent = std::weak_ptr<HSymbol>(moduleSymbol);
+            auto fileNode = std::ranges::find_if(
+                moduleNode->Children,
+                [](const std::shared_ptr<Hyve::Parser::HAstNode>& node) {
+                    return node->Type == Hyve::Parser::HAstNodeType::File;
+                }
+            );
+
+            // Ensure we have a file node
+            if (fileNode == moduleNode->Children.end()) {
+                throw std::runtime_error("Module does not have a file node");
+            }
 
             // Add the file symbol to the module symbol children
+            auto typedFileNode = std::dynamic_pointer_cast<Parser::HAstFileNode>(*fileNode);
+
+            auto fileSymbol = std::make_shared<HFileSymbol>();
+            fileSymbol->Name = typedFileNode->Name;
+            fileSymbol->Parent = moduleSymbol;
             moduleSymbol->Children.push_back(fileSymbol);
 
-            BuildTypeTable(typedModuleNode, fileSymbol);
+            BuildSymbolTable(moduleNode, fileSymbol);
 
             return moduleSymbol;
         }
@@ -189,7 +178,7 @@ namespace Hyve::Typeck {
                 if (!typeNode->Children.empty()) {
                     auto bodyNode = typeNode->Children[0];
 
-                    BuildTypeTable(bodyNode, symbol);  
+                    BuildSymbolTable(bodyNode, symbol);
                 }
 
                 parent->Children.push_back(symbol);
@@ -208,7 +197,7 @@ namespace Hyve::Typeck {
                 if (!funcNode->Children.empty()) {
                     auto bodyNode = funcNode->Children[0];
 
-                    BuildTypeTable(bodyNode, symbol);
+                    BuildSymbolTable(bodyNode, symbol);
                 }
 
 			    parent->Children.push_back(symbol);
@@ -236,7 +225,7 @@ namespace Hyve::Typeck {
 
                 // Get the children of the type node
                 for (const auto& child : declNode->Children) {
-                    symbol->Children.push_back(BuildTypeTable(child, symbol));
+                    symbol->Children.push_back(BuildSymbolTable(child, symbol));
                 }
 
                 parent->Children.push_back(symbol);
@@ -265,7 +254,7 @@ namespace Hyve::Typeck {
 
                 // Get the children of the type node
                 for (const auto& child : declNode->Children) {
-                    symbol->Children.push_back(BuildTypeTable(child, symbol));
+                    symbol->Children.push_back(BuildSymbolTable(child, symbol));
                 }
 
                 parent->Children.push_back(symbol);
@@ -276,7 +265,7 @@ namespace Hyve::Typeck {
     }
 
     void HTypeck::InferTypes(
-        const std::vector<std::shared_ptr<HSymbol>>& symbols,
+        const std::shared_ptr<HSymbolTable>& symbols,
         std::shared_ptr<Parser::HAstNode>& nodes
     ) {
         using enum Parser::HAstNodeType;
@@ -305,7 +294,15 @@ namespace Hyve::Typeck {
                 } else {
 					throw std::runtime_error("Property declaration does not have a type or initializer");
                 }
-			}
+            } else {
+                // Check that the type actually exists
+                // We do this by checking if the type is in the current scope
+                // If it is not, we go one level up and check again, until we reach the top level
+                // We traverse the tree in a depth-first manner
+                auto type = declNode->TypeNode;
+                
+                auto foundSymbol = symbols->Find(declNode->CreateScopeString(), declNode->TypeNode->Name);
+            }
         }
     }
 

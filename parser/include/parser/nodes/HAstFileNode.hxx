@@ -9,7 +9,5 @@ namespace Hyve::Parser {
             Name = "";
             Type = HAstNodeType::File;
         }
-
-        std::string Name;
     };
 }

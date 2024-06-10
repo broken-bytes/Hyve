@@ -55,7 +55,10 @@ namespace Hyve::Parser {
 		funcNode->ReturnType = ParseReturnType(stream);
 
 		// Parse the function body
-		funcNode->Children.push_back(ParseBody(stream));
+		if(auto body = ParseBody(stream); body != nullptr) {
+			funcNode->Children.push_back(body);
+			body->Parent = funcNode;
+		}
 
 		return funcNode;
 	}
