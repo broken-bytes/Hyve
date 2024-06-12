@@ -5,6 +5,7 @@
 #include "parser/parsers/HExpressionParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
 #include "parser/parsers/HInheritanceParser.hxx"
+#include "parser/parsers/HInitParser.hxx"
 #include "parser/parsers/HModuleParser.hxx"
 #include "parser/parsers/HPropertyParser.hxx"
 #include "parser/parsers/HProtocolParser.hxx"
@@ -190,6 +191,25 @@ namespace Hyve::Parser {
 		}
 
 		if (token.Type == FUNC) {
+			return true;
+		}
+
+		return false;
+	}
+	bool IHParser::IsInit(Lexer::HTokenStream& stream) const {
+		using enum Lexer::HTokenType;
+		auto token = stream.PeekUntilNonLineBreak();
+
+		if (token.Type == PUBLIC || token.Type == PRIVATE || token.Type == INTERNAL) {
+			// We need to skip the access modifier, as it is optional. Peek two tokens ahead
+			auto tokens = stream.Peek(2);
+
+			if (tokens[1].Type == INIT) {
+				return true;
+			}
+		}
+
+		if (token.Type == INIT) {
 			return true;
 		}
 
@@ -560,11 +580,18 @@ namespace Hyve::Parser {
 		auto exprParser = std::make_shared<HExpressionParser>(errorHandler);
 		auto funcParser = std::make_shared<HFuncParser>(errorHandler);
 		auto inheritanceParser = std::make_shared<HInheritanceParser>(errorHandler);
+		auto initParser = std::make_shared<HInitParser>(errorHandler);
 		auto propParser = std::make_shared<HPropertyParser>(errorHandler, exprParser);
 		auto protocolParser = std::make_shared<HProtocolParser>();
 		auto prototypeParser = std::make_shared<HPrototypeParser>();
 		auto statementParser = std::make_shared<HStatementParser>(errorHandler, exprParser);
-		auto structParser = std::make_shared<HStructParser>(errorHandler, funcParser, inheritanceParser, propParser);
+		auto structParser = std::make_shared<HStructParser>(
+			errorHandler, 
+			funcParser, 
+			inheritanceParser, 
+			initParser,
+			propParser
+		);
 		auto varParser = std::make_shared<HVariableParser>(errorHandler, exprParser);
 		auto moduleParser = std::make_shared<HModuleParser>(
 			errorHandler,

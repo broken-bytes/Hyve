@@ -3,6 +3,7 @@
 #include "parser/IHParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
 #include "parser/parsers/HInheritanceParser.hxx"
+#include "parser/parsers/HInitParser.hxx"
 #include "parser/parsers/HPropertyParser.hxx"
 #include "parser/nodes/HAstStructBodyNode.hxx"
 #include <core/HErrorHandler.hxx>
@@ -15,6 +16,7 @@ namespace Hyve::Parser {
 			std::shared_ptr<Core::HErrorHandler> errorHandler,
 			std::shared_ptr<HFuncParser> funcParser,
 			std::shared_ptr<HInheritanceParser> inheritanceParser,
+			std::shared_ptr<HInitParser> initParser,
 			std::shared_ptr<HPropertyParser> propParser
 		);
 		~HStructParser() final = default;
@@ -26,6 +28,7 @@ namespace Hyve::Parser {
 		// Different parsers per context
 		std::shared_ptr<HFuncParser> _funcParser;
 		std::shared_ptr<HInheritanceParser> _inheritanceParser;
+		std::shared_ptr<HInitParser> _initParser;
 		std::shared_ptr<HPropertyParser> _propParser;
 
 		std::shared_ptr<HAstStructBodyNode> ParseStructBody(Lexer::HTokenStream& stream);

@@ -16,6 +16,7 @@
 #include <parser/nodes/HAstClassNode.hxx>
 #include <parser/nodes/HAstFileNode.hxx>
 #include <parser/nodes/HAstFuncDeclNode.hxx>
+#include <parser/nodes/HAstInitDeclNode.hxx>
 #include <parser/nodes/HAstLiteralNode.hxx>
 #include <parser/nodes/HAstModuleDeclNode.hxx>
 #include <parser/nodes/HAstPropertyDeclNode.hxx>
@@ -114,63 +115,61 @@ namespace Hyve::Typeck {
         const std::shared_ptr<Hyve::Parser::HAstNode>& ast,
         const std::shared_ptr<HSymbol>& parent
     ) {
-        if (parent == nullptr && ast->Type == Hyve::Parser::HAstNodeType::Module) {
-            auto moduleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(ast);
-
-            // Create the symbol
-            auto moduleSymbol = std::make_shared<HModuleSymbol>();
-            moduleSymbol->Name = moduleNode->Name;
-
-            auto fileNode = std::ranges::find_if(
-                moduleNode->Children,
-                [](const std::shared_ptr<Hyve::Parser::HAstNode>& node) {
-                    return node->Type == Hyve::Parser::HAstNodeType::File;
-                }
-            );
-
-            // Ensure we have a file node
-            if (fileNode == moduleNode->Children.end()) {
-                throw std::runtime_error("Module does not have a file node");
-            }
-
-            // Add the file symbol to the module symbol children
-            auto typedFileNode = std::dynamic_pointer_cast<Parser::HAstFileNode>(*fileNode);
-
-            auto fileSymbol = std::make_shared<HFileSymbol>();
-            fileSymbol->Name = typedFileNode->Name;
-            fileSymbol->Parent = moduleSymbol;
-            moduleSymbol->Children.push_back(fileSymbol);
-
-            BuildSymbolTable(typedFileNode, fileSymbol);
-
-            return moduleSymbol;
-        }
+        using enum Parser::HAstTypeKind;
 
         // Traverse the AST and build the symbol table
+        // We have a few edge cases to consider:
+        // An AST always starts with a module node, followed by any number of submodules.
+        // The deepest module node will have a file node.
+        // This means we only need to check in the module node if we have a parent or not.
+
+        // Do the module check here
+        if (parent == nullptr) {
+            auto moduleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(ast);
+
+            std::shared_ptr<HSymbol> symbol = nullptr;
+
+            symbol = std::make_shared<HModuleSymbol>();
+            symbol->SymbolType = HSymbolType::Module;
+            symbol->Name = moduleNode->Name;
+
+            return BuildSymbolTable(ast, symbol);
+        }
+
         for (const auto& node : ast->Children) {
-            if (node->Type == Hyve::Parser::HAstNodeType::NominalType) {
+            if (node->Type == Parser::HAstNodeType::Module) {
+                auto moduleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(node);
+                std::shared_ptr<HSymbol> symbol = nullptr;
+
+                symbol = std::make_shared<HModuleSymbol>();
+                symbol->Name = moduleNode->Name;
+                parent->Children.push_back(symbol);
+                symbol->Parent = std::weak_ptr<HSymbol>(parent);
+
+                BuildSymbolTable(node, symbol);
+
+            } else if (node->Type == Hyve::Parser::HAstNodeType::NominalType) {
                 auto typeNode = std::dynamic_pointer_cast<Hyve::Parser::HAstTypeNode>(node);
 
                 // Create a symbol as a unique_ptr
                 std::shared_ptr<HSymbol> symbol = nullptr;
 
-                if (typeNode->Kind == Parser::HAstTypeKind::Class) {
+                if (typeNode->Kind == Class) {
                     symbol = std::make_shared<HClassSymbol>();
-                    symbol->SymbolType = HSymbolType::Class;
-                } else if (typeNode->Kind == Parser::HAstTypeKind::Enum) {
-                    symbol = std::make_shared<HEnumSymbol>();
-                    symbol->SymbolType = HSymbolType::Enum;
-                } else if (typeNode->Kind == Parser::HAstTypeKind::Protocol) {
-                    symbol = std::make_shared<HProtocolSymbol>();
-                    symbol->SymbolType = HSymbolType::Protocol;
-                } else if (typeNode->Kind == Parser::HAstTypeKind::Prototype) {
-                    symbol = std::make_shared<HPrototypeSymbol>();
-                    symbol->SymbolType = HSymbolType::Prototype;
-			    } else if (typeNode->Kind == Parser::HAstTypeKind::Struct) {
-                    symbol = std::make_shared<HStructSymbol>();
-                    symbol->SymbolType = HSymbolType::Struct;
                 }
-					
+                else if (typeNode->Kind == Enum) {
+                    symbol = std::make_shared<HEnumSymbol>();
+                }
+                else if (typeNode->Kind == Protocol) {
+                    symbol = std::make_shared<HProtocolSymbol>();
+                }
+                else if (typeNode->Kind == Prototype) {
+                    symbol = std::make_shared<HPrototypeSymbol>();
+                }
+                else if (typeNode->Kind == Struct) {
+                    symbol = std::make_shared<HStructSymbol>();
+                }
+
                 symbol->Name = typeNode->Name;
                 symbol->Parent = std::weak_ptr<HSymbol>(parent);
 
@@ -182,7 +181,21 @@ namespace Hyve::Typeck {
                 }
 
                 parent->Children.push_back(symbol);
-                
+
+            }
+            else if (node->Type == Hyve::Parser::HAstNodeType::File) {
+                auto fileNode = std::dynamic_pointer_cast<Hyve::Parser::HAstFileNode>(node);
+
+                // Create a symbol
+                auto symbol = std::make_shared<HFileSymbol>();
+                symbol->Name = fileNode->Name;
+                symbol->Parent = std::weak_ptr<HSymbol>(parent);
+
+                if (!fileNode->Children.empty()) {
+                    BuildSymbolTable(fileNode, symbol);
+                }
+
+                parent->Children.push_back(symbol);
             } else if (node->Type == Hyve::Parser::HAstNodeType::Func) {
                 auto funcNode = std::dynamic_pointer_cast<Hyve::Parser::HAstFuncDeclNode>(node);
 
@@ -190,7 +203,6 @@ namespace Hyve::Typeck {
                 auto symbol = std::make_shared<HFunctionSymbol>();
                 symbol->Name = funcNode->Name;
                 symbol->Parent = std::weak_ptr<HSymbol>(parent);
-                symbol->SymbolType = HSymbolType::Function;
                 symbol->AccessLevel = funcNode->AccessLevel;
 
                 // Get the children of the the body node, if any
@@ -201,6 +213,23 @@ namespace Hyve::Typeck {
                 }
 
 			    parent->Children.push_back(symbol);
+            } else if (node->Type == Hyve::Parser::HAstNodeType::Init) {
+                auto initNode = std::dynamic_pointer_cast<Parser::HAstInitDeclNode>(node);
+
+                // Create a symbol
+                auto symbol = std::make_shared<HFunctionSymbol>();
+                symbol->Name = initNode->Name;
+                symbol->Parent = std::weak_ptr<HSymbol>(parent);
+                symbol->AccessLevel = initNode->AccessLevel;
+
+                // Get the children of the the body node, if any
+                if (!initNode->Children.empty()) {
+                    auto bodyNode = initNode->Children[0];
+
+                    BuildSymbolTable(bodyNode, symbol);
+                }
+
+                parent->Children.push_back(symbol);
             } else if (node->Type == Hyve::Parser::HAstNodeType::PropertyDecl) {
                 auto declNode = std::dynamic_pointer_cast<Hyve::Parser::HAstPropertyDeclNode>(node);
 
@@ -208,7 +237,6 @@ namespace Hyve::Typeck {
                 auto symbol = std::make_shared<HPropertySymbol>();
                 symbol->Name = declNode->Name;
                 symbol->Parent = std::weak_ptr<HSymbol>(parent);
-                symbol->SymbolType = HSymbolType::Variable;
                 symbol->AccessLevel = declNode->AccessLevel;
 
                 auto type = std::make_shared<HType>();
@@ -237,7 +265,6 @@ namespace Hyve::Typeck {
                 auto symbol = std::make_shared<HVariableSymbol>();
                 symbol->Name = declNode->Name;
                 symbol->Parent = std::weak_ptr<HSymbol>(parent);
-                symbol->SymbolType = HSymbolType::Variable;
 
                 auto type = std::make_shared<HType>();
 

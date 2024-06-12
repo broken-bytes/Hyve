@@ -47,6 +47,7 @@ namespace Hyve::Parser {
 		while(stream.Peek().Type == DOT) {
 			token = stream.Consume(DOT);
 			token = stream.PeekUntilNonLineBreak();
+			
 			if (token.Type == IDENTIFIER) {
 				token = stream.Consume(IDENTIFIER);
 				auto moduleNode = std::make_shared<HAstModuleDeclNode>();

@@ -32,6 +32,7 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsInit(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsProperty(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsProtocol(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream) const;

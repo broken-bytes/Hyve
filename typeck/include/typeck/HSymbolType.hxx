@@ -7,6 +7,7 @@ enum class HSymbolType {
     Variable,
     Class,
     Enum,
+    Property,
     Protocol,
     Prototype,
     Struct,

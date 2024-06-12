@@ -6,6 +6,7 @@ namespace Hyve::Parser {
         Expression,
         Statement,
         NominalType,
+        Init,
         Func,
         PropertyDecl,
         VariableDecl,

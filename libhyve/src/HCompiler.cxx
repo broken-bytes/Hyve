@@ -26,6 +26,7 @@ namespace Hyve {
 			auto ast = _parser->Parse(tokens);
             asts.push_back(ast);
             auto symbolTable = _typeck->BuildSymbolTable(ast, nullptr);
+
             symbols.push_back(symbolTable);
 		}
 

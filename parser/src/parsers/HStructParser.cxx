@@ -12,10 +12,12 @@ namespace Hyve::Parser {
 		std::shared_ptr<Core::HErrorHandler> errorHandler,
 		std::shared_ptr<HFuncParser> funcParser,
 		std::shared_ptr<HInheritanceParser> inheritanceParser,
+		std::shared_ptr<HInitParser> initParser,
 		std::shared_ptr<HPropertyParser> propParser
 	) : _errorHandler(errorHandler), 
 		_funcParser(funcParser), 
 		_inheritanceParser(inheritanceParser),
+		_initParser(initParser),
 		_propParser(propParser) { }
 
 	std::shared_ptr<HAstNode> HStructParser::Parse(Lexer::HTokenStream& stream) {
@@ -103,6 +105,11 @@ namespace Hyve::Parser {
 				if(auto func = _funcParser->Parse(stream); func != nullptr) {
 					func->Parent = bodyNode;
 					bodyNode->Children.push_back(func);
+				}
+			} else if (IsInit(stream)) {
+				if (auto init = _initParser->Parse(stream); init != nullptr) {
+					init->Parent = bodyNode;
+					bodyNode->Children.push_back(init);
 				}
 			} else {
 				// We have an unrevoered error, panic
