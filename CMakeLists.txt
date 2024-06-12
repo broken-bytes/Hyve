@@ -40,3 +40,9 @@ set_property(TARGET hyvec PROPERTY CXX_STANDARD 23)
 target_include_directories(hyvec PUBLIC ${CMAKE_SOURCE_DIR}/cli/include)
 
 target_link_libraries(hyvec PUBLIC CLI)
+
+if(HYVE_BOOTSTRAP)
+    target_compile_definitions(Parser PRIVATE HYVE_BOOTSTRAP=1)
+    target_compile_definitions(Typeck PRIVATE HYVE_BOOTSTRAP=1)
+    target_compile_definitions(Generator PRIVATE HYVE_BOOTSTRAP=1)
+endif()

@@ -26,6 +26,9 @@ namespace Hyve::Parser {
 
 		auto structNode = std::make_shared<HAstStructNode>();
 
+		// A struct may have an access modifier
+		auto accessLevel = ParseAccessLevel(stream);
+
 		// A Struct always starts with the struct keyword
 		auto token = stream.Consume(STRUCT);
 
@@ -90,6 +93,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		while (token.Type != RCBRACKET) {
+			// TODO: Parse init
 			if (IsProperty(stream)) {
 				if (auto prop = _propParser->Parse(stream); prop != nullptr) {
 					prop->Parent = bodyNode;

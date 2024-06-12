@@ -36,6 +36,7 @@ llvm_map_components_to_libnames(llvm_libs
     X86Desc
     X86Disassembler
     X86Info
+    Linker
     # Add other components as needed
 )
 

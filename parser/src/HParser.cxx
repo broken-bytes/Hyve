@@ -54,8 +54,21 @@ namespace Hyve::Parser {
         // Every file should start with a module declaration(or after the imports),
         // so we use the module parser
         if (auto mod = _moduleParser->Parse(stream); mod != nullptr) {
-           // We need to set all children of the module to have the file as their parent
-            for (const auto& child : mod->Children) {
+            // We need to set all children of the module to have the file as their parent
+            // We also need to make sure we get the deepest module
+            // This is because the module parser will return the top level module
+
+            auto current = mod;
+            while (!current->Children.empty()) {
+				auto moduleNode = std::dynamic_pointer_cast<HAstModuleDeclNode>(current->Children[0]);
+                if (moduleNode == nullptr) {
+                    break;
+                }
+
+                current = moduleNode;
+            }
+
+            for (const auto& child : current->Children) {
 				child->Parent = file;
                 file->Children.push_back(child);
 			}
@@ -64,9 +77,9 @@ namespace Hyve::Parser {
             // We do this because each module can have multiple files
             // but each file can only have one module
             // Additionally, definitions aren't technically children of the module
-            mod->Children = {};
-            mod->Children.push_back(file);
-            file->Parent = mod;
+            current->Children = {};
+            current->Children.push_back(file);
+            file->Parent = current;
 
             return mod;
         }

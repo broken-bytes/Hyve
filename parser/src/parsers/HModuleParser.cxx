@@ -32,16 +32,49 @@ namespace Hyve::Parser {
 
 	std::shared_ptr<HAstNode> HModuleParser::Parse(Lexer::HTokenStream& stream) {
 		using enum Lexer::HTokenType;
+		using enum Lexer::HTokenFamily;
 		using enum Core::HCompilerError::ErrorCode;
-
-		auto moduleNode = std::make_shared<HAstModuleDeclNode>();
+		
+		auto rootModule = std::make_shared<HAstModuleDeclNode>();
 
 		auto token = stream.Consume(MODULE);
 
 		token = stream.Consume(IDENTIFIER);
-		moduleNode->Name = token.Value;
+		rootModule->Name = token.Value;
+
+		// We may have nested modules.
+		// We keep parsing until we reach anything other than a dot followed by an identifier
+		while(stream.Peek().Type == DOT) {
+			token = stream.Consume(DOT);
+			token = stream.PeekUntilNonLineBreak();
+			if (token.Type == IDENTIFIER) {
+				token = stream.Consume(IDENTIFIER);
+				auto moduleNode = std::make_shared<HAstModuleDeclNode>();
+				moduleNode->Name = token.Value;
+
+				// Get the deepest module node
+				auto currentModule = rootModule;
+				while (!currentModule->Children.empty()) {
+					currentModule = std::static_pointer_cast<HAstModuleDeclNode>(currentModule->Children.back());
+				}
+
+				moduleNode->Parent = currentModule;
+				currentModule->Children.push_back(moduleNode);
+
+			} else {
+				_errorHandler->AddError(INVALID_MODULE_DECLARATION, token.FileName, token.Line);
+				Panic(stream, KEYWORD);
+				token = stream.PeekUntilNonLineBreak();
+			}
+		}
 
 		token = stream.PeekUntilNonLineBreak();
+
+		// Get the deepest module node
+		auto moduleNode = rootModule;
+		while (!moduleNode->Children.empty()) {
+			moduleNode = std::static_pointer_cast<HAstModuleDeclNode>(moduleNode->Children.back());
+		}
 
 		while (token.Type != END_OF_FILE) {
 			if (IsClass(stream)) {
@@ -63,14 +96,14 @@ namespace Hyve::Parser {
 			} else {
 				HandleErrorCase(stream);
 				
-				return moduleNode;
+				return rootModule;
 			}
 			// Make module node the parent of the class node
 			moduleNode->Children.back()->Parent = moduleNode;
 			token = stream.PeekUntilNonLineBreak();
 		}
 
-		return moduleNode;
+		return rootModule;
 	}
 
 	void HModuleParser::HandleErrorCase(Lexer::HTokenStream& stream) {

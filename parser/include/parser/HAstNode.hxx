@@ -10,6 +10,10 @@ namespace Hyve::Parser {
     struct HAstNode {
 		std::string Name;
 
+		HAstNode() {
+			Children = {};
+		}
+
         virtual ~HAstNode() = default;
         HAstNodeType Type;
         std::weak_ptr<HAstNode> Parent;
