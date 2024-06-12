@@ -342,7 +342,6 @@ namespace Hyve::Typeck {
         // If we have just a literal node, we can return the type of the literal immediately
         if (node->Type == Parser::HAstNodeType::Literal) {
 			auto literalNode = std::dynamic_pointer_cast<Parser::HAstLiteralNode>(node);
-			
 		}
 
         return nullptr;

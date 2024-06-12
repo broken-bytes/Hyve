@@ -18,5 +18,9 @@ namespace Hyve::Typeck {
         std::vector<std::shared_ptr<HSymbol>> _children;
 
         std::shared_ptr<HSymbol> FindInScope(std::shared_ptr<HSymbol> scope, std::string_view name) const;
+
+#ifdef HYVE_BOOTSTRAP
+        void AddBuiltInTypes();
+#endif
 	};
 }

@@ -1,3 +1,5 @@
+use hyve.lowlevel
+
 module hyve.builtins
 
 public struct _Int8 {
