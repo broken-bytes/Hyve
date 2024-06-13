@@ -295,11 +295,25 @@ namespace Hyve::Typeck {
         const std::shared_ptr<HSymbolTable>& symbols,
         std::shared_ptr<Parser::HAstNode>& nodes
     ) {
+        // First we infer types of the local module only
+        InferLocalTypes(symbols, nodes);
+        // Then we infer types of the imported modules + The Standard Library
+        InferImportedTypes(symbols, nodes);
+        // Finally we find any unimported types
+        // This is used for fixit hints in LSP
+        FindUnimportedTypes(symbols, nodes);
+    }
+
+    void HTypeck::InferLocalTypes(
+        const std::shared_ptr<HSymbolTable>& symbols,
+        std::shared_ptr<Parser::HAstNode>& nodes
+    ) {
         using enum Parser::HAstNodeType;
+
         // Files/Modules only need their children to be inferred
         if (nodes->Type == File || nodes->Type == Module) {
             for(auto& node: nodes->Children) {
-				InferTypes(symbols, node);
+                InferLocalTypes(symbols, node);
 			}
         } else if (nodes->Type == NominalType || nodes->Type == Func) {
             // Get the body node
@@ -308,7 +322,7 @@ namespace Hyve::Typeck {
             }
             auto bodyNode = nodes->Children[0];
             for (auto& node : bodyNode->Children) {
-                InferTypes(symbols, node);
+                InferLocalTypes(symbols, node);
             }
         } else if (nodes->Type == PropertyDecl) {
             auto declNode = std::dynamic_pointer_cast<Parser::HAstPropertyDeclNode>(nodes);
@@ -331,6 +345,20 @@ namespace Hyve::Typeck {
                 auto foundSymbol = symbols->Find(declNode->CreateScopeString(), declNode->TypeNode->Name);
             }
         }
+    }
+
+    void HTypeck::InferImportedTypes(
+        const std::shared_ptr<HSymbolTable>&,
+        std::shared_ptr<Parser::HAstNode>& nodes
+    ) {
+
+    }
+
+    void HTypeck::FindUnimportedTypes(
+        const std::shared_ptr<HSymbolTable>&,
+        std::shared_ptr<Parser::HAstNode>& nodes
+    ) {
+
     }
 
     std::shared_ptr<Parser::HAstTypeNode> HTypeck::CalculateExpressionType(

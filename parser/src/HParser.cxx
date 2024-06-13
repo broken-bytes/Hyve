@@ -49,6 +49,7 @@ namespace Hyve::Parser {
         // A file may start with imports, so parse them first
         while (token.Type == Lexer::HTokenType::IMPORT) {
             file->Children.push_back(ParseImport(stream));
+            token = stream.PeekUntilNonLineBreak();
 		}
 
         // Every file should start with a module declaration(or after the imports),
@@ -105,6 +106,16 @@ namespace Hyve::Parser {
         }
 
         importNode->Name = token.Value;
+
+        // Imports may use submodules, so we need to take that into account
+        token = stream.PeekUntilNonLineBreak();
+
+        while (token.Type == DOT) {
+			stream.Consume(DOT);
+			token = stream.Consume(IDENTIFIER);
+			importNode->Name += "." + token.Value;
+			token = stream.PeekUntilNonLineBreak();
+		}
 		
         return importNode;
     }
