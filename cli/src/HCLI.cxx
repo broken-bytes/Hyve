@@ -7,7 +7,8 @@
 #include <utility>
 
 namespace Hyve::CLI {
-    HCLI::HCLI(std::string version) : _version(std::move(version)) {
+    HCLI::HCLI(std::string version) 
+    : _version(std::move(version)) {
         std::stringstream vsString;
         vsString <<R"(
     ______
@@ -47,24 +48,38 @@ namespace Hyve::CLI {
         };
 
         auto compile = Hyve::CLI::HCLICommand{
-                .ShortName = "-c",
-                .LongName = "--compile",
-                .Alias = "Compile",
-                .Help = "Compiles the given file",
-                .Handler = [this](const std::string& data) { _sourceFiles.push_back(data); }
+            .ShortName = "-c",
+            .LongName = "--compile",
+            .Alias = "Compile",
+            .Help = "Compiles the given file",
+            .Handler = [this](const std::string& data) { _sourceFiles.push_back(data); }
         };
 
-        auto target = Hyve::CLI::HCLICommand{
-                .ShortName = "-t",
-                .LongName = "--target",
-                .Alias = "Target",
-                .Help = "Sets the compile target. Possible values are debug|release"
+        auto warnings = Hyve::CLI::HCLICommand{
+			.ShortName = "-w",
+			.LongName = "--warnings",
+			.Alias = "Warnings",
+			.Help = "Tells the compiler what warnings to emit. Comma Separated array of W0|W1|WA",
+			.Handler = [this](const std::string& data) { 
+				_compilerArguments.emplace_back(HCompilerArgumentType::WARNINGS, data);
+			}
+		};
+
+        auto moduleTarget = Hyve::CLI::HCLICommand{
+            .ShortName = "-m",
+            .LongName = "--module",
+            .Alias = "Module",
+            .Help = "Tells the compiler to emit a module",
+            .Handler = [this](const std::string& data) { 
+                _compilerArguments.emplace_back(HCompilerArgumentType::MODULE, data);
+            }
         };
 
         std::vector<Hyve::CLI::HCLICommand> commands = {
-                help,
-                compile,
-                target
+            help,
+            compile,
+            warnings,
+            moduleTarget
         };
 
         SetAvailableParameters(commands);
@@ -112,10 +127,11 @@ namespace Hyve::CLI {
 			exit(1);
 		}
 
-        _compiler->Compile(_sourceFiles);
+        _compiler->Compile(_sourceFiles, _compilerArguments);
     }
 
     void HCLI::ProcessCommandParameters(const std::vector<std::string>& arguments) {
+        using enum Hyve::CLI::CLIColor;
         std::string command;
 
         std::vector<HCLICommandParameter> params {};
@@ -136,14 +152,14 @@ namespace Hyve::CLI {
             }
         }
 
-        Write(Hyve::CLI::CLIColor::YELLOW, "Compiler options used:\n");
+        Write(YELLOW, "Compiler options used:\n");
 
         for(const auto& arg: params) {
-            Write(Hyve::CLI::CLIColor::YELLOW, "  - ");
-            Write(Hyve::CLI::CLIColor::YELLOW, arg.Name);
-            Write(Hyve::CLI::CLIColor::YELLOW, " ");
-            Write(Hyve::CLI::CLIColor::YELLOW, arg.Value);
-            Write(Hyve::CLI::CLIColor::YELLOW, "\n");
+            Write(YELLOW, "  - ");
+            Write(YELLOW, arg.Name);
+            Write(YELLOW, " ");
+            Write(YELLOW, arg.Value);
+            Write(YELLOW, "\n");
         }
 
         _providedCommands = params;

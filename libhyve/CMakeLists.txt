@@ -6,6 +6,7 @@ SET(
 SET(
     HEADERS
     include/libhyve/HCompiler.hxx
+    include/libhyve/HCompilerArgument.hxx
 )
 
 add_library(libhyve STATIC ${SRC} ${HEADERS})

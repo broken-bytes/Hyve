@@ -1,0 +1,11 @@
+use hyve.builtins
+
+module hyve.core
+
+public struct Int32 {
+    private var value: _Int32
+
+    public init(value: Integer) {
+        self.value = value
+    }
+}

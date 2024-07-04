@@ -28,9 +28,14 @@ namespace Hyve::Typeck {
 			const std::vector<std::shared_ptr<HSymbol>>& symbolTables
 		);
 
-        void InferLocalTypes(
+        void InferTypes(
+			const std::shared_ptr<HSymbolTable>&,
+			std::shared_ptr<Parser::HAstNode>& nodes
+		);
+
+        void InferTypesWithSymbolTable(
             const std::shared_ptr<HSymbolTable>&,
-            std::shared_ptr<Parser::HAstNode>& nodes
+            const std::shared_ptr<Parser::HAstNode>& nodes
         );
 
         void InferImportedTypes(

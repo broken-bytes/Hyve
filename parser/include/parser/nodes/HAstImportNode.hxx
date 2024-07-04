@@ -8,6 +8,7 @@
 namespace Hyve::Parser {
     struct HAstImportNode : HAstStatementNode {
         HAstImportNode() {
+            Type = HAstNodeType::Import;
             StatementType = StatementType::Import;
         }
     };

@@ -3,7 +3,9 @@
 #include "cli/HCLICommand.hxx"
 #include "cli/HCLICommandParameter.hxx"
 #include <libhyve/HCompiler.hxx>
+#include <libhyve/HCompilerArgument.hxx>
 #include <cstdint>
+#include <map>
 #include <vector>
 
 namespace Hyve::CLI {
@@ -31,6 +33,7 @@ namespace Hyve::CLI {
         std::vector<HCLICommandParameter> _providedCommands;
         std::vector<std::string> _sourceFiles;
         std::unique_ptr<Hyve::HCompiler> _compiler;
+        std::vector<Hyve::HCompilerArgument> _compilerArguments;
 
         [[nodiscard]] bool CheckIfCommand(std::string_view str) const;
         [[nodiscard]] HCLICommand GetCommand(std::string_view str) const;

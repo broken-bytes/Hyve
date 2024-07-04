@@ -16,15 +16,31 @@
 #include <parser/nodes/HAstClassNode.hxx>
 #include <parser/nodes/HAstFileNode.hxx>
 #include <parser/nodes/HAstFuncDeclNode.hxx>
+#include <parser/nodes/HAstImportNode.hxx>
 #include <parser/nodes/HAstInitDeclNode.hxx>
 #include <parser/nodes/HAstLiteralNode.hxx>
 #include <parser/nodes/HAstModuleDeclNode.hxx>
 #include <parser/nodes/HAstPropertyDeclNode.hxx>
 #include <parser/nodes/HAstVarDeclNode.hxx>
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <ranges>
 #include <stdexcept>
+
+std::vector<std::string_view> splitString(std::string_view str, char delimiter) {
+    std::vector<std::string_view> tokens;
+    size_t start = 0;
+    size_t end;
+
+    while ((end = str.find(delimiter, start)) != std::string_view::npos) {
+        tokens.emplace_back(str.substr(start, end - start));
+        start = end + 1;
+    }
+
+    tokens.emplace_back(str.substr(start));
+    return tokens;
+}
 
 namespace Hyve::Typeck {
     HSymbolType NodeTypeToSymbolType(Parser::HAstTypeKind type) {
@@ -296,7 +312,7 @@ namespace Hyve::Typeck {
         std::shared_ptr<Parser::HAstNode>& nodes
     ) {
         // First we infer types of the local module only
-        InferLocalTypes(symbols, nodes);
+        InferTypesWithSymbolTable(symbols, nodes);
         // Then we infer types of the imported modules + The Standard Library
         InferImportedTypes(symbols, nodes);
         // Finally we find any unimported types
@@ -304,16 +320,16 @@ namespace Hyve::Typeck {
         FindUnimportedTypes(symbols, nodes);
     }
 
-    void HTypeck::InferLocalTypes(
+    void HTypeck::InferTypesWithSymbolTable(
         const std::shared_ptr<HSymbolTable>& symbols,
-        std::shared_ptr<Parser::HAstNode>& nodes
+        const std::shared_ptr<Parser::HAstNode>& nodes
     ) {
         using enum Parser::HAstNodeType;
 
         // Files/Modules only need their children to be inferred
         if (nodes->Type == File || nodes->Type == Module) {
-            for(auto& node: nodes->Children) {
-                InferLocalTypes(symbols, node);
+            for(const auto& node: nodes->Children) {
+                InferTypesWithSymbolTable(symbols, node);
 			}
         } else if (nodes->Type == NominalType || nodes->Type == Func) {
             // Get the body node
@@ -321,8 +337,8 @@ namespace Hyve::Typeck {
                 return;
             }
             auto bodyNode = nodes->Children[0];
-            for (auto& node : bodyNode->Children) {
-                InferLocalTypes(symbols, node);
+            for (const auto& node : bodyNode->Children) {
+                InferTypesWithSymbolTable(symbols, node);
             }
         } else if (nodes->Type == PropertyDecl) {
             auto declNode = std::dynamic_pointer_cast<Parser::HAstPropertyDeclNode>(nodes);
@@ -343,15 +359,72 @@ namespace Hyve::Typeck {
                 auto type = declNode->TypeNode;
                 
                 auto foundSymbol = symbols->Find(declNode->CreateScopeString(), declNode->TypeNode->Name);
+
+                if (foundSymbol != nullptr) {
+                    // We found the symbol, so we can continue
+					// We need to check if the symbol is a type or not
+					if (foundSymbol->SymbolType != HSymbolType::Class && foundSymbol->SymbolType != HSymbolType::Struct) {
+						throw std::runtime_error("Property type is not a class or struct");
+                    }
+                    else {
+                        // Assign the type to the symbol
+                        type->Kind = SymbolTypeToNodeType(foundSymbol->SymbolType);
+                        // Get the module of the symbol
+                        // First we create the scope string for the symbol
+                        auto scope = declNode->CreateScopeString();
+                        // Then we take the first part of the scope string
+                        auto moduleSymbol = scope.front();
+                    }
+				}
             }
         }
     }
 
     void HTypeck::InferImportedTypes(
-        const std::shared_ptr<HSymbolTable>&,
+        const std::shared_ptr<HSymbolTable>& symbols,
         std::shared_ptr<Parser::HAstNode>& nodes
     ) {
+        // We know that this function always only has a single file node, so we can just take the first one
+        auto fileNode = Parser::HAstNode::FindNodesWithType(Parser::HAstNodeType::File, nodes);
 
+        if(fileNode.empty()) {
+			throw std::runtime_error("No file node found in AST");
+		}
+
+        // Take the first file node
+        auto file = fileNode.front();
+
+        // Get all the import nodes
+        auto importNodes = Parser::HAstNode::FindNodesWithType(Parser::HAstNodeType::Import, file);
+        std::vector<std::shared_ptr<HSymbol>> importedModules;
+
+        // For each import node, we need to find the module in the symbol table
+        for (const auto& childNode : importNodes) {
+            auto importNode = std::dynamic_pointer_cast<Parser::HAstImportNode>(childNode);
+            
+            // Find each part of the import node in the symbol table
+            auto parts = splitString(importNode->Name, '.');
+            std::shared_ptr<HSymbol> currentSymbol = nullptr;
+            std::vector<std::string_view> scope = {};
+
+            // Scope is everything except the last part
+            for (size_t i = 0; i < parts.size() - 1; i++) {
+				scope.push_back(parts[i]);
+			}
+
+            auto importedModuleSymbol = symbols->Find(scope, parts.back());
+
+            if (importedModuleSymbol == nullptr) {
+				throw std::runtime_error("Imported module not found in symbol table");
+			}
+
+            importedModules.push_back(importedModuleSymbol);
+		}
+
+        // Now we have all imported modules. Check if they contain any types that refer to in the local module
+        for (const auto& importedModule : importedModules) {
+            InferTypesWithSymbolTable(std::make_shared<HSymbolTable>(importedModule->Children), nodes);
+		}
     }
 
     void HTypeck::FindUnimportedTypes(

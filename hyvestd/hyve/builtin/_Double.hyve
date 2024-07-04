@@ -1,0 +1,15 @@
+use hyve.lowlevel
+
+module hyve.builtins
+
+public struct _Double {
+    var value: double
+
+    public init(value: double) {
+        self.value = value
+    }
+
+    public fn add(lhs: _Double, rhs: _Double) -> _Double {
+        var result = addFloat(a: lhs.value, b: rhs.value)
+    }
+}

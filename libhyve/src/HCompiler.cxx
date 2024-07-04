@@ -1,6 +1,8 @@
 #include "libhyve/HCompiler.hxx"
+#include <libhyve/HCompilerArgument.hxx>
 #include <parser/IHParser.hxx>
 #include <fstream>
+#include <map>
 
 // TESTING ONLY
 #include <generator/HGenerator.hxx>
@@ -10,13 +12,13 @@ namespace Hyve {
         _lexer = std::make_shared<Lexer::HLexer>();
         _parser = Parser::Create();
         _typeck = std::make_shared<Typeck::HTypeck>();
+        _generator = std::make_shared<Generator::HGenerator>();
     }
 
-	void HCompiler::Compile(const std::vector<std::string>& files) {
-        // TESTING ONLY
-        Generator::HGenerator generator;
-        generator.GenerateIR("");
-
+    void HCompiler::Compile(
+        const std::vector<std::string>& files, 
+        std::vector<HCompilerArgument> arguments
+    ) {
         std::vector<std::shared_ptr<Typeck::HSymbol>> symbols = {};
         std::vector<std::shared_ptr<Parser::HAstNode>> asts = {};
 
@@ -30,7 +32,6 @@ namespace Hyve {
             symbols.push_back(symbolTable);
 		}
 
-        // TODO: Merge the symbol tables
         auto symbolTable = _typeck->MergeSymbols(symbols);
 
         for (auto& ast : asts) {

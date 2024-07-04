@@ -41,5 +41,23 @@ namespace Hyve::Parser {
 
 			return scope;
 		}
+
+		static inline std::vector<std::shared_ptr<HAstNode>> FindNodesWithType(HAstNodeType type, std::shared_ptr<HAstNode> root) {
+			auto nodes = std::vector<std::shared_ptr<HAstNode>>();
+
+			auto currentNode = root;
+
+			if (currentNode->Type == type) {
+				nodes.push_back(std::shared_ptr<HAstNode>(currentNode));
+			}
+
+			for(const auto& child : currentNode->Children) {
+				for(const auto& node : FindNodesWithType(type, child)) {
+					nodes.push_back(node);
+				}
+			}
+
+			return nodes;
+		}
     };
 }

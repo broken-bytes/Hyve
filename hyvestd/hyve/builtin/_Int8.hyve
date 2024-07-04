@@ -1,0 +1,15 @@
+use hyve.lowlevel
+
+module hyve.builtins
+
+public struct _Int8 {
+    var value: i32
+
+    public init(value: Integer) {
+        self.value = value
+    }
+
+    public fn add(lhs: _Int8, rhs: _Int8) -> _Int8 {
+        var result = addInt8(a: lhs.value, b: rhs.value)
+    }
+}

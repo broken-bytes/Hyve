@@ -66,24 +66,20 @@ namespace Hyve::Typeck {
         // Add the low-level types to the symbol table
 
 		auto int8Type = std::make_shared<HSymbol>();
-        int8Type->Name = "int8";
+        int8Type->Name = "i8";
         int8Type->SymbolType = HSymbolType::Struct;
 
         auto int16Type = std::make_shared<HSymbol>();
-        int16Type->Name = "int16";
+        int16Type->Name = "i16";
         int16Type->SymbolType = HSymbolType::Struct;
 
         auto int32Type = std::make_shared<HSymbol>();
-        int32Type->Name = "int32";
+        int32Type->Name = "i32";
         int32Type->SymbolType = HSymbolType::Struct;
 
         auto int64Type = std::make_shared<HSymbol>();
-        int64Type->Name = "int64";
+        int64Type->Name = "i64";
         int64Type->SymbolType = HSymbolType::Struct;
-
-        auto charType = std::make_shared<HSymbol>();
-        charType->Name = "char";
-        charType->SymbolType = HSymbolType::Struct;
 
 		auto floatType = std::make_shared<HSymbol>();
         floatType->Name = "float";
@@ -100,7 +96,6 @@ namespace Hyve::Typeck {
         lowLevelModule->Children.push_back(int16Type);
         lowLevelModule->Children.push_back(int32Type);
         lowLevelModule->Children.push_back(int64Type);
-        lowLevelModule->Children.push_back(charType);
         lowLevelModule->Children.push_back(floatType);
         lowLevelModule->Children.push_back(doubleType);
 
