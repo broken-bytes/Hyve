@@ -2,6 +2,9 @@
 #include "cli/HCLIInvalidCommandException.hxx"
 #include <algorithm>
 #include <cstdio>
+#include <format>
+#include <iostream>
+#include <print>
 #include <ranges>
 #include <sstream>
 #include <utility>
@@ -36,12 +39,12 @@ namespace Hyve::CLI {
                 .Alias = "Help",
                 .Help = "Displays help for Hyve",
                 .Handler = []([[maybe_unused]] const std::string_view data) {
-                    printf("hyvec is the compiler for the Hyve language\n");
-					printf("Usage: hyvec [options]\n\n");
-					printf("Options:\n");
-					printf("  -h, --help\t\tDisplays this help message\n");
-					printf("  -c, --compile\t\tCompiles the given file\n");
-					printf("  -t, --target\t\tSets the compile target. Possible values are debug|release\n");
+                    std::cout << "hyvec is the compiler for the Hyve language" << std::endl;
+                    std::cout << "Usage: hyvec [options]\n\n" << std::endl;
+                    std::cout << "Options:\n" << std::endl;
+                    std::cout << "  -h, --help\t\tDisplays this help message\n" << std::endl;
+                    std::cout << "  -c, --compile\t\tCompiles the given file\n" << std::endl;
+                    std::cout << "  -t, --target\t\tSets the compile target. Possible values are debug|release\n" << std::endl;
 
                     exit(0);
             }
@@ -170,7 +173,7 @@ namespace Hyve::CLI {
     }
 
     void HCLI::Write(CLIColor color, const std::string& message) const {
-        printf("\033[1;%im%s\033[0m", (int)color, message.c_str());
+        std::print("\033[1;{}m{}\033[0m", static_cast<int>(color), message);
     }
 
     bool HCLI::CheckIfCommand(std::string_view str) const {
