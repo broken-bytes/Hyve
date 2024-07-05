@@ -76,12 +76,12 @@ namespace Hyve::Typeck {
 
     std::shared_ptr<HSymbol> HSymbolTable::Find(std::string_view name) const {
         // Find the first matching symbol in the root scope
-        for (auto& child : _children) {
+        for (const auto& child : _children) {
             if (child->Name == name) {
                 return child;
             }
             else {
-                return child->FindNestedChild(name);
+                child->FindNestedChild(name);
             }
         }
 
@@ -90,7 +90,7 @@ namespace Hyve::Typeck {
 
     std::shared_ptr<HSymbol> HSymbolTable::FindInScope(std::shared_ptr<HSymbol> scope, std::string_view name) const {
         // Find the first matching symbol in the scope
-        for (auto& child : scope->Children) {
+        for (const auto& child : scope->Children) {
             if (child->Name == name) {
                 return child;
 			}
