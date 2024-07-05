@@ -106,23 +106,15 @@ namespace Hyve::CLI {
             }
         }
 
-        // If the help command is provided, we skip any other command
-        if(std::ranges::find_if(
-			_providedCommands.begin(), 
-			_providedCommands.end(), 
-			[](const auto& cmd) { return cmd.Name == "Help"; }) != _providedCommands.end()
-		) {
-			return;
-		}
+        if (std::ranges::find_if(_providedCommands, [](const auto& cmd) { return cmd.Name == "Help"; }) != _providedCommands.end()) {
+            return;
+        }
 
-        if(std::ranges::find_if(
-            _providedCommands.begin(), 
-            _providedCommands.end(), 
-            [](const auto& cmd) { return cmd.Name == "Compile"; }) == _providedCommands.end()
-        ) {
-			Write(CLIColor::RED, "No compile command provided. Exiting...\n");
-			exit(1);
-		}
+        // If no compile command is provided, exit with an error message
+        if (std::ranges::find_if(_providedCommands, [](const auto& cmd) { return cmd.Name == "Compile"; }) == _providedCommands.end()) {
+            Write(CLIColor::RED, "No compile command provided. Exiting...\n");
+            exit(1);
+        }
 
         // If no source files are provided, we can't compile anything
         if(_sourceFiles.empty()) {
@@ -187,6 +179,6 @@ namespace Hyve::CLI {
             }
         }
 
-        throw HCLIInvalidCommandException(std::string(str));
+        throw HCLIInvalidCommandException(str);
     }
 }

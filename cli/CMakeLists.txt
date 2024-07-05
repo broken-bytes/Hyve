@@ -6,6 +6,9 @@ SET(
 SET(
     HEADERS
     include/cli/HCLI.hxx
+    include/cli/HCLICommand.hxx
+    include/cli/HCLICommandParameter.hxx
+    include/cli/HCLIInvalidCommandException.hxx
 )
 
 add_library(CLI STATIC ${SRC} ${HEADERS})

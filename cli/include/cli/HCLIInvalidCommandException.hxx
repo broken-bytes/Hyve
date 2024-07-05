@@ -4,9 +4,9 @@
 #include <string>
 
 namespace Hyve::CLI {
-    class HCLIInvalidCommandException : std::exception {
+    class HCLIInvalidCommandException : public std::exception {
         public:
-        HCLIInvalidCommandException(std::string command) : std::exception(), _command(command) { };
+        explicit HCLIInvalidCommandException(std::string_view command) : std::exception(), _command(command) { };
         const std::string& Command() const {
             return _command;
         }
