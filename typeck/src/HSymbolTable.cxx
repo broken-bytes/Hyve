@@ -5,13 +5,37 @@
 #include <ranges>
 
 namespace Hyve::Typeck {
-    HSymbolTable::HSymbolTable(
-        const std::vector<std::shared_ptr<HSymbol>>& children
-    ) : _children(children) {
+    HSymbolTable::HSymbolTable() {
 #ifdef HYVE_BOOTSTRAP
         // Add the built-in types to the symbol table
 		AddBuiltInTypes();
 #endif
+    }
+
+    void HSymbolTable::Append(const std::shared_ptr<HSymbol>& symbol) {
+        // Check for emptiness to increase performance
+        if (_children.empty()) {
+            _children.push_back(symbol);
+
+            return;
+        }
+
+        // Check if the symbol is already in the symbol table
+        auto existingSymbol = std::ranges::find_if(_children, [&](const auto& child) {
+				return child->Name == symbol->Name;
+			}
+		);
+
+        // If the symbol is not in the symbol table, add it
+		if (existingSymbol == _children.end()) {
+			_children.push_back(symbol);
+        }
+        else {
+            // If the symbol is in the symbol table, update it
+            for (const auto& child : symbol->Children) {
+                (*existingSymbol)->AppendChild(child);
+            }
+        }
     }
 
     std::shared_ptr<HSymbol> HSymbolTable::Find(std::vector<std::string_view> scope, std::string_view name) const {
@@ -48,6 +72,20 @@ namespace Hyve::Typeck {
 
         // We found the scope, now we need to find the symbol in the scope
 		return FindInScope(currentScope, name);
+    }
+
+    std::shared_ptr<HSymbol> HSymbolTable::Find(std::string_view name) const {
+        // Find the first matching symbol in the root scope
+        for (auto& child : _children) {
+            if (child->Name == name) {
+                return child;
+            }
+            else {
+                return child->FindNestedChild(name);
+            }
+        }
+
+        return nullptr;
     }
 
     std::shared_ptr<HSymbol> HSymbolTable::FindInScope(std::shared_ptr<HSymbol> scope, std::string_view name) const {
@@ -99,16 +137,15 @@ namespace Hyve::Typeck {
         lowLevelModule->Children.push_back(floatType);
         lowLevelModule->Children.push_back(doubleType);
 
-        // Find the hyve module and add the low level module to it
-        auto hyveModule = std::ranges::find_if(_children, [](const auto& child) {
-				return child->Name == "hyve" && child->SymbolType == HSymbolType::Module;
-			}
-		);
+        // Create the "hyve" module
+        auto hyveModule = std::make_shared<HModuleSymbol>();
+        hyveModule->Name = "hyve";
 
-        if (hyveModule != _children.end()) {
-            lowLevelModule->Parent = *hyveModule;
-            (*hyveModule)->Children.push_back(lowLevelModule);
-        }
+        // Add the low-level module to the "hyve" module
+        hyveModule->Children.push_back(lowLevelModule);
+
+        // Add the "hyve" module to the symbol table
+        _children.push_back(hyveModule);
     }
 #endif
 }

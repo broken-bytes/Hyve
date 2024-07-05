@@ -40,7 +40,7 @@ namespace Hyve::Typeck {
 
         void InferImportedTypes(
             const std::shared_ptr<HSymbolTable>&,
-            std::shared_ptr<Parser::HAstNode>& nodes
+            const std::shared_ptr<Parser::HAstNode>& nodes
         );
 
         void FindUnimportedTypes(
@@ -54,6 +54,11 @@ namespace Hyve::Typeck {
         std::shared_ptr<Parser::HAstTypeNode> CalculateExpressionType(
 			const std::shared_ptr<Parser::HAstNode>& node,
 			const std::shared_ptr<HSymbol>& symbol
+		);
+
+        void MergeModuleWithTable(
+            const std::shared_ptr<HSymbolTable>& table,
+            const std::shared_ptr<HSymbol>& moduleSymbol
 		);
     };
 }

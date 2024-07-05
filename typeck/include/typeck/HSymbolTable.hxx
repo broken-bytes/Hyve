@@ -8,11 +8,12 @@
 namespace Hyve::Typeck {
     struct HSymbolTable {
     public:
-        explicit HSymbolTable(
-            const std::vector<std::shared_ptr<HSymbol>>& children
-        );
+        explicit HSymbolTable();
+
+        void Append(const std::shared_ptr<HSymbol>& symbol);
         
         std::shared_ptr<HSymbol> Find(std::vector<std::string_view> scope, std::string_view name) const;
+        std::shared_ptr<HSymbol> Find(std::string_view name) const;
 
     private:
         std::vector<std::shared_ptr<HSymbol>> _children;

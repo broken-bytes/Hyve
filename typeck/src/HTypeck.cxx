@@ -39,6 +39,7 @@ std::vector<std::string_view> splitString(std::string_view str, char delimiter) 
     }
 
     tokens.emplace_back(str.substr(start));
+    
     return tokens;
 }
 
@@ -94,7 +95,7 @@ namespace Hyve::Typeck {
     std::shared_ptr<HSymbolTable> HTypeck::MergeSymbols(
         const std::vector<std::shared_ptr<HSymbol>>& symbolTables
     ) {
-		std::vector<std::shared_ptr<HSymbol>> mergedSymbols;
+		auto mergedSymbols = std::make_shared<HSymbolTable >();
 
 		// We only need to merge duplicate modules.
         // Since we know modules are top-level, 
@@ -107,24 +108,10 @@ namespace Hyve::Typeck {
 				throw std::runtime_error("Symbol table does not have a module symbol");
 			}
 
-            auto existingModule = std::ranges::find_if(
-				mergedSymbols,
-				[moduleSymbol](const std::shared_ptr<HSymbol>& symbol) {
-					return symbol->Name == moduleSymbol->Name && symbol->SymbolType == HSymbolType::Module;
-				}
-			);
-
-			if (existingModule != mergedSymbols.end()) {
-				// Merge the children of the right-hand side to the left-hand side
-				for (const auto& child : moduleSymbol->Children) {
-					(*existingModule)->Children.push_back(child);
-				}
-			} else {
-				mergedSymbols.push_back(moduleSymbol);
-			}
+            MergeModuleWithTable(mergedSymbols, moduleSymbol);
         }
 
-		return std::make_shared<HSymbolTable>(mergedSymbols);
+        return mergedSymbols;
 	}
 
     std::shared_ptr<HSymbol> HTypeck::BuildSymbolTable(
@@ -358,7 +345,7 @@ namespace Hyve::Typeck {
                 // We traverse the tree in a depth-first manner
                 auto type = declNode->TypeNode;
                 
-                auto foundSymbol = symbols->Find(declNode->CreateScopeString(), declNode->TypeNode->Name);
+                auto foundSymbol = symbols->Find(declNode->TypeNode->Name);
 
                 if (foundSymbol != nullptr) {
                     // We found the symbol, so we can continue
@@ -382,7 +369,7 @@ namespace Hyve::Typeck {
 
     void HTypeck::InferImportedTypes(
         const std::shared_ptr<HSymbolTable>& symbols,
-        std::shared_ptr<Parser::HAstNode>& nodes
+        const std::shared_ptr<Parser::HAstNode>& nodes
     ) {
         // We know that this function always only has a single file node, so we can just take the first one
         auto fileNode = Parser::HAstNode::FindNodesWithType(Parser::HAstNodeType::File, nodes);
@@ -422,9 +409,16 @@ namespace Hyve::Typeck {
 		}
 
         // Now we have all imported modules. Check if they contain any types that refer to in the local module
+
+        // Create a mini symbol table for the imported module
+        auto importTable = std::make_shared<HSymbolTable>();
+
         for (const auto& importedModule : importedModules) {
-            InferTypesWithSymbolTable(std::make_shared<HSymbolTable>(importedModule->Children), nodes);
+            importTable->Append(importedModule);
 		}
+
+        // Infer types for the imported modules
+		InferTypesWithSymbolTable(importTable, nodes);
     }
 
     void HTypeck::FindUnimportedTypes(
@@ -446,5 +440,20 @@ namespace Hyve::Typeck {
 		}
 
         return nullptr;
+    }
+
+    void HTypeck::MergeModuleWithTable(
+        const std::shared_ptr<HSymbolTable>& table,
+        const std::shared_ptr<HSymbol>& moduleSymbol
+    ) {
+        auto foundSymbol = table->Find(moduleSymbol->Name);
+
+		if (foundSymbol == nullptr) {
+			table->Append(moduleSymbol);
+		} else {
+            for (const auto& child : moduleSymbol->Children) {
+                foundSymbol->AppendChild(child);
+            }
+		}
     }
 }
