@@ -39,7 +39,7 @@ namespace Hyve::Generator {
         LLVMContext context;
 
         // Create a new module
-        std::unique_ptr<Module> currentModule = std::make_unique<Module>(fileName, context);
+        auto currentModule = std::make_unique<Module>(fileName, context);
 
         // Create a function type: int main()
         FunctionType* mainType = FunctionType::get(Type::getInt32Ty(context), false);
@@ -60,9 +60,6 @@ namespace Hyve::Generator {
         // Create the printf function and add it to the module
         FunctionCallee printf = currentModule->getOrInsertFunction("printf", printfType);
 
-        // Create a global string: const char *str = "Hello, World!\n"
-        Value* helloWorld = builder.CreateGlobalStringPtr("Hello, World!");
-
         std::vector<Type*> funcArgTypes(2, Type::getInt32Ty(context));
         FunctionType* externCFuncType = FunctionType::get(Type::getInt32Ty(context), funcArgTypes, false);
 
@@ -70,29 +67,29 @@ namespace Hyve::Generator {
         Function* externCFunc = Function::Create(externCFuncType, Function::ExternalLinkage, "CFunc", *currentModule);
         externCFunc->setCallingConv(CallingConv::C);
 
-        Value* arg1 = builder.getInt32(2);
-        Value* arg2 = builder.getInt32(0);
+        auto* arg1 = builder.getInt32(2);
+        auto* arg2 = builder.getInt32(0);
         // Call the function: CFunc(2, 0)
-        Value* callResult = builder.CreateCall(externCFunc, { arg1, arg2 });
+        auto* callResult = builder.CreateCall(externCFunc, { arg1, arg2 });
 
         // Create two basic blocks for conditional branching
-        BasicBlock* evenBlock = BasicBlock::Create(context, "even", mainFunction);
-        BasicBlock* oddBlock = BasicBlock::Create(context, "odd", mainFunction);
+        auto* evenBlock = BasicBlock::Create(context, "even", mainFunction);
+        auto* oddBlock = BasicBlock::Create(context, "odd", mainFunction);
 
         // Create the conditional branch
-        Value* modResult = builder.CreateSRem(callResult, builder.getInt32(2));
-        Value* isOdd = builder.CreateICmpNE(modResult, builder.getInt32(0));
+        auto* modResult = builder.CreateSRem(callResult, builder.getInt32(2));
+        auto* isOdd = builder.CreateICmpNE(modResult, builder.getInt32(0));
         builder.CreateCondBr(isOdd, oddBlock, evenBlock);
 
         // Set the insertion point to the even block
         builder.SetInsertPoint(evenBlock);
-        Value* evenString = builder.CreateGlobalStringPtr("Even\n");
+        auto* evenString = builder.CreateGlobalStringPtr("Even\n");
         builder.CreateCall(printf, { evenString });
         builder.CreateRet(builder.getInt32(0));
 
         // Set the insertion point to the odd block
         builder.SetInsertPoint(oddBlock);
-        Value* oddString = builder.CreateGlobalStringPtr("Odd\n");
+        auto* oddString = builder.CreateGlobalStringPtr("Odd\n");
         builder.CreateCall(printf, { oddString });
         builder.CreateRet(builder.getInt32(0));
 

@@ -6,6 +6,6 @@
 namespace Hyve::Lexer {
     class HLexerError : public std::runtime_error {
         public:
-        explicit HLexerError(const std::string& message) : std::runtime_error(message) { }
+            using std::runtime_error::runtime_error;
     };
 }

@@ -7,7 +7,11 @@ SET(
 SET(
     HEADERS
     include/lexer/HLexer.hxx
+    include/lexer/HLexerError.hxx
+    include/lexer/HToken.hxx
+    include/lexer/HTokenKeywords.hxx
     include/lexer/HTokenStream.hxx
+    include/lexer/HTokenType.hxx
 )
 
 add_library(Lexer STATIC ${SRC} ${HEADERS})

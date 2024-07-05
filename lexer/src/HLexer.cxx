@@ -14,6 +14,8 @@ namespace Hyve::Lexer {
     const std::string identifierStr = "[a-zA-Z_]+[a-zA-Z0-9_]*";
     const std::regex identifierRegex(identifierStr);
 
+    void Erase(std::string& source, size_t count);
+
     /// <summary>
     /// Tries to get a structural keyword from the source(Class, Struct, etc.)
     /// </summary>
@@ -447,6 +449,58 @@ namespace Hyve::Lexer {
         return INVALID;
     }
 
+    std::optional<std::tuple<std::string, uint64_t, uint64_t>> TryHandleWhitespace(std::string& source, uint64_t start, uint64_t offset) {
+        std::string next;
+
+        if (std::isspace(static_cast<int>(source[offset]))) {
+            next = source.substr(0, offset);
+            Erase(source, 1);
+
+            auto result = std::tuple<std::string, uint64_t, uint64_t>{
+                next, start, start + offset
+            };
+
+            return result;
+        }
+        else {
+            return std::nullopt;
+        }
+	}
+
+    bool TryGetBinOrHex(std::string& source, uint64_t offset) {
+        // Only the second character is allowed to be x or b, but only if first char is 0
+        if (offset == 1 && (source[1] == 'b' || source[1] == 'x')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool TryGetDouble(std::string& source, uint64_t offset) {
+        // If we receive a dot we are in a double literal
+        if (!std::isdigit(source[offset]) && source[offset] == '.') {
+            if (TryGetBinOrHex(source, offset)) {
+                Erase(source, 1);
+                throw HLexerError("Binary or hex numbers cannot be doubles");
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    void TryCheckIsNumber(std::string& source, uint64_t offset, bool isDouble) {
+        if (std::isalpha(source[offset])) {
+            Erase(source, 1);
+
+            if (!isDouble) {
+                throw HLexerError("Invalid integer literal");
+            }
+
+            throw HLexerError("Invalid double literal");
+        }
+    }
+
     void Erase(std::string& source, size_t count) {
         for(int x = 0; x < count; x++) {
             if(std::isspace(source[x])) {
@@ -549,14 +603,8 @@ namespace Hyve::Lexer {
             // Number literal, keep going until we reach whitespace, or any character
             for(int offset = 0; offset < source.length(); offset++) {
                 // We hit a guaranteed literal end via whitespace
-                if (std::isspace(static_cast<int>(source[offset]))) {
-                    next = source.substr(0, offset);
-                    Erase(source, 1);
-
-                    auto result = std::tuple<std::string, uint64_t, uint64_t> {
-                        next, _currentColumnStart, _currentColumnStart + offset
-                    };
-                    _currentColumnStart = _currentColumnStart + offset;
+                if (auto result = TryHandleWhitespace(source, _currentColumnStart, offset); result != std::nullopt) {
+                    _currentColumnStart = std::get<2>(result.value());
 
                     return result;
                 }
@@ -567,32 +615,18 @@ namespace Hyve::Lexer {
 				}
 
                 // If we receive a dot we are in a double literal
-                if(!std::isdigit(source[offset]) && source[offset] == '.') {
-                    if(isBinOrHex) {
-                        Erase(source, 1);
-                        _currentColumnStart = _currentColumnStart + offset + 1;
-                        throw HLexerError("Binary or hex numbers cannot be doubles");
-                    }
+                if(TryGetDouble(source, offset)) {
                     isDoubleLiteral = true;
                     continue;
                 }
                 // Only the second character is allowed to be x or b, but only if first char is 0
-                if (offset == 1  && (source[1] == 'b' || source[1] == 'x')) {
+                if (TryGetBinOrHex(source, offset)) {
                     isBinOrHex = true;
                     continue;
                 }
 
                 // Invalid number literal
-                if(std::isalpha(source[offset])) {
-                    Erase(source, 1);
-                    _currentColumnStart = _currentColumnStart + offset + 1;
-
-                    if(!isDoubleLiteral) {
-                        throw HLexerError("Invalid integer literal");
-                    }
-
-                    throw HLexerError("Invalid double literal");
-                }
+                TryCheckIsNumber(source, offset, isDoubleLiteral);
 
                 next = source.substr(0, offset);
             }
@@ -601,23 +635,19 @@ namespace Hyve::Lexer {
         return std::nullopt;
     }
 
-    bool HLexer::NextIsLineBreak(std::string& source) {
+    bool HLexer::NextIsLineBreak(std::string_view source) {
         // First check if we have two characters left, so we can check for \r\n or \n\r and remove both
-        bool checkForBoth = source.length() >= 2;
-
-        if (checkForBoth) {
-            if (source[0] == '\r' && source[1] == '\n') {
+        if (bool checkForBoth = source.length() >= 2; checkForBoth) {
+            if (source.starts_with('\r') && source.substr(1).starts_with('\n')) {
                 return true;
             }
 
-            if (source[0] == '\n' && source[1] == '\r') {
+            if (source.starts_with('\n') && source.substr(1).starts_with('\r')) {
                 return true;
             }
         }
-        else {
-            if (source[0] == '\n') {
-                return true;
-            }
+        else if (source.starts_with('\n')) {
+            return true;
         }
 
         return false;
@@ -625,10 +655,8 @@ namespace Hyve::Lexer {
 
     std::optional<std::tuple<std::string, uint64_t, uint64_t>> HLexer::ProcessLineBreak(std::string& source) {
         // First check if we have two characters left, so we can check for \r\n or \n\r and remove both
-        bool checkForBoth = source.length() >= 2;
-
-        if(checkForBoth) {
-			if(source[0] == '\r' && source[1] == '\n') {
+        if(bool checkForBoth = source.length() >= 2; checkForBoth) {
+			if(source.starts_with('\r') && source.substr(1).starts_with('\n')) {
 				Erase(source, 2);
 				auto result = std::tuple<std::string, uint64_t, uint64_t> {
 						"\n", _currentColumnStart, _currentColumnStart
@@ -639,7 +667,7 @@ namespace Hyve::Lexer {
 				return result;
 			}
 
-			if(source[0] == '\n' && source[1] == '\r') {
+			if(source.starts_with('\n') && source.substr(1).starts_with('\r')) {
 				Erase(source, 2);
 				auto result = std::tuple<std::string, uint64_t, uint64_t> {
 						"\n", _currentColumnStart, _currentColumnStart
@@ -650,7 +678,7 @@ namespace Hyve::Lexer {
 				return result;
 			}
         } else {
-           if(source[0] == '\n') {
+           if(source.starts_with('\n')) {
 			   Erase(source, 1);
 			   auto result = std::tuple<std::string, uint64_t, uint64_t> {
 					   "\n", _currentColumnStart, _currentColumnStart
@@ -678,8 +706,7 @@ namespace Hyve::Lexer {
 
         // First check if we have a string
 
-        auto stringToken = ProcessStringLiteral(source);
-        if(stringToken.has_value()) {
+        if(auto stringToken = ProcessStringLiteral(source); stringToken.has_value()) {
             return {
                 std::get<0>(stringToken.value()),
                 true,
@@ -700,8 +727,7 @@ namespace Hyve::Lexer {
         }
 
         // At last, check for number literal
-        auto numberToken = ProcessNumberLiteral(source);
-        if(numberToken.has_value()) {
+        if(auto numberToken = ProcessNumberLiteral(source); numberToken.has_value()) {
             return {
                     std::get<0>(numberToken.value()),
                     false,
