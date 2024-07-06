@@ -7,10 +7,10 @@
 namespace Hyve::Lexer {
 	struct HToken;
 
-	class HControlFlowProcessor : public HProcessor {
+	class HSpecialProcessor : public HProcessor {
 	public:
 		using HProcessor::HProcessor;
-		~HControlFlowProcessor() final = default;
+		~HSpecialProcessor() final = default;
 
 		std::optional<HToken> Process(std::string_view source) final;
 	};

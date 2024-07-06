@@ -1,54 +1,56 @@
 #include "lexer/processors/HControlFlowProcessor.hxx"
 #include "lexer/HToken.hxx"
+#include "lexer/HTokenKeywords.hxx"
 
 namespace Hyve::Lexer {
 	std::optional<HToken> HControlFlowProcessor::Process(std::string_view source) {
 		using enum HTokenFamily;
 		using enum HTokenType;
+		using namespace Keywords;
 
 		// No control flow keyword can be less than 2 characters(if, do)
 		if (source.size() < 2) {
 			return std::nullopt;
 		}
 
-		if(source == "if") {
-			return MAKE_TOKEN(IF, KEYWORD, "if", 0, 2);
+		if(CheckMatchingSequence(source, KEYWORD_IF)) {
+			return MAKE_TOKEN(IF, KEYWORD_IF);
 		}
 
-		if (source == "else") {
-			return MAKE_TOKEN(ELSE, KEYWORD, "else", 0, 4);
+		if (CheckMatchingSequence(source, KEYWORD_ELSE)) {
+			return MAKE_TOKEN(ELSE, KEYWORD_ELSE);
 		}
 
-		if (source == "do") {
-			return MAKE_TOKEN(DO, KEYWORD, "do", 0, 2);
+		if (CheckMatchingSequence(source, KEYWORD_DO)) {
+			return MAKE_TOKEN(DO, KEYWORD_DO);
 		}
 
-		if (source == "while") {
-			return MAKE_TOKEN(WHILE, KEYWORD, "while", 0, 5);
+		if (CheckMatchingSequence(source, KEYWORD_WHILE)) {
+			return MAKE_TOKEN(WHILE, KEYWORD_WHILE);
 		}
 
-		if (source == "for") {
-			return MAKE_TOKEN(FOR, KEYWORD, "for", 0, 3);
+		if (CheckMatchingSequence(source, KEYWORD_FOR)) {
+			return MAKE_TOKEN(FOR, KEYWORD_FOR);
 		}
 
-		if (source == "break") {
-			return MAKE_TOKEN(BREAK, KEYWORD, "break", 0, 5);
+		if (CheckMatchingSequence(source, KEYWORD_BREAK)) {
+			return MAKE_TOKEN(BREAK, KEYWORD_BREAK);
 		}
 
-		if (source == "continue") {
-			return MAKE_TOKEN(CONTINUE, KEYWORD, "continue", 0, 8);
+		if (CheckMatchingSequence(source, KEYWORD_CONTINUE)) {
+			return MAKE_TOKEN(CONTINUE, KEYWORD_CONTINUE);
 		}
 
-		if(source == "return") {
-			return MAKE_TOKEN(RETURN, KEYWORD, "return", 0, 6);
+		if(CheckMatchingSequence(source, KEYWORD_RETURN)) {
+			return MAKE_TOKEN(RETURN, KEYWORD_RETURN);
 		}
 
-		if (source == "when") {
-			return MAKE_TOKEN(WHEN, KEYWORD, "switch", 0, 6);
+		if (CheckMatchingSequence(source, KEYWORD_WHEN)) {
+			return MAKE_TOKEN(WHEN, KEYWORD_WHEN);
 		}
 
-		if (source == "try") {
-			return MAKE_TOKEN(TRY, KEYWORD, "try", 0, 3);
+		if (CheckMatchingSequence(source, KEYWORD_TRY)) {
+			return MAKE_TOKEN(TRY, KEYWORD_TRY);
 		}
 
 		return std::nullopt;

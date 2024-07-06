@@ -6,16 +6,15 @@
 namespace Hyve::Lexer {
 	class HNumberProcessor : public HProcessor {
 	public:
-		HNumberProcessor() : HProcessor() {}
+		using HProcessor::HProcessor;
 		~HNumberProcessor() final = default;
 
 		std::optional<HToken> Process(std::string_view) final;
 
 	private:
-		std::optional<HToken> ProcessInteger(std::string_view source);
-		std::optional<HToken> ProcessFloat(std::string_view source);
-		std::optional<HToken> ProcessHex(std::string_view source);
-		std::optional<HToken> ProcessBinary(std::string_view source);
-		void HandleError(std::string_view source, std::string_view message);
+		std::optional<HToken> ProcessInteger(std::string_view source) const;
+		std::optional<HToken> ProcessFloat(std::string_view source) const;
+		std::optional<HToken> ProcessHex(std::string_view source) const;
+		std::optional<HToken> ProcessBinary(std::string_view source) const;
 	};
 }

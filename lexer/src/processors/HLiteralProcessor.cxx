@@ -1,6 +1,8 @@
 #include "lexer/processors/HLiteralProcessor.hxx"
 #include "lexer/processors/HNumberProcessor.hxx"
 #include "lexer/HToken.hxx"
+#include "lexer/HTokenType.hxx"
+#include "lexer/HTokenKeywords.hxx"
 
 namespace Hyve::Lexer {
 	HLiteralProcessor::HLiteralProcessor(
@@ -28,24 +30,27 @@ namespace Hyve::Lexer {
 		}
 	}
 
-	std::optional<HToken> HLiteralProcessor::ProcessNumericLiteral(std::string_view source) {
+	std::optional<HToken> HLiteralProcessor::ProcessNumericLiteral(std::string_view source) const {
 		return _numberProcessor->Process(source);
 	}
 
-	std::optional<HToken> HLiteralProcessor::ProcessBooleanLiteral(std::string_view source) {
+	std::optional<HToken> HLiteralProcessor::ProcessBooleanLiteral(std::string_view source) const {
 		using enum HTokenType;
 		using enum HTokenFamily;
+		using namespace Keywords;
 
-		if(source.starts_with("true")) {
-			return MAKE_TOKEN(TRUE, LITERAL, "true", 0, 4);
-		} else if(source.starts_with("false")) {
-			return MAKE_TOKEN(FALSE, LITERAL, "false", 0, 5);
+		if(CheckMatchingSequence(source, Keywords::KEYWORD_TRUE)) {
+			return MAKE_TOKEN(TRUE, Keywords::KEYWORD_TRUE);
+		}
+		
+		if(CheckMatchingSequence(source, Keywords::KEYWORD_FALSE)) {
+			return MAKE_TOKEN(FALSE, Keywords::KEYWORD_FALSE);
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<HToken> HLiteralProcessor::ProcessStringLiteral(std::string_view source) {
+	std::optional<HToken> HLiteralProcessor::ProcessStringLiteral(std::string_view source) const {
 		using enum HTokenType;
 		using enum HTokenFamily;
 
@@ -72,18 +77,19 @@ namespace Hyve::Lexer {
 				return std::nullopt;
 			}
 
-			return MAKE_TOKEN(STRING, LITERAL, literalValue, 0, literalLength);
+			return MAKE_TOKEN(STRING, literalValue);
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<HToken> HLiteralProcessor::ProcessNullLiteral(std::string_view source) {
+	std::optional<HToken> HLiteralProcessor::ProcessNullLiteral(std::string_view source) const {
 		using enum HTokenType;
 		using enum HTokenFamily;
+		using namespace Keywords;
 
-		if(source.starts_with("null")) {
-			return MAKE_TOKEN(NULL, LITERAL, "null", 0, 4);
+		if(CheckMatchingSequence(source, KEYWORD_NULL)) {
+			return MAKE_TOKEN(NULL_LITERAL, KEYWORD_NULL);
 		}
 
 		return std::nullopt;

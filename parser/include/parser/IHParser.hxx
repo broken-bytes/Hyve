@@ -34,7 +34,7 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsInit(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsProperty(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool IsProtocol(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsContract(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsStruct(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsVariable(Lexer::HTokenStream& stream) const;
@@ -43,7 +43,7 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsStatementOperator(HAstOperatorType type) const;
 		[[nodiscard]] bool IsUnaryOperator(HAstOperatorType type) const;
 		[[nodiscard]] bool IsBinaryOperator(HAstOperatorType type) const;
-		[[nodiscard]] HAstOperatorType GetOperatorType(Lexer::HToken& token) const;
+		[[nodiscard]] HAstOperatorType GetOperatorType(const Lexer::HToken& token) const;
 		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::shared_ptr<HAstLiteralNode> ParseString(std::string_view literal) const;
 		[[nodiscard]] Core::HAccessLevel ParseAccessLevel(Lexer::HTokenStream& stream) const;

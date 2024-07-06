@@ -13,5 +13,6 @@ namespace Hyve::Lexer {
         uint64_t Line;
         uint64_t ColumnStart;
         uint64_t ColumnEnd;
+        std::string Error;
     };
 }

@@ -40,7 +40,7 @@ namespace Hyve::Lexer {
 		return std::nullopt;
 	}
 
-	std::optional<HToken> HNumberProcessor::ProcessInteger(std::string_view source) {
+	std::optional<HToken> HNumberProcessor::ProcessInteger(std::string_view source) const {
 		using enum HTokenFamily;
 		using enum HTokenType;
 		// Parse numbers until the source ends or an operator is found.
@@ -51,7 +51,7 @@ namespace Hyve::Lexer {
 				number.push_back(c);
 			}
 			else if (isalpha(c)) {
-				HandleError(source, "Unexpected character in number literal.");
+				return HandleError(source, "Unexpected character in number literal.");
 				return std::nullopt;
 			}
 			else if (c == '.') {
@@ -72,10 +72,10 @@ namespace Hyve::Lexer {
 		// This is because the source is a substring of the original source.
 		// The lexer will handle this by adding the offset of the source to the column start and end.
 		// Additionally, line and file information will be added by the lexer.
-		return MAKE_TOKEN(LITERAL, INTEGER, number, 0, number.size());
+		return MAKE_TOKEN(INTEGER, number);
 	}
 
-	std::optional<HToken> HNumberProcessor::ProcessFloat(std::string_view source) {
+	std::optional<HToken> HNumberProcessor::ProcessFloat(std::string_view source) const {
 		using enum HTokenFamily;
 		using enum HTokenType;
 
@@ -87,12 +87,12 @@ namespace Hyve::Lexer {
 				number.push_back(c);
 			}
 			else if (isalpha(c)) {
-				HandleError(source, "Unexpected character in number literal.");
+				return HandleError(source, "Unexpected character in number literal.");
 				return std::nullopt;
 			}
 			else if (c == '.') {
 				if (hasDot) {
-					HandleError(source, "Unexpected dot in number literal.");
+					return HandleError(source, "Unexpected dot in number literal.");
 					return std::nullopt;
 				}
 				hasDot = true;
@@ -108,10 +108,10 @@ namespace Hyve::Lexer {
 		}
 
 		// Same as the integer literal, some information is not accurate.
-		return MAKE_TOKEN(LITERAL, FLOAT, number, 0, number.size());
+		return MAKE_TOKEN(FLOAT, number);
 	}
 
-	std::optional<HToken> HNumberProcessor::ProcessHex(std::string_view source) {
+	std::optional<HToken> HNumberProcessor::ProcessHex(std::string_view source) const {
 		using enum HTokenFamily;
 		using enum HTokenType;
 
@@ -129,8 +129,7 @@ namespace Hyve::Lexer {
 				number.push_back(source[i]);
 			}
 			else if (isalpha(source[i])) {
-				HandleError(source, "Unexpected character in hex literal.");
-				return std::nullopt;
+				return HandleError(source, "Unexpected character in hex literal.");
 			}
 			else if (IsOperator(source[i])) {
 				break;
@@ -141,10 +140,10 @@ namespace Hyve::Lexer {
 			return std::nullopt;
 		}
 
-		return MAKE_TOKEN(LITERAL, INTEGER, number, 0, number.size());
+		return MAKE_TOKEN(INTEGER, number);
 	}
 
-	std::optional<HToken> HNumberProcessor::ProcessBinary(std::string_view source) {
+	std::optional<HToken> HNumberProcessor::ProcessBinary(std::string_view source) const {
 		using enum HTokenFamily;
 		using enum HTokenType;
 
@@ -162,7 +161,7 @@ namespace Hyve::Lexer {
 				number.push_back(source[i]);
 			}
 			else if (isalpha(source[i])) {
-				HandleError(source, "Unexpected character in binary literal.");
+				return HandleError(source, "Unexpected character in binary literal.");
 				return std::nullopt;
 			}
 			else if (IsOperator(source[i])) {
@@ -174,11 +173,6 @@ namespace Hyve::Lexer {
 			return std::nullopt;
 		}
 
-		return MAKE_TOKEN(LITERAL, INTEGER, number, 0, number.size());
-	}
-
-	void HNumberProcessor::HandleError(std::string_view source, std::string_view message) {
-		// TODO: Register the error in the lexer so it can be displayed later and the lexer can continue.
-		std::cerr << "Error: " << message << std::endl;
+		return MAKE_TOKEN(INTEGER, number);
 	}
 }

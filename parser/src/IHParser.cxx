@@ -242,7 +242,7 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsProtocol(Lexer::HTokenStream& stream) const {
+	bool IHParser::IsContract(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		
 		auto token = stream.PeekUntilNonLineBreak();
@@ -251,12 +251,12 @@ namespace Hyve::Parser {
 			// We need to skip the access modifier, as it is optional. Peek two tokens ahead
 			auto tokens = stream.Peek(2);
 
-			if (tokens[1].Type == PROTOCOL) {
+			if (tokens[1].Type == CONTRACT) {
 				return true;
 			}
 		}
 
-		if (token.Type == PROTOCOL) {
+		if (token.Type == CONTRACT) {
 			return true;
 		}
 
@@ -428,7 +428,7 @@ namespace Hyve::Parser {
 		}
 	}
 
-	HAstOperatorType IHParser::GetOperatorType(Lexer::HToken& token) const {
+	HAstOperatorType IHParser::GetOperatorType(const Lexer::HToken& token) const {
 		using enum Lexer::HTokenType;
 
 		switch (token.Type) {
