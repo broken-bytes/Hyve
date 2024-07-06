@@ -20,27 +20,27 @@ namespace Hyve::Lexer {
 			return std::nullopt;
 		}
 
-		if (CheckMatchingSequence(source, GROUPING_PAREN_LEFT)) {
+		if (source.starts_with(GROUPING_PAREN_LEFT)) {
 			return MAKE_TOKEN(PAREN_LEFT, GROUPING_PAREN_LEFT);
 		}
 
-		if (CheckMatchingSequence(source, GROUPING_PAREN_RIGHT)) {
+		if (source.starts_with(GROUPING_PAREN_RIGHT)) {
 			return MAKE_TOKEN(PAREN_RIGHT, GROUPING_PAREN_RIGHT);
 		}
 
-		if (CheckMatchingSequence(source, GROUPING_BRACKET_LEFT)) {
+		if (source.starts_with(GROUPING_BRACKET_LEFT)) {
 			return MAKE_TOKEN(BRACKET_LEFT, GROUPING_BRACKET_LEFT);
 		}
 
-		if (CheckMatchingSequence(source, GROUPING_BRACKET_RIGHT)) {
+		if (source.starts_with(GROUPING_BRACKET_RIGHT)) {
 			return MAKE_TOKEN(BRACKET_RIGHT, GROUPING_BRACKET_RIGHT);
 		}
 
-		if (CheckMatchingSequence(source, GROUPING_CURLY_LEFT)) {
+		if (source.starts_with(GROUPING_CURLY_LEFT)) {
 			return MAKE_TOKEN(CURLY_LEFT, GROUPING_CURLY_LEFT);
 		}
 
-		if (CheckMatchingSequence(source, GROUPING_CURLY_RIGHT)) {
+		if (source.starts_with(GROUPING_CURLY_RIGHT)) {
 			return MAKE_TOKEN(CURLY_RIGHT, GROUPING_CURLY_RIGHT);
 		}
 

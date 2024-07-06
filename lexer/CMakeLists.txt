@@ -2,7 +2,6 @@ SET(
     SRC
     src/HLexer.cxx
     src/HTokenStream.cxx
-    src/processors/HCommentProcessor.cxx
     src/processors/HControlFlowProcessor.cxx
     src/processors/HGroupingProcessor.cxx
     src/processors/HIdentifierProcessor.cxx
@@ -26,7 +25,6 @@ SET(
     include/lexer/HTokenStream.hxx
     include/lexer/HTokenType.hxx
     include/lexer/HProcessor.hxx
-    include/lexer/processors/HCommentProcessor.hxx
     include/lexer/processors/HControlFlowProcessor.hxx
     include/lexer/processors/HGroupingProcessor.hxx
     include/lexer/processors/HIdentifierProcessor.hxx

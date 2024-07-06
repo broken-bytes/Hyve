@@ -51,7 +51,7 @@ namespace Hyve::Parser {
 		token = stream.Consume();
 
 		// If we don't have a closing brace, emit an error but continue
-		if (token.Type != RCBRACKET) {
+		if (token.Type != CURLY_RIGHT) {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 		}
 
@@ -67,17 +67,17 @@ namespace Hyve::Parser {
 		// The next token should be an opening brace
 		auto token = stream.PeekUntilNonLineBreak();
 
-		if (token.Type != LCBRACKET) {
+		if (token.Type != CURLY_LEFT) {
 			stream.Consume();
 
 			// We have something in front of the opening brace, ignore it and continue
-			if (stream.Peek().Type == LCBRACKET) {
+			if (stream.Peek().Type == CURLY_LEFT) {
 				stream.Consume();
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			} else {
 				// We have an unrevoered error, panic
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
-				Panic(stream, LCBRACKET);
+				Panic(stream, CURLY_LEFT);
 				
 				return nullptr;
 			}
@@ -94,7 +94,7 @@ namespace Hyve::Parser {
 		// Ensure we have an opening brace
 		token = stream.PeekUntilNonLineBreak();
 
-		while (token.Type != RCBRACKET) {
+		while (token.Type != CURLY_RIGHT) {
 			// TODO: Parse init
 			if (IsProperty(stream)) {
 				if (auto prop = _propParser->Parse(stream); prop != nullptr) {
@@ -114,7 +114,7 @@ namespace Hyve::Parser {
 			} else {
 				// We have an unrevoered error, panic
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
-				Panic(stream, RCBRACKET);
+				Panic(stream, CURLY_RIGHT);
 				
 				return nullptr;
 			}

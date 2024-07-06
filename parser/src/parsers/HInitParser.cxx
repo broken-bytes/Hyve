@@ -54,7 +54,7 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// Ensure the next token is an opening parenthesis
-		if (token.Type != LBRACKET) {
+		if (token.Type != BRACKET_LEFT) {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			Panic(stream, KEYWORD);
 		}
@@ -64,7 +64,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		// Parse the parameters
-		while (token.Type != RBRACKET) {
+		while (token.Type != BRACKET_RIGHT) {
 			// Parse the parameter name
 			if (token.Type != IDENTIFIER) {
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
@@ -118,7 +118,7 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// We return gracefully if the body is missing because some types allow functions without bodies(like interfaces)
-		if (token.Type != LCBRACKET) {
+		if (token.Type != CURLY_LEFT) {
 			return nullptr;
 		}
 
@@ -130,7 +130,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		// Parse statements and expressions one by one
-		while (token.Type != RCBRACKET) {
+		while (token.Type != CURLY_RIGHT) {
 			// TODO: Implement statement and expression parsing
 			token = stream.Consume();
 		}

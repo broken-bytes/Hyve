@@ -33,7 +33,7 @@ namespace Hyve::Parser {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			// Check if the next token is an opening parenthesis, if so, we can assume the function name is missing.
 			// In this case we provide an error message DONT panic but generate a node with a missing name
-			if(token.Type == LBRACKET) {
+			if(token.Type == BRACKET_LEFT) {
 				_errorHandler->AddError(MISSING_FUNCTION_NAME, token.FileName, token.Line);
 				funcNode->Name = "";
 			} else {
@@ -73,7 +73,7 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// Ensure the next token is an opening parenthesis
-		if (token.Type != LBRACKET) {
+		if (token.Type != BRACKET_LEFT) {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			Panic(stream, KEYWORD);
 		}
@@ -83,7 +83,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		// Parse the parameters
-		while (token.Type != RBRACKET) {
+		while (token.Type != BRACKET_RIGHT) {
 			// Parse the parameter name
 			if (token.Type != IDENTIFIER) {
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
@@ -138,7 +138,7 @@ namespace Hyve::Parser {
 
 		if (token.Type != ARROW) {
 			// If the return type is missing, we provide an error message and generate a node with a missing return type
-			if (token.Type == LCBRACKET) {
+			if (token.Type == CURLY_LEFT) {
 				_errorHandler->AddError(MISSING_FUNCTION_RETURN_TYPE, token.FileName, token.Line);
 				
 				return nullptr;
@@ -160,7 +160,7 @@ namespace Hyve::Parser {
 			_errorHandler->AddError(MISSING_FUNCTION_RETURN_TYPE, token.FileName, token.Line);
 			// Check if the next token is an opening curly brace, if so, we can assume the return type is missing.
 			// In this case we provide an error message DONT panic but generate a node with a missing name
-			if (token.Type == LCBRACKET) {
+			if (token.Type == CURLY_LEFT) {
 				_errorHandler->AddError(MISSING_FUNCTION_RETURN_TYPE, token.FileName, token.Line);
 				return nullptr;
 			} else {
@@ -186,7 +186,7 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// We return gracefully if the body is missing because some types allow functions without bodies(like interfaces)
-		if (token.Type != LCBRACKET) {
+		if (token.Type != CURLY_LEFT) {
 			return nullptr;
 		}
 
@@ -198,7 +198,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		// Parse statements and expressions one by one
-		while (token.Type != RCBRACKET) {
+		while (token.Type != CURLY_RIGHT) {
 			// TODO: Implement statement and expression parsing
 			token = stream.Consume();
 		}

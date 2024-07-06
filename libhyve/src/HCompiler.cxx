@@ -9,7 +9,7 @@
 
 namespace Hyve {
     HCompiler::HCompiler() {
-        _lexer = std::make_shared<Lexer::HLexer>();
+        _lexer = Lexer::HLexer::Create();
         _parser = Parser::Create();
         _typeck = std::make_shared<Typeck::HTypeck>();
         _generator = std::make_shared<Generator::HGenerator>();

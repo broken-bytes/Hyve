@@ -22,11 +22,21 @@ namespace Hyve::Lexer {
 		};
 	}
 
+	/**
+	* @brief Updates the token's line and column information.
+	* @param token The token to update.
+	* @param line The line number to update the token with.
+	* @param start The starting column number to update the token with.
+	* @return The updated token.
+	* @note The column end is updated to the sum of start and the size of ColumnEnd.
+	*/
 	constexpr HToken UPDATE_TOKEN(
-		HToken token, 
+		HToken token,
+		std::string_view file,
 		size_t line,
 		size_t start
 	) {
+		token.FileName = file;
 		token.Line = line;
 		token.ColumnStart = start;
 		token.ColumnEnd = start + token.ColumnEnd;
@@ -138,3 +148,5 @@ namespace Hyve::Lexer {
 		}
 	};
 }
+
+inline Hyve::Lexer::HProcessor::~HProcessor() = default;

@@ -29,7 +29,7 @@ namespace Hyve::Parser {
 			// We need to check if the next token is a dot operator
 			if (nextToken.Type == DOT) {
 				left = ParseMemberAccess(stream);
-			} else if(nextToken.Type == LBRACKET) {
+			} else if(nextToken.Type == BRACKET_LEFT) {
 				left = ParseFuncCall(stream);
 			} else {
 				// Consume the identifier
@@ -164,7 +164,7 @@ namespace Hyve::Parser {
 		// We only need to check if the next token is a left bracket
 		// If it is, we need to parse the function call
 		// If it is not we return a prop access node
-		if (token.Type == LBRACKET) {
+		if (token.Type == BRACKET_LEFT) {
 			auto funcCall = ParseFuncCall(stream);
 			funcCall->Target = memberAccess;
 

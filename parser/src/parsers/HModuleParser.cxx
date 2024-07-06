@@ -84,7 +84,7 @@ namespace Hyve::Parser {
 				moduleNode->Children.push_back(_funcParser->Parse(stream));
 			} else if(IsEnum(stream)) {
 				moduleNode->Children.push_back(_enumParser->Parse(stream));
-			} else if (IsProtocol(stream)) {
+			} else if (IsContract(stream)) {
 				moduleNode->Children.push_back(_protocolParser->Parse(stream));
 			} else if(IsPrototype(stream)) {
 				moduleNode->Children.push_back(_prototypeParser->Parse(stream));

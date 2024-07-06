@@ -14,6 +14,12 @@ namespace Hyve::Lexer {
 		// If it is a number, then it is a numeric literal
 		// Otherwise we need to check if it is a boolean or null literal
 		// If it is none of the above, then it is not a literal
+
+		// If the string is empty, then it is not a literal
+		if (source.empty()) {
+			return std::nullopt;
+		}
+
 		if (auto numericLiteral = ProcessNumericLiteral(source); numericLiteral.has_value()) {
 			return numericLiteral;
 		}
@@ -78,6 +84,11 @@ namespace Hyve::Lexer {
 			}
 
 			return MAKE_TOKEN(STRING, literalValue);
+		}
+
+		// If we had an opening quote but no closing quote, then it is an invalid string literal
+		if (isStringLiteral) {
+			return HandleError(source, "Invalid string literal. Missing closing quote.");
 		}
 
 		return std::nullopt;

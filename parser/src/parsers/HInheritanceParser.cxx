@@ -18,7 +18,7 @@ namespace Hyve::Parser {
 			auto token = stream.Consume(COLON);
 
 			// While the next token is not a left curly brace we keep parsing the inheritance
-			while (stream.Peek().Type != LCBRACKET) {
+			while (stream.Peek().Type != CURLY_LEFT) {
 				auto inheritance = stream.Consume(IDENTIFIER);
 				auto typeNode = std::make_shared<HAstTypeNode>();
 				typeNode->Name = inheritance.Value;
@@ -37,7 +37,7 @@ namespace Hyve::Parser {
 					// Report the error and skip the token
 					_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 					// Panic: Skip Until the curly brace
-					Panic(stream, LCBRACKET);
+					Panic(stream, CURLY_LEFT);
 				}
 			}
 
