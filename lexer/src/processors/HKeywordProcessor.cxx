@@ -45,6 +45,21 @@ namespace Hyve::Lexer {
         else if (CheckMatchingSequence(source, KEYWORD_VAR)) {
             return MAKE_TOKEN(VAR, KEYWORD_VAR);
         }
+        else if (CheckMatchingSequence(source, KEYWORD_MODULE)) {
+            return MAKE_TOKEN(MODULE, KEYWORD_MODULE);
+        }
+        else if (CheckMatchingSequence(source, KEYWORD_IMPORT)) {
+            return MAKE_TOKEN(IMPORT, KEYWORD_IMPORT);
+        }
+        else if (CheckMatchingSequence(source, KEYWORD_PUBLIC)) {
+			return MAKE_TOKEN(PUBLIC, KEYWORD_PUBLIC);
+        }
+        else if (CheckMatchingSequence(source, KEYWORD_PRIVATE)) {
+            return MAKE_TOKEN(PRIVATE, KEYWORD_PRIVATE);
+        }
+        else if (CheckMatchingSequence(source, KEYWORD_INIT)) {
+            return MAKE_TOKEN(INIT, KEYWORD_INIT);
+        }
 			
 		return std::nullopt;
 	}

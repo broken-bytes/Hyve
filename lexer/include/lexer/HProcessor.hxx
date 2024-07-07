@@ -1,7 +1,9 @@
 #pragma once
 
 #include "lexer/HToken.hxx"
+#include "lexer/HTokenGroupings.hxx"
 #include "lexer/HTokenOperators.hxx"
+#include "lexer/HTokenSpecials.hxx"
 #include <iostream>
 #include <optional>
 #include <string>
@@ -91,7 +93,12 @@ namespace Hyve::Lexer {
 			Operators::OPERATOR_SHIFT_RIGHT_ASSIGN,
 			Operators::OPERATOR_TERNARY,
 			Operators::OPERATOR_ARROW,
-			Operators::OPERATOR_DOT
+			Operators::OPERATOR_DOT,
+			Specials::SPECIAL_COMMA,
+			Groupings::GROUPING_PAREN_LEFT,
+			Groupings::GROUPING_PAREN_RIGHT,
+			Groupings::GROUPING_BRACKET_LEFT,
+			Groupings::GROUPING_BRACKET_RIGHT
 		};
 		/**
 		* @brief Drops characters until a non-whitespace character is found. EOF is considered a whitespace character.
@@ -130,9 +137,12 @@ namespace Hyve::Lexer {
 		*/
 		bool CheckMatchingSequence(std::string_view source, std::string_view target) const {
 			if (
-				source.starts_with(target) &&
-				source.size() > target.size() &&
-				IsOperator(source.substr(target.size()).front())
+				(source.starts_with(target) && source.size() == target.size()) ||
+				(
+					source.starts_with(target) && 
+					source.size() > target.size() && 
+					IsOperator(source.substr(target.size()).front())
+				)
 			) {
 				return true;
 			}

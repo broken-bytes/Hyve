@@ -54,7 +54,7 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// Ensure the next token is an opening parenthesis
-		if (token.Type != BRACKET_LEFT) {
+		if (token.Type != PAREN_LEFT) {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			Panic(stream, KEYWORD);
 		}
@@ -64,7 +64,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		// Parse the parameters
-		while (token.Type != BRACKET_RIGHT) {
+		while (token.Type != PAREN_RIGHT) {
 			// Parse the parameter name
 			if (token.Type != IDENTIFIER) {
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);

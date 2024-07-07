@@ -232,6 +232,7 @@ namespace Hyve::Lexer {
             return KEYWORD;
         case COMMA:
         case COLON:
+        case LINEBREAK:
             return SPECIAL;
         default:
             return UNKNOWN;

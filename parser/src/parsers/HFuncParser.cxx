@@ -33,7 +33,7 @@ namespace Hyve::Parser {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			// Check if the next token is an opening parenthesis, if so, we can assume the function name is missing.
 			// In this case we provide an error message DONT panic but generate a node with a missing name
-			if(token.Type == BRACKET_LEFT) {
+			if(token.Type == PAREN_LEFT) {
 				_errorHandler->AddError(MISSING_FUNCTION_NAME, token.FileName, token.Line);
 				funcNode->Name = "";
 			} else {
@@ -73,7 +73,7 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// Ensure the next token is an opening parenthesis
-		if (token.Type != BRACKET_LEFT) {
+		if (token.Type != PAREN_LEFT) {
 			_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			Panic(stream, KEYWORD);
 		}
@@ -83,7 +83,7 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		// Parse the parameters
-		while (token.Type != BRACKET_RIGHT) {
+		while (token.Type != PAREN_RIGHT) {
 			// Parse the parameter name
 			if (token.Type != IDENTIFIER) {
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
@@ -202,8 +202,6 @@ namespace Hyve::Parser {
 			// TODO: Implement statement and expression parsing
 			token = stream.Consume();
 		}
-
-		token = stream.Consume();
 
 		return body;
 	}

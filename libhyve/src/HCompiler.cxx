@@ -17,7 +17,7 @@ namespace Hyve {
 
     void HCompiler::Compile(
         const std::vector<std::string>& files, 
-        std::vector<HCompilerArgument> arguments
+        const std::vector<HCompilerArgument>& arguments
     ) {
         std::vector<std::shared_ptr<Typeck::HSymbol>> symbols = {};
         std::vector<std::shared_ptr<Parser::HAstNode>> asts = {};

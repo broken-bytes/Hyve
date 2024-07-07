@@ -39,7 +39,7 @@ namespace Hyve::Lexer {
             std::shared_ptr<HPunctuationProcessor> punctuationProcessor,
             std::shared_ptr<HSpecialProcessor> specialProcessor
         );
-        [[nodiscard]] HTokenStream Tokenize(std::string stream, const std::string& fileName) const;
+        [[nodiscard]] HTokenStream Tokenize(const std::string& stream, std::string_view fileName) const;
 
         static std::shared_ptr<HLexer> Create() {
             return std::make_shared<HLexer>(

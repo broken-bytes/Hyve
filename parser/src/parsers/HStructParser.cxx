@@ -75,7 +75,7 @@ namespace Hyve::Parser {
 				stream.Consume();
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 			} else {
-				// We have an unrevoered error, panic
+				// We have an unrecoverable error, panic
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 				Panic(stream, CURLY_LEFT);
 				
@@ -85,7 +85,7 @@ namespace Hyve::Parser {
 			return nullptr;
 		}
 
-		stream.Consume();
+		token = stream.Consume();
 
 		// Create the body of the struct
 		// Parse the body of the struct
@@ -95,7 +95,6 @@ namespace Hyve::Parser {
 		token = stream.PeekUntilNonLineBreak();
 
 		while (token.Type != CURLY_RIGHT) {
-			// TODO: Parse init
 			if (IsProperty(stream)) {
 				if (auto prop = _propParser->Parse(stream); prop != nullptr) {
 					prop->Parent = bodyNode;
@@ -112,11 +111,11 @@ namespace Hyve::Parser {
 					bodyNode->Children.push_back(init);
 				}
 			} else {
-				// We have an unrevoered error, panic
+				// We have an unrecoverable error, panic
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
 				Panic(stream, CURLY_RIGHT);
-				
-				return nullptr;
+
+				return bodyNode;				
 			}
 
 			token = stream.PeekUntilNonLineBreak();

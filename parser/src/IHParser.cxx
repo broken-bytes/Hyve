@@ -21,13 +21,19 @@
 
 namespace Hyve::Parser {
 	void IHParser::Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) const {
-		while(stream.Peek().Type != type) {
+		if (stream.IsEmpty()) {
+			return;
+		}
+		while(stream.Peek().Type != type && !stream.IsEmpty()) {
 			stream.Consume();
 		}
 	}
 
 	void IHParser::Panic(Lexer::HTokenStream& stream, Lexer::HTokenFamily family) const {
-		while (stream.Peek().Family != family) {
+		if (stream.IsEmpty()) {
+			return;
+		}
+		while (stream.Peek().Family != family && !stream.IsEmpty()) {
 			stream.Consume();
 		}
 	}

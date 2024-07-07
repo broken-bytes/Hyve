@@ -2,6 +2,7 @@
 
 #include "lexer/HToken.hxx"
 #include <stdexcept>
+#include <iostream>
 #include <iterator>
 #include <vector>
 
@@ -25,7 +26,7 @@ namespace Hyve::Lexer {
 
         // Consume (and remove) the token at the current position
         HToken Consume() {
-            if (_currentPosition >= _tokens.size()) {
+            if (IsEmpty()) {
                 // Return the EOF token, no matter if it exists or not
                 return HToken { Lexer::HTokenFamily::UNKNOWN, Lexer::HTokenType::END_OF_FILE };
             }
@@ -36,7 +37,7 @@ namespace Hyve::Lexer {
         }
 
         HToken Consume(Lexer::HTokenType type) {
-            if (_currentPosition >= _tokens.size()) {
+            if (IsEmpty()) {
                 return HToken { Lexer::HTokenFamily::UNKNOWN, Lexer::HTokenType::END_OF_FILE };
             }
             auto token = _tokens[_currentPosition];
@@ -89,6 +90,11 @@ namespace Hyve::Lexer {
 			}
 
 			throw TokenStreamError("Peeked past end of token stream");
+		}
+
+        // Checks if the stream has more tokens
+        bool IsEmpty() const {
+			return _currentPosition >= _tokens.size() - 1;
 		}
 
         // Iterator interface for iteration over the stream

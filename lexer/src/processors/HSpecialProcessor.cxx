@@ -14,20 +14,8 @@ namespace Hyve::Lexer {
 			return std::nullopt;
 		}
 
-		if (source.front() == '\n' && source.substr(1).front() == '\r') {
-			return MAKE_TOKEN(LINEBREAK, "\n\r");
-		}
-
-		if (source.front() == '\r' && source.substr(1).front() == '\n') {
-			return MAKE_TOKEN(LINEBREAK, "\r\n");
-		}
-
 		if (source.front() == '\n') {
-			return MAKE_TOKEN(LINEBREAK, "\n");
-		}
-
-		if (source.front() == '\r') {
-			return MAKE_TOKEN(LINEBREAK, "\r");
+			return MAKE_TOKEN(LINEBREAK, "\n\r");
 		}
 
 		if(source.starts_with(SPECIAL_HARD_UNWRAP)) {

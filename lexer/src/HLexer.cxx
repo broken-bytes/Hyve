@@ -119,10 +119,6 @@ namespace Hyve::Lexer {
 			return grouping.value();
 		}
 
-        if (auto identifier = _identifierProcessor->Process(source); identifier.has_value()) {
-            return identifier.value();
-		}
-
         if (auto keyword = _keywordProcessor->Process(source); keyword.has_value()) {
 			return keyword.value();
         }
@@ -139,6 +135,10 @@ namespace Hyve::Lexer {
 			return punctuation.value();
 		}
 
+        if (auto identifier = _identifierProcessor->Process(source); identifier.has_value()) {
+            return identifier.value();
+        }
+
         if (auto special = _specialProcessor->Process(source); special.has_value()) {
 			return special.value();
 		}
@@ -146,7 +146,7 @@ namespace Hyve::Lexer {
         return MAKE_TOKEN(HTokenType::ERROR, std::string(source));
     }
 
-    HTokenStream HLexer::Tokenize(std::string stream, const std::string& fileName) const {
+    HTokenStream HLexer::Tokenize(const std::string& stream, std::string_view fileName) const {
         using enum HTokenType;
         using namespace Symbols;
         std::vector<HToken> tokens = {};
@@ -172,7 +172,7 @@ namespace Hyve::Lexer {
             if (normalizedStream.starts_with(SYMBOL_COMMENT)) {
 				Erase(normalizedStream, std::strlen(SYMBOL_COMMENT));
 				RemoveComment(normalizedStream, false, currentLine, currentColumnStart);
-			}
+			} 
 			else if (normalizedStream.starts_with(SYMBOL_MULTILINE_COMMENT_BEGIN)) {
 				Erase(normalizedStream, std::strlen(SYMBOL_MULTILINE_COMMENT_BEGIN));
 				RemoveComment(normalizedStream, true, currentLine, currentColumnStart);
@@ -195,6 +195,8 @@ namespace Hyve::Lexer {
 
             if(!normalizedStream.empty()) {
                 currentToken = (normalizedStream | std::views::split(' ')).front();
+                std::cout << "Stream: " << normalizedStream << std::endl;
+                std::cout << "Current token: " << std::string_view(currentToken) << std::endl;
 			}
         }
 
