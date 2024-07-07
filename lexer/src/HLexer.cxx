@@ -195,8 +195,6 @@ namespace Hyve::Lexer {
 
             if(!normalizedStream.empty()) {
                 currentToken = (normalizedStream | std::views::split(' ')).front();
-                std::cout << "Stream: " << normalizedStream << std::endl;
-                std::cout << "Current token: " << std::string_view(currentToken) << std::endl;
 			}
         }
 

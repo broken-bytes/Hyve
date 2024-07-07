@@ -37,5 +37,7 @@ namespace Hyve::CLI {
 
         [[nodiscard]] bool CheckIfCommand(std::string_view str) const;
         [[nodiscard]] HCLICommand GetCommand(std::string_view str) const;
+
+        void PrintHelp() const;
     };
 }

@@ -32,8 +32,8 @@ namespace Hyve::Lexer {
 	* @return The updated token.
 	* @note The column end is updated to the sum of start and the size of ColumnEnd.
 	*/
-	constexpr HToken UPDATE_TOKEN(
-		HToken token,
+	constexpr void UPDATE_TOKEN(
+		HToken& token,
 		std::string_view file,
 		size_t line,
 		size_t start
@@ -42,8 +42,6 @@ namespace Hyve::Lexer {
 		token.Line = line;
 		token.ColumnStart = start;
 		token.ColumnEnd = start + token.ColumnEnd;
-
-		return token;
 	}
 
 	struct HToken;
