@@ -11,17 +11,13 @@
 
 namespace Hyve::AST {
     struct HAstLocalPropertyDeclNode : public HAstNode {
-        std::string Name;
-        bool IsMutable;
-        std::shared_ptr<HAstTypeNode> TypeNode;
-        std::shared_ptr<HAstExpressionNode> Initializer;
+        bool IsMutable = false;
+        std::shared_ptr<HAstTypeNode> TypeNode = nullptr;
+        std::shared_ptr<HAstExpressionNode> Initializer = nullptr;
 
         HAstLocalPropertyDeclNode() {
             Name = "";
-            IsMutable = false;
-            Initializer = nullptr;
             Type = HAstNodeType::PropertyDecl;
-            TypeNode = nullptr;
         }
     };
 }

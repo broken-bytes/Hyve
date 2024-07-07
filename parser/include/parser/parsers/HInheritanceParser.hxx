@@ -11,7 +11,7 @@ namespace Hyve::AST {
 namespace Hyve::Parser {
 	class HInheritanceParser : public IHParser {
 	public:
-		HInheritanceParser(
+		explicit HInheritanceParser(
 			std::shared_ptr<Core::HErrorHandler> errorHandler
 		);
 		~HInheritanceParser() final = default;

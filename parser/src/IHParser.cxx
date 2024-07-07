@@ -103,7 +103,8 @@ namespace Hyve::Parser {
 			return false;
 		}
 
-		return false;
+		// TODO: Implement proper expression parsing
+		return true;
 	}
 
 	bool IHParser::IsStatement(Lexer::HTokenStream& stream) const {
@@ -455,19 +456,19 @@ namespace Hyve::Parser {
 		// Set the type
 		switch (token.Type) {
 			case INTEGER:
-				lit->Type = "Integer";
+				lit->LiteralType = "Integer";
 				break;
 			case FLOAT:
-				lit->Type = "Float";
+				lit->LiteralType = "Float";
 				break;
 			case BOOLEAN:
-				lit->Type = "Boolean";
+				lit->LiteralType = "Boolean";
 				break;
 			case STRING:
-				lit->Type = "String";
+				lit->LiteralType = "String";
 				break;
 			case NULL_LITERAL:
-				lit->Type = "Null";
+				lit->LiteralType = "Null";
 				break;
 			default:
 				throw Core::HCompilerError(
@@ -483,7 +484,7 @@ namespace Hyve::Parser {
 
 	std::shared_ptr<HAstLiteralNode> IHParser::ParseString(std::string_view literal) const {
 		auto ast = std::make_shared<HAstLiteralNode>();
-		ast->Type = "String";
+		ast->LiteralType = "String";
 		ast->Value = literal;
 
 		return ast;
@@ -530,7 +531,7 @@ namespace Hyve::Parser {
 				if (stream.Peek().Type == Lexer::HTokenType::BRACKET_RIGHT && parent->Name == "Array") {
 					stream.Consume();
 					std::shared_ptr<HAstArrayNode> array = dynamic_pointer_cast<HAstArrayNode>(parent);
-					array->Type = type;
+					array->ItemType = type;
 					type = array;
 				}
 				else {
@@ -548,7 +549,7 @@ namespace Hyve::Parser {
 		else if (token.Type == Lexer::HTokenType::BRACKET_LEFT) {
 			auto array = std::make_shared<HAstArrayNode>();
 			array->Name = "Array";
-			array->Type = ParseType(stream, array);
+			array->ItemType = ParseType(stream, array);
 			return array;
 		}
 		else {

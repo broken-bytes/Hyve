@@ -7,7 +7,6 @@
 
 namespace Hyve::AST {
     struct HAstProtocolNode : HAstTypeNode {
-        std::string Name;
         std::shared_ptr<HAstInheritanceNode> Inheritance;
 
         HAstProtocolNode() {
@@ -17,7 +16,8 @@ namespace Hyve::AST {
             Kind = HAstTypeKind::Protocol;
         }
 
-        HAstProtocolNode(std::string name, std::shared_ptr<HAstInheritanceNode> inheritance) : Name(name), Inheritance(inheritance) {
+        HAstProtocolNode(std::string name, std::shared_ptr<HAstInheritanceNode> inheritance) : Inheritance(inheritance) {
+            Name = name;
             Type = HAstNodeType::NominalType;
             Kind = HAstTypeKind::Protocol;
         }

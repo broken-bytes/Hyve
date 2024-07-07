@@ -5,6 +5,6 @@
 
 namespace Hyve::AST {
     struct HAstArrayNode : public HAstTypeNode {
-        std::shared_ptr<HAstTypeNode> Type;
+        std::shared_ptr<HAstTypeNode> ItemType;
     };
 }

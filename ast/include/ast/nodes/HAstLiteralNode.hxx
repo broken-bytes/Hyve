@@ -6,7 +6,7 @@
 
 namespace Hyve::AST {
     struct HAstLiteralNode : HAstExpressionNode {
-        std::string Type;
+        std::string LiteralType;
         std::string Value;
     };
 }

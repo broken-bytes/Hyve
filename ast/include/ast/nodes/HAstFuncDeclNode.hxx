@@ -10,7 +10,6 @@
 
 namespace Hyve::AST {
     struct HAstFuncDeclNode : public HAstWithAccessLevelNode {
-        std::string Name;
         bool InferReturnType;
         std::shared_ptr<HAstTypeNode> ReturnType;
         std::vector<HAstParamater> Parameters;

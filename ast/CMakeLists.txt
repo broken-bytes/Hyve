@@ -14,6 +14,7 @@ SET(
     include/ast/nodes/HAstExpressionNode.hxx
     include/ast/nodes/HAstFileNode.hxx
     include/ast/nodes/HAstFuncCallNode.hxx
+    include/ast/nodes/HAstFuncDeclNode.hxx
     include/ast/nodes/HAstIdentifierNode.hxx
     include/ast/nodes/HAstImportNode.hxx
     include/ast/nodes/HAstInheritanceNode.hxx
