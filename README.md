@@ -31,14 +31,14 @@ class World {
 
     }
 
-    func hello() -> String {
+    fn hello() -> String {
         "Hello World"
     }
 }
 
-async func main() {
+fn main() {
     let world = World()
-    print(world.hello());
+    print(world.hello())
 }
 ```
 
