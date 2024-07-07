@@ -5,9 +5,13 @@
 #include "parser/parsers/HInheritanceParser.hxx"
 #include "parser/parsers/HInitParser.hxx"
 #include "parser/parsers/HPropertyParser.hxx"
-#include "parser/nodes/HAstStructBodyNode.hxx"
 #include <core/HErrorHandler.hxx>
 #include <memory>
+
+namespace Hyve::AST {
+	struct HAstStructBodyNode;
+	struct HAstNode;
+}
 
 namespace Hyve::Parser {
 	class HStructParser : public IHParser {
@@ -21,7 +25,7 @@ namespace Hyve::Parser {
 		);
 		~HStructParser() final = default;
 
-		std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
+		std::shared_ptr<AST::HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;
@@ -31,6 +35,6 @@ namespace Hyve::Parser {
 		std::shared_ptr<HInitParser> _initParser;
 		std::shared_ptr<HPropertyParser> _propParser;
 
-		std::shared_ptr<HAstStructBodyNode> ParseStructBody(Lexer::HTokenStream& stream);
+		std::shared_ptr<AST::HAstStructBodyNode> ParseStructBody(Lexer::HTokenStream& stream);
 	};
 }

@@ -1,37 +1,39 @@
 #include "parser/HParser.hxx"
-#include "parser/nodes/HAstAssignmentNode.hxx"
-#include "parser/nodes/HAstBinaryExpressionNode.hxx"
-#include "parser/nodes/HAstUnaryExpressionNode.hxx"
-#include "parser/nodes/HAstStatementNode.hxx"
-#include "parser/nodes/HAstReturnNode.hxx"
-#include "parser/nodes/HAstFileNode.hxx"
-#include "parser/nodes/HAstModuleDeclNode.hxx"
-#include "parser/nodes/HAstFuncCallNode.hxx"
-#include "parser/nodes/HAstFuncDeclNode.hxx"
-#include "parser/nodes/HAstTypeNode.hxx"
-#include "parser/nodes/HAstArrayNode.hxx"
-#include "parser/nodes/HAstMemberAccessNode.hxx"
-#include "parser/nodes/HAstVarDeclNode.hxx"
-#include "parser/nodes/HAstExpressionNode.hxx"
-#include "parser/nodes/HAstPropAccessNode.hxx"
-#include "parser/nodes/HAstLiteralNode.hxx"
-#include "parser/nodes/HAstClassNode.hxx"
-#include "parser/nodes/HAstClassBodyNode.hxx"
-#include "parser/nodes/HAstPrototypeNode.hxx"
-#include "parser/nodes/HAstPrototypeBodyNode.hxx"
-#include "parser/nodes/HAstProtocolNode.hxx"
-#include "parser/nodes/HAstProtocolBodyNode.hxx"
-#include "parser/nodes/HAstStructNode.hxx"
-#include "parser/nodes/HAstStructBodyNode.hxx"
-#include "parser/nodes/HAstInitNode.hxx"
+#include <ast/nodes/HAstAssignmentNode.hxx>
+#include <ast/nodes/HAstBinaryExpressionNode.hxx>
+#include <ast/nodes/HAstUnaryExpressionNode.hxx>
+#include <ast/nodes/HAstStatementNode.hxx>
+#include <ast/nodes/HAstReturnNode.hxx>
+#include <ast/nodes/HAstFileNode.hxx>
+#include <ast/nodes/HAstModuleDeclNode.hxx>
+#include <ast/nodes/HAstFuncCallNode.hxx>
+#include <ast/nodes/HAstFuncDeclNode.hxx>
+#include <ast/nodes/HAstTypeNode.hxx>
+#include <ast/nodes/HAstArrayNode.hxx>
+#include <ast/nodes/HAstMemberAccessNode.hxx>
+#include <ast/nodes/HAstImportNode.hxx>
+#include <ast/nodes/HAstVarDeclNode.hxx>
+#include <ast/nodes/HAstExpressionNode.hxx>
+#include <ast/nodes/HAstPropAccessNode.hxx>
+#include <ast/nodes/HAstLiteralNode.hxx>
+#include <ast/nodes/HAstClassNode.hxx>
+#include <ast/nodes/HAstClassBodyNode.hxx>
+#include <ast/nodes/HAstPrototypeNode.hxx>
+#include <ast/nodes/HAstPrototypeBodyNode.hxx>
+#include <ast/nodes/HAstProtocolNode.hxx>
+#include <ast/nodes/HAstProtocolBodyNode.hxx>
+#include <ast/nodes/HAstStructNode.hxx>
+#include <ast/nodes/HAstStructBodyNode.hxx>
+#include <ast/nodes/HAstInitNode.hxx>
 #include <lexer/HToken.hxx>
 #include <lexer/HTokenType.hxx>
 #include <core/HAccessLevel.hxx>
 #include <core/HCompilerError.hxx>
-
 #include <sstream>
 
 namespace Hyve::Parser {
+    using namespace AST;
+
     HParser::HParser(
         const std::shared_ptr<Core::HErrorHandler>& errorHandler,
         const std::shared_ptr<HModuleParser> moduleParser

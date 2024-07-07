@@ -1,7 +1,12 @@
 #include "parser/parsers/HPropertyParser.hxx"
-#include "parser/nodes/HAstPropertyDeclNode.hxx"
+#include <ast/nodes/HAstPropertyDeclNode.hxx>
+#include <lexer/HToken.hxx>
+#include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HPropertyParser::HPropertyParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler,
 		std::shared_ptr<HExpressionParser> exprParser

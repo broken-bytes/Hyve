@@ -10,7 +10,7 @@ namespace Hyve::Parser {
 		HProtocolParser() = default;
 		~HProtocolParser() final = default;
 
-		virtual std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
+		virtual std::shared_ptr<AST::HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		// Different parsers per context

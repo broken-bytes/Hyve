@@ -1,9 +1,12 @@
 #pragma once
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
-#include <llvm/Target/TargetMachine.h>
+#include <memory>
 #include <string>
+#include <string_view>
+
+namespace Hyve::AST {
+	struct HAstNode;
+}
 
 namespace Hyve::Generator {
 	class HGenerator {
@@ -11,14 +14,6 @@ namespace Hyve::Generator {
 		HGenerator() = default;
 		~HGenerator() = default;
 
-		std::string GenerateIR(std::string_view HIR);
-
-	private:
-		std::unique_ptr<llvm::TargetMachine> targetMachine;
-
-#ifdef HYVE_BOOTSTRAP
-		void LinkStandardLibrary(llvm::LLVMContext& context, llvm::Module* currentModule);
-		std::unique_ptr<llvm::Module> LoadLowLevelStandardLibrary(llvm::LLVMContext& context);
-#endif
+		std::string GenerateIR(std::string_view fileName, std::shared_ptr<AST::HAstNode> nodes) const;
 	};
 }

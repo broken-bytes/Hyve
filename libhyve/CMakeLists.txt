@@ -16,9 +16,6 @@ target_include_directories(libhyve PUBLIC ${CMAKE_SOURCE_DIR}/typeck/include)
 target_include_directories(libhyve PUBLIC ${CMAKE_SOURCE_DIR}/parser/include)
 target_include_directories(libhyve PUBLIC ${CMAKE_SOURCE_DIR}/lexer/include)
 target_include_directories(libhyve PUBLIC ${CMAKE_SOURCE_DIR}/core/include)
-
-target_link_libraries(libhyve PUBLIC Typeck Parser Lexer Core)
-
-# TESTING ONLY
 target_include_directories(libhyve PUBLIC ${CMAKE_SOURCE_DIR}/generator/include)
-target_link_libraries(libhyve PUBLIC Generator)
+
+target_link_libraries(libhyve PRIVATE Typeck Parser Lexer AST Generator Core)

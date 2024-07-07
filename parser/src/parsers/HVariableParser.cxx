@@ -1,8 +1,12 @@
 #include "parser/parsers/HVariableParser.hxx"
-#include "parser/nodes/HAstVarDeclNode.hxx"
+#include <ast/nodes/HAstVarDeclNode.hxx>
+#include <lexer/HToken.hxx>
 #include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HVariableParser::HVariableParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler,
 		std::shared_ptr<HExpressionParser> expressionParser

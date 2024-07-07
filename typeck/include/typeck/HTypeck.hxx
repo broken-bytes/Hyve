@@ -3,12 +3,14 @@
 #include "typeck/HSymbol.hxx"
 #include "typeck/HSymbolTable.hxx"
 #include "typeck/symbols/HStructSymbol.hxx"
-#include <parser/HAstNode.hxx>
-#include <parser/nodes/HAstTypeNode.hxx>
-
 #include <memory>
 #include <string>
 #include <vector>
+
+namespace Hyve::AST {
+	struct HAstNode;
+    struct HAstTypeNode;
+}
 
 namespace Hyve::Typeck {
     class HTypeck {
@@ -20,7 +22,7 @@ namespace Hyve::Typeck {
         /// <param name="ast">The node to use</param>
         /// <param name="parent">The parent symbol to use</param>
         std::shared_ptr<HSymbol> BuildSymbolTable(
-            const std::shared_ptr<Hyve::Parser::HAstNode>& ast,
+            const std::shared_ptr<AST::HAstNode>& ast,
             const std::shared_ptr<HSymbol>& parent
         );
 
@@ -30,29 +32,29 @@ namespace Hyve::Typeck {
 
         void InferTypes(
 			const std::shared_ptr<HSymbolTable>&,
-			std::shared_ptr<Parser::HAstNode>& nodes
+			std::shared_ptr<AST::HAstNode>& nodes
 		);
 
         void InferTypesWithSymbolTable(
             const std::shared_ptr<HSymbolTable>&,
-            const std::shared_ptr<Parser::HAstNode>& nodes
+            const std::shared_ptr<AST::HAstNode>& nodes
         );
 
         void InferImportedTypes(
             const std::shared_ptr<HSymbolTable>&,
-            const std::shared_ptr<Parser::HAstNode>& nodes
+            const std::shared_ptr<AST::HAstNode>& nodes
         );
 
         void FindUnimportedTypes(
             const std::shared_ptr<HSymbolTable>&,
-            std::shared_ptr<Parser::HAstNode>& nodes
+            std::shared_ptr<AST::HAstNode>& nodes
         );
 
     private:
         std::shared_ptr<HSymbol> _builtins;
 
-        std::shared_ptr<Parser::HAstTypeNode> CalculateExpressionType(
-			const std::shared_ptr<Parser::HAstNode>& node,
+        std::shared_ptr<AST::HAstTypeNode> CalculateExpressionType(
+			const std::shared_ptr<AST::HAstNode>& node,
 			const std::shared_ptr<HSymbol>& symbol
 		);
 

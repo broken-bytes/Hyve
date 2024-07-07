@@ -1,9 +1,17 @@
 #include "parser/parsers/HExpressionParser.hxx"
-#include "parser/nodes/HAstExpressionNode.hxx"
-#include "parser/nodes/HAstPropAccessNode.hxx"
-#include "parser/nodes/HAstIdentifierNode.hxx"
+#include <ast/nodes/HAstBinaryExpressionNode.hxx>
+#include <ast/nodes/HAstExpressionNode.hxx>
+#include <ast/nodes/HAstFuncCallNode.hxx>
+#include <ast/nodes/HAstPropAccessNode.hxx>
+#include <ast/nodes/HAstIdentifierNode.hxx>
+#include <ast/nodes/HAstMemberAccessNode.hxx>
+#include <ast/nodes/HAstUnaryExpressionNode.hxx>
+#include <lexer/HToken.hxx>
+#include <lexer/HTokenStream.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HExpressionParser::HExpressionParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler
 	) : _errorHandler(errorHandler) { }
@@ -75,7 +83,7 @@ namespace Hyve::Parser {
 		return left;
 	}
 
-	std::shared_ptr<HAstFuncCallNode> HExpressionParser::ParseFuncCall(Lexer::HTokenStream& stream) {
+	std::shared_ptr<HAstFuncCallNode> HExpressionParser::ParseFuncCall(Lexer::HTokenStream& stream) const {
 		auto funcCall = std::make_shared<HAstFuncCallNode>();
 
 		// Consume the identifier
@@ -93,15 +101,15 @@ namespace Hyve::Parser {
 		return funcCall;
 	}
 
-	std::shared_ptr<HAstUnaryExpressionNode> HExpressionParser::ParseUnaryExpression(Lexer::HTokenStream& stream) {
+	std::shared_ptr<HAstUnaryExpressionNode> HExpressionParser::ParseUnaryExpression(Lexer::HTokenStream& stream) const {
 		return nullptr;
 	}
 
-	std::shared_ptr<HAstBinaryExpressionNode> HExpressionParser::ParseBinaryExpression(Lexer::HTokenStream& stream) {
+	std::shared_ptr<HAstBinaryExpressionNode> HExpressionParser::ParseBinaryExpression(Lexer::HTokenStream& stream) const {
 		return nullptr;
 	}
 
-	std::shared_ptr<HAstPropAccessNode> HExpressionParser::ParsePropAccess(Lexer::HTokenStream& stream) {
+	std::shared_ptr<HAstPropAccessNode> HExpressionParser::ParsePropAccess(Lexer::HTokenStream& stream) const {
 		auto token = stream.Consume();
 
 		auto propAccess = std::shared_ptr<HAstPropAccessNode>();
@@ -109,7 +117,7 @@ namespace Hyve::Parser {
 		return propAccess;
 	}
 
-	std::shared_ptr<HAstExpressionNode> HExpressionParser::ParseMemberAccess(Lexer::HTokenStream& stream) {
+	std::shared_ptr<HAstExpressionNode> HExpressionParser::ParseMemberAccess(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		using enum Lexer::HTokenFamily;
 		using enum Core::HCompilerError::ErrorCode;

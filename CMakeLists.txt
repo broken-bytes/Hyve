@@ -17,6 +17,7 @@ project(Hyve)
 set_property(GLOBAL PROPERTY CXX_STANDARD 23)
 
 add_subdirectory(core)
+add_subdirectory(ast)
 add_subdirectory(lexer)
 add_subdirectory(parser)
 add_subdirectory(typeck)
@@ -24,10 +25,10 @@ add_subdirectory(hir)
 add_subdirectory(generator)
 add_subdirectory(libhyve)
 add_subdirectory(cli)
-
-add_executable(hyvec main.cxx)
+add_subdirectory(hyvec)
 
 set_property(TARGET Core PROPERTY CXX_STANDARD 23)
+set_property(TARGET AST PROPERTY CXX_STANDARD 23)
 set_property(TARGET Lexer PROPERTY CXX_STANDARD 23)
 set_property(TARGET Parser PROPERTY CXX_STANDARD 23)
 set_property(TARGET Typeck PROPERTY CXX_STANDARD 23)
@@ -37,11 +38,9 @@ set_property(TARGET Generator PROPERTY CXX_STANDARD 23)
 set_property(TARGET libhyve PROPERTY CXX_STANDARD 23)
 set_property(TARGET hyvec PROPERTY CXX_STANDARD 23)
 
-target_include_directories(hyvec PUBLIC ${CMAKE_SOURCE_DIR}/cli/include)
-
-target_link_libraries(hyvec PUBLIC CLI)
 
 if(HYVE_BOOTSTRAP)
+    target_compile_definitions(AST PRIVATE HYVE_BOOTSTRAP=1)
     target_compile_definitions(Parser PRIVATE HYVE_BOOTSTRAP=1)
     target_compile_definitions(Typeck PRIVATE HYVE_BOOTSTRAP=1)
     target_compile_definitions(Generator PRIVATE HYVE_BOOTSTRAP=1)

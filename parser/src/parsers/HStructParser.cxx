@@ -1,13 +1,18 @@
 #include "parser/parsers/HStructParser.hxx"
-#include "parser/nodes/HAstStructBodyNode.hxx"
-#include "parser/nodes/HAstStructNode.hxx"
-#include "parser/nodes/HAstTypeNode.hxx"
-#include "parser/nodes/HAstInheritanceNode.hxx"
+#include <ast/HAstNode.hxx>
+#include <ast/nodes/HAstStructBodyNode.hxx>
+#include <ast/nodes/HAstStructNode.hxx>
+#include <ast/nodes/HAstTypeNode.hxx>
+#include <ast/nodes/HAstInheritanceNode.hxx>
+#include <lexer/HToken.hxx>
 #include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 #include <core/HCompilerError.hxx>
 #include <core/HErrorHandler.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HStructParser::HStructParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler,
 		std::shared_ptr<HFuncParser> funcParser,

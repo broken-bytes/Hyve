@@ -1,4 +1,5 @@
 #include "generator/HGenerator.hxx"
+#include <ast/HAstNode.hxx>
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -28,8 +29,41 @@
 
 using namespace llvm;
 
+#ifdef HYVE_BOOTSTRAP
+std::unique_ptr<Module> LoadLowLevelStandardLibrary(llvm::LLVMContext& context) {
+    // Load the low level standard library LLVM IR code and link it with the current module
+    SMDiagnostic err;
+    auto path = std::filesystem::current_path() / "low_level.bc";
+    auto mod = parseIRFile(path.string(), err, context);
+    if (!mod) {
+        err.print("HyveCompiler", errs());
+        return nullptr;
+    }
+
+    return mod;
+}
+
+void LinkStandardLibrary(llvm::LLVMContext& context, llvm::Module* currentModule) {
+    auto lowLevelModule = LoadLowLevelStandardLibrary(context);
+    if (!lowLevelModule) {
+        return;
+    }
+
+    // Link the low level standard library with the current module
+    if (Linker::linkModules(*currentModule, std::move(lowLevelModule))) {
+        errs() << "Error linking modules\n";
+        return;
+    }
+
+    // Print the module to stdout
+    currentModule->print(outs(), nullptr);
+}
+#endif
+
 namespace Hyve::Generator {
-	std::string HGenerator::GenerateIR(std::string_view fileName) {
+    using namespace AST;
+
+	std::string HGenerator::GenerateIR(std::string_view fileName, std::shared_ptr<HAstNode> nodes) const {
         // Initialize the target registry etc.
         InitializeNativeTarget();
         InitializeNativeTargetAsmPrinter();
@@ -109,12 +143,16 @@ namespace Hyve::Generator {
 
         TargetOptions opt;
         auto RM = std::optional<Reloc::Model>();
-        targetMachine = std::unique_ptr<TargetMachine>(Target->createTargetMachine(targetTriple, "generic", "", opt, RM));
+        auto targetMachine = std::unique_ptr<TargetMachine>(
+            Target->createTargetMachine(targetTriple, "generic", "", opt, RM)
+        );
 
         currentModule->setDataLayout(targetMachine->createDataLayout());
 
+#ifdef HYVE_BOOTSTRAP
         // Link the standard library
         LinkStandardLibrary(context, currentModule.get());
+#endif
 
         std::error_code EC;
         raw_fd_ostream dest("hello.o", EC, sys::fs::OF_None);
@@ -137,35 +175,4 @@ namespace Hyve::Generator {
 
         return "";
 	}
-
-#ifdef HYVE_BOOTSTRAP
-    std::unique_ptr<Module> HGenerator::LoadLowLevelStandardLibrary(llvm::LLVMContext& context) {
-        // Load the low level standard library LLVM IR code and link it with the current module
-        SMDiagnostic err;
-        auto path = std::filesystem::current_path() / "low_level.bc";
-        auto mod = parseIRFile(path.string(), err, context);
-        if (!mod) {
-            err.print("HyveCompiler", errs());
-            return nullptr;
-        }
-
-        return mod;
-    }
-
-    void HGenerator::LinkStandardLibrary(llvm::LLVMContext& context, llvm::Module* currentModule) {
-        auto lowLevelModule = LoadLowLevelStandardLibrary(context);
-        if (!lowLevelModule) {
-            return;
-        }
-
-        // Link the low level standard library with the current module
-        if (Linker::linkModules(*currentModule, std::move(lowLevelModule))) {
-            errs() << "Error linking modules\n";
-            return;
-        }
-
-        // Print the module to stdout
-        currentModule->print(outs(), nullptr);
-    }
-    #endif
 }

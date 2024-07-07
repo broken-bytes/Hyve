@@ -1,9 +1,16 @@
 #include "parser/parsers/HInitParser.hxx"
-#include "parser/nodes/HAstBlockNode.hxx"
-#include "parser/nodes/HAstInitDeclNode.hxx"
+#include <ast/HAstNode.hxx>
+#include <ast/HAstParameter.hxx>
+#include <ast/nodes/HAstBlockNode.hxx>
+#include <ast/nodes/HAstInitDeclNode.hxx>
+#include <lexer/HToken.hxx>
+#include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 #include <core/HAccessLevel.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HInitParser::HInitParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler
 	) : _errorHandler(errorHandler) {}

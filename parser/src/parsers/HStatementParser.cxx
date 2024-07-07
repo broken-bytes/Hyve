@@ -1,8 +1,13 @@
 #include "parser/parsers/HStatementParser.hxx"
-#include "parser/nodes/HAstIdentifierNode.hxx"
+#include <ast/nodes/HAstAssignmentNode.hxx>
+#include <ast/nodes/HAstIdentifierNode.hxx>
+#include <lexer/HToken.hxx>
 #include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HStatementParser::HStatementParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler,
 		std::shared_ptr<HExpressionParser> exprParser

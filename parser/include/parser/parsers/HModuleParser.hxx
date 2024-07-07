@@ -29,7 +29,7 @@ namespace Hyve::Parser {
 		);
 		~HModuleParser() final = default;
 
-		std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
+		std::shared_ptr<AST::HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;

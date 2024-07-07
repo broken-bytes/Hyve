@@ -20,7 +20,7 @@ namespace Hyve {
         const std::vector<HCompilerArgument>& arguments
     ) {
         std::vector<std::shared_ptr<Typeck::HSymbol>> symbols = {};
-        std::vector<std::shared_ptr<Parser::HAstNode>> asts = {};
+        std::vector<std::shared_ptr<AST::HAstNode>> asts = {};
 
         for(const auto& file : files) {
 			auto source = LoadSourceFile(file);
@@ -34,9 +34,13 @@ namespace Hyve {
 
         auto symbolTable = _typeck->MergeSymbols(symbols);
 
-        for (auto& ast : asts) {
+         for (auto& ast : asts) {
             _typeck->InferTypes(symbolTable, ast);
-        }
+         }
+
+         for (auto& ast : asts) {
+             _generator->GenerateIR("", ast);
+         }
 	}
 
 	std::string HCompiler::LoadSourceFile(const std::string& file) const {

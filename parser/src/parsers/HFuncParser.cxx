@@ -1,9 +1,14 @@
 #include "parser/parsers/HFuncParser.hxx"
-#include "parser/nodes/HAstFuncDeclNode.hxx"
-#include "parser/nodes/HAstBlockNode.hxx"
 #include <core/HCompilerError.hxx>
+#include <ast/nodes/HAstFuncDeclNode.hxx>
+#include <ast/nodes/HAstBlockNode.hxx>
+#include <lexer/HToken.hxx>
+#include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HFuncParser::HFuncParser(std::shared_ptr<Core::HErrorHandler> errorHandler) : _errorHandler(errorHandler) { }
 
 	std::shared_ptr<HAstNode> HFuncParser::Parse(Lexer::HTokenStream& stream) {

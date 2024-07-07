@@ -4,6 +4,10 @@
 #include "parser/parsers/HTypeParser.hxx"
 #include <core/HErrorHandler.hxx>
 
+namespace Hyve::AST {
+	struct HAstNode;
+}
+
 namespace Hyve::Parser {
 	class HInheritanceParser : public IHParser {
 	public:
@@ -12,7 +16,7 @@ namespace Hyve::Parser {
 		);
 		~HInheritanceParser() final = default;
 
-		std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
+		std::shared_ptr<AST::HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;

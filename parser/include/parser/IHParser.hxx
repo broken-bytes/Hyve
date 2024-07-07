@@ -1,21 +1,37 @@
 #pragma once
 
-#include "parser/HAstNode.hxx"
-#include "parser/HAstOperatorType.hxx"
 #include "parser/HParserContext.hxx"
-#include "parser/nodes/HAstLiteralNode.hxx"
-#include "parser/nodes/HAstTypeNode.hxx"
-#include <lexer/HToken.hxx>
-#include <lexer/HTokenStream.hxx>
 #include <memory>
 #include <string>
+#include <vector>
+
+namespace Hyve {
+	namespace AST {
+		struct HAstNode;
+		struct HAstExpressionNode;
+		struct HAstLiteralNode;
+		struct HAstTypeNode;
+		enum class HAstOperatorType;
+	}
+
+	namespace Lexer {
+		struct HToken;
+		enum class HTokenFamily;
+		enum class HTokenType;
+		class HTokenStream;
+	}
+
+	namespace Core {
+		enum class HAccessLevel;
+	}
+}
 
 namespace Hyve::Parser {
 	class IHParser {
 	public:
 		IHParser() = default;
 		virtual ~IHParser() = 0;
-		[[nodiscard]] virtual std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) = 0;
+		[[nodiscard]] virtual std::shared_ptr<AST::HAstNode> Parse(Lexer::HTokenStream& stream) = 0;
 
 	protected:
 		/// <summary>
@@ -38,25 +54,24 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsStruct(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsVariable(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] std::int8_t GetOperatorPrecedence(HAstOperatorType type) const;
+		[[nodiscard]] std::int8_t GetOperatorPrecedence(AST::HAstOperatorType type) const;
 		[[nodiscard]] bool IsOperator(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool IsStatementOperator(HAstOperatorType type) const;
-		[[nodiscard]] bool IsUnaryOperator(HAstOperatorType type) const;
-		[[nodiscard]] bool IsBinaryOperator(HAstOperatorType type) const;
-		[[nodiscard]] HAstOperatorType GetOperatorType(const Lexer::HToken& token) const;
-		[[nodiscard]] std::shared_ptr<HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] std::shared_ptr<HAstLiteralNode> ParseString(std::string_view literal) const;
+		[[nodiscard]] bool IsStatementOperator(AST::HAstOperatorType type) const;
+		[[nodiscard]] bool IsUnaryOperator(AST::HAstOperatorType type) const;
+		[[nodiscard]] bool IsBinaryOperator(AST::HAstOperatorType type) const;
+		[[nodiscard]] AST::HAstOperatorType GetOperatorType(const Lexer::HToken& token) const;
+		[[nodiscard]] std::shared_ptr<AST::HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] std::shared_ptr<AST::HAstLiteralNode> ParseString(std::string_view literal) const;
 		[[nodiscard]] Core::HAccessLevel ParseAccessLevel(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] std::shared_ptr<HAstTypeNode> ParseType(
+		[[nodiscard]] std::shared_ptr<AST::HAstTypeNode> ParseType(
 			Lexer::HTokenStream& stream,
-			std::shared_ptr<HAstTypeNode> parent = nullptr
+			std::shared_ptr<AST::HAstTypeNode> parent = nullptr
 		);
 		[[nodiscard]] HParserContext GetContext() const;
 		void SetContext(HParserContext ctx);
 
 	private:
 		std::string _file;
-		std::vector<Lexer::HToken> _tokens;
 		uint64_t _tokenIndex;
 		HParserContext _context;
 	};

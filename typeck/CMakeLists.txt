@@ -22,6 +22,7 @@ add_library(Typeck STATIC ${SRC})
 
 target_include_directories(Typeck PUBLIC include)
 target_include_directories(Typeck PUBLIC ${CMAKE_SOURCE_DIR}/parser/include)
+target_include_directories(Typeck PUBLIC ${CMAKE_SOURCE_DIR}/ast/include)
 target_include_directories(Typeck PUBLIC ${CMAKE_SOURCE_DIR}/core/include)
 
-target_link_libraries(Typeck PUBLIC Parser)
+target_link_libraries(Typeck PUBLIC Parser AST Core)

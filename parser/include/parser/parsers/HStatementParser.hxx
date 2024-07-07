@@ -2,9 +2,13 @@
 
 #include "parser/IHParser.hxx"
 #include "parser/parsers/HExpressionParser.hxx"
-#include "parser/nodes/HAstAssignmentNode.hxx"
 #include <core/HErrorHandler.hxx>
 #include <memory>
+
+namespace Hyve::AST {
+	struct HAstAssignmentNode;
+	struct HAstNode;
+}
 
 namespace Hyve::Parser {
 	class HStatementParser : public IHParser {
@@ -15,13 +19,13 @@ namespace Hyve::Parser {
 		);
 		~HStatementParser() final = default;
 
-		virtual std::shared_ptr<HAstNode> Parse(Lexer::HTokenStream& stream) override;
+		virtual std::shared_ptr<AST::HAstNode> Parse(Lexer::HTokenStream& stream) override;
 
 	private:
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;
 		// Different parsers per context
 		std::shared_ptr<HExpressionParser> _exprParser;
 
-		std::shared_ptr<HAstAssignmentNode> ParseAssignment(Lexer::HTokenStream& stream);
+		std::shared_ptr<AST::HAstAssignmentNode> ParseAssignment(Lexer::HTokenStream& stream);
 	};
 }

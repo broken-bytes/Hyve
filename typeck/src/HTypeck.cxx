@@ -11,17 +11,17 @@
 #include "typeck/symbols/HPrototypeSymbol.hxx"
 #include "typeck/symbols/HStructSymbol.hxx"
 #include "typeck/symbols/HVariableSymbol.hxx"
-#include <parser/HAstNode.hxx>
-#include <parser/nodes/HAstTypeNode.hxx>
-#include <parser/nodes/HAstClassNode.hxx>
-#include <parser/nodes/HAstFileNode.hxx>
-#include <parser/nodes/HAstFuncDeclNode.hxx>
-#include <parser/nodes/HAstImportNode.hxx>
-#include <parser/nodes/HAstInitDeclNode.hxx>
-#include <parser/nodes/HAstLiteralNode.hxx>
-#include <parser/nodes/HAstModuleDeclNode.hxx>
-#include <parser/nodes/HAstPropertyDeclNode.hxx>
-#include <parser/nodes/HAstVarDeclNode.hxx>
+#include <ast/HAstNode.hxx>
+#include <ast/nodes/HAstTypeNode.hxx>
+#include <ast/nodes/HAstClassNode.hxx>
+#include <ast/nodes/HAstFileNode.hxx>
+#include <ast/nodes/HAstFuncDeclNode.hxx>
+#include <ast/nodes/HAstImportNode.hxx>
+#include <ast/nodes/HAstInitDeclNode.hxx>
+#include <ast/nodes/HAstLiteralNode.hxx>
+#include <ast/nodes/HAstModuleDeclNode.hxx>
+#include <ast/nodes/HAstPropertyDeclNode.hxx>
+#include <ast/nodes/HAstVarDeclNode.hxx>
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -44,47 +44,48 @@ std::vector<std::string_view> splitString(std::string_view str, char delimiter) 
 }
 
 namespace Hyve::Typeck {
-    HSymbolType NodeTypeToSymbolType(Parser::HAstTypeKind type) {
+    using namespace AST;
+    HSymbolType NodeTypeToSymbolType(HAstTypeKind type) {
         switch (type) {
-        case Parser::HAstTypeKind::Class:
+        case HAstTypeKind::Class:
             return HSymbolType::Class;
-        case Parser::HAstTypeKind::Enum:
+        case HAstTypeKind::Enum:
             return HSymbolType::Enum;
-        case Parser::HAstTypeKind::Function:
+        case HAstTypeKind::Function:
             return HSymbolType::Function;
-        case Parser::HAstTypeKind::Protocol:
+        case HAstTypeKind::Protocol:
             return HSymbolType::Protocol;
-        case Parser::HAstTypeKind::Struct:
+        case HAstTypeKind::Struct:
             return HSymbolType::Struct;
-        case Parser::HAstTypeKind::Prototype:
+        case HAstTypeKind::Prototype:
             return HSymbolType::Prototype;
         default:
             return HSymbolType::UnknownSymbol;
         }
     }
 
-    Parser::HAstTypeKind SymbolTypeToNodeType(HSymbolType type) {
+    HAstTypeKind SymbolTypeToNodeType(HSymbolType type) {
 		switch (type) {
 		case HSymbolType::Class:
-			return Parser::HAstTypeKind::Class;
+			return HAstTypeKind::Class;
 		case HSymbolType::Enum:
-			return Parser::HAstTypeKind::Enum;
+			return HAstTypeKind::Enum;
         case HSymbolType::File:
-			return Parser::HAstTypeKind::File;
+			return HAstTypeKind::File;
 		case HSymbolType::Function:
-			return Parser::HAstTypeKind::Function;
+			return HAstTypeKind::Function;
         case HSymbolType::Module:
-            return Parser::HAstTypeKind::Module;
+            return HAstTypeKind::Module;
 		case HSymbolType::Protocol:
-			return Parser::HAstTypeKind::Protocol;
+			return HAstTypeKind::Protocol;
 		case HSymbolType::Prototype:
-			return Parser::HAstTypeKind::Prototype;
+			return HAstTypeKind::Prototype;
         case HSymbolType::Struct:
-            return Parser::HAstTypeKind::Struct;
+            return HAstTypeKind::Struct;
         case HSymbolType::Variable:
-			return Parser::HAstTypeKind::Variable;
+			return HAstTypeKind::Variable;
         default:
-            return Parser::HAstTypeKind::UnknownKind;
+            return HAstTypeKind::UnknownKind;
 		}
 	}
 
@@ -115,10 +116,10 @@ namespace Hyve::Typeck {
 	}
 
     std::shared_ptr<HSymbol> HTypeck::BuildSymbolTable(
-        const std::shared_ptr<Hyve::Parser::HAstNode>& ast,
+        const std::shared_ptr<HAstNode>& ast,
         const std::shared_ptr<HSymbol>& parent
     ) {
-        using enum Parser::HAstTypeKind;
+        using enum HAstTypeKind;
 
         // Traverse the AST and build the symbol table
         // We have a few edge cases to consider:
@@ -128,7 +129,7 @@ namespace Hyve::Typeck {
 
         // Do the module check here
         if (parent == nullptr) {
-            auto moduleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(ast);
+            auto moduleNode = std::dynamic_pointer_cast<HAstModuleDeclNode>(ast);
 
             std::shared_ptr<HSymbol> symbol = nullptr;
 
@@ -140,8 +141,8 @@ namespace Hyve::Typeck {
         }
 
         for (const auto& node : ast->Children) {
-            if (node->Type == Parser::HAstNodeType::Module) {
-                auto moduleNode = std::dynamic_pointer_cast<Hyve::Parser::HAstModuleDeclNode>(node);
+            if (node->Type == HAstNodeType::Module) {
+                auto moduleNode = std::dynamic_pointer_cast<HAstModuleDeclNode>(node);
                 std::shared_ptr<HSymbol> symbol = nullptr;
 
                 symbol = std::make_shared<HModuleSymbol>();
@@ -151,8 +152,8 @@ namespace Hyve::Typeck {
 
                 BuildSymbolTable(node, symbol);
 
-            } else if (node->Type == Hyve::Parser::HAstNodeType::NominalType) {
-                auto typeNode = std::dynamic_pointer_cast<Hyve::Parser::HAstTypeNode>(node);
+            } else if (node->Type == HAstNodeType::NominalType) {
+                auto typeNode = std::dynamic_pointer_cast<HAstTypeNode>(node);
 
                 // Create a symbol as a unique_ptr
                 std::shared_ptr<HSymbol> symbol = nullptr;
@@ -186,8 +187,8 @@ namespace Hyve::Typeck {
                 parent->Children.push_back(symbol);
 
             }
-            else if (node->Type == Hyve::Parser::HAstNodeType::File) {
-                auto fileNode = std::dynamic_pointer_cast<Hyve::Parser::HAstFileNode>(node);
+            else if (node->Type == HAstNodeType::File) {
+                auto fileNode = std::dynamic_pointer_cast<HAstFileNode>(node);
 
                 // Create a symbol
                 auto symbol = std::make_shared<HFileSymbol>();
@@ -199,8 +200,8 @@ namespace Hyve::Typeck {
                 }
 
                 parent->Children.push_back(symbol);
-            } else if (node->Type == Hyve::Parser::HAstNodeType::Func) {
-                auto funcNode = std::dynamic_pointer_cast<Hyve::Parser::HAstFuncDeclNode>(node);
+            } else if (node->Type == HAstNodeType::Func) {
+                auto funcNode = std::dynamic_pointer_cast<HAstFuncDeclNode>(node);
 
                 // Create a symbol
                 auto symbol = std::make_shared<HFunctionSymbol>();
@@ -216,8 +217,8 @@ namespace Hyve::Typeck {
                 }
 
 			    parent->Children.push_back(symbol);
-            } else if (node->Type == Hyve::Parser::HAstNodeType::Init) {
-                auto initNode = std::dynamic_pointer_cast<Parser::HAstInitDeclNode>(node);
+            } else if (node->Type == HAstNodeType::Init) {
+                auto initNode = std::dynamic_pointer_cast<HAstInitDeclNode>(node);
 
                 // Create a symbol
                 auto symbol = std::make_shared<HFunctionSymbol>();
@@ -233,8 +234,8 @@ namespace Hyve::Typeck {
                 }
 
                 parent->Children.push_back(symbol);
-            } else if (node->Type == Hyve::Parser::HAstNodeType::PropertyDecl) {
-                auto declNode = std::dynamic_pointer_cast<Hyve::Parser::HAstPropertyDeclNode>(node);
+            } else if (node->Type == HAstNodeType::PropertyDecl) {
+                auto declNode = std::dynamic_pointer_cast<HAstPropertyDeclNode>(node);
 
                 // Create a symbol
                 auto symbol = std::make_shared<HPropertySymbol>();
@@ -261,8 +262,8 @@ namespace Hyve::Typeck {
 
                 parent->Children.push_back(symbol);
             }
-            else if (node->Type == Hyve::Parser::HAstNodeType::VariableDecl) {
-                auto declNode = std::dynamic_pointer_cast<Hyve::Parser::HAstVarDeclNode>(node);
+            else if (node->Type == HAstNodeType::VariableDecl) {
+                auto declNode = std::dynamic_pointer_cast<HAstVarDeclNode>(node);
 
                 // Create a symbol
                 auto symbol = std::make_shared<HVariableSymbol>();
@@ -296,7 +297,7 @@ namespace Hyve::Typeck {
 
     void HTypeck::InferTypes(
         const std::shared_ptr<HSymbolTable>& symbols,
-        std::shared_ptr<Parser::HAstNode>& nodes
+        std::shared_ptr<HAstNode>& nodes
     ) {
         // First we infer types of the local module only
         InferTypesWithSymbolTable(symbols, nodes);
@@ -309,9 +310,9 @@ namespace Hyve::Typeck {
 
     void HTypeck::InferTypesWithSymbolTable(
         const std::shared_ptr<HSymbolTable>& symbols,
-        const std::shared_ptr<Parser::HAstNode>& nodes
+        const std::shared_ptr<HAstNode>& nodes
     ) {
-        using enum Parser::HAstNodeType;
+        using enum HAstNodeType;
 
         // Files/Modules only need their children to be inferred
         if (nodes->Type == File || nodes->Type == Module) {
@@ -328,7 +329,7 @@ namespace Hyve::Typeck {
                 InferTypesWithSymbolTable(symbols, node);
             }
         } else if (nodes->Type == PropertyDecl) {
-            auto declNode = std::dynamic_pointer_cast<Parser::HAstPropertyDeclNode>(nodes);
+            auto declNode = std::dynamic_pointer_cast<HAstPropertyDeclNode>(nodes);
 
             // We only infer the type if the type node is null and the initializer is not null
             if (declNode->TypeNode == nullptr) {
@@ -369,10 +370,10 @@ namespace Hyve::Typeck {
 
     void HTypeck::InferImportedTypes(
         const std::shared_ptr<HSymbolTable>& symbols,
-        const std::shared_ptr<Parser::HAstNode>& nodes
+        const std::shared_ptr<HAstNode>& nodes
     ) {
         // We know that this function always only has a single file node, so we can just take the first one
-        auto fileNode = Parser::HAstNode::FindNodesWithType(Parser::HAstNodeType::File, nodes);
+        auto fileNode = HAstNode::FindNodesWithType(HAstNodeType::File, nodes);
 
         if(fileNode.empty()) {
 			throw std::runtime_error("No file node found in AST");
@@ -382,12 +383,12 @@ namespace Hyve::Typeck {
         auto file = fileNode.front();
 
         // Get all the import nodes
-        auto importNodes = Parser::HAstNode::FindNodesWithType(Parser::HAstNodeType::Import, file);
+        auto importNodes = HAstNode::FindNodesWithType(HAstNodeType::Import, file);
         std::vector<std::shared_ptr<HSymbol>> importedModules;
 
         // For each import node, we need to find the module in the symbol table
         for (const auto& childNode : importNodes) {
-            auto importNode = std::dynamic_pointer_cast<Parser::HAstImportNode>(childNode);
+            auto importNode = std::dynamic_pointer_cast<HAstImportNode>(childNode);
             
             // Find each part of the import node in the symbol table
             auto parts = splitString(importNode->Name, '.');
@@ -423,20 +424,20 @@ namespace Hyve::Typeck {
 
     void HTypeck::FindUnimportedTypes(
         const std::shared_ptr<HSymbolTable>&,
-        std::shared_ptr<Parser::HAstNode>& nodes
+        std::shared_ptr<HAstNode>& nodes
     ) {
 
     }
 
-    std::shared_ptr<Parser::HAstTypeNode> HTypeck::CalculateExpressionType(
-        const std::shared_ptr<Parser::HAstNode>& node,
+    std::shared_ptr<HAstTypeNode> HTypeck::CalculateExpressionType(
+        const std::shared_ptr<HAstNode>& node,
         const std::shared_ptr<HSymbol>& symbol
     ) {
         // TODO: Implement this
         
         // If we have just a literal node, we can return the type of the literal immediately
-        if (node->Type == Parser::HAstNodeType::Literal) {
-			auto literalNode = std::dynamic_pointer_cast<Parser::HAstLiteralNode>(node);
+        if (node->Type == HAstNodeType::Literal) {
+			auto literalNode = std::dynamic_pointer_cast<HAstLiteralNode>(node);
 		}
 
         return nullptr;

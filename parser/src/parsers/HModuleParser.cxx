@@ -1,12 +1,14 @@
 #include "parser/parsers/HModuleParser.hxx"
-#include "parser/HAstNode.hxx"
-#include "parser/nodes/HAstModuleDeclNode.hxx"
+#include <ast/HAstNode.hxx>
+#include <ast/nodes/HAstModuleDeclNode.hxx>
 #include <lexer/HToken.hxx>
 #include <core/HCompilerError.hxx>
 #include <string_view>
 #include <vector>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	// NOSONAR disable brain-overload
 	HModuleParser::HModuleParser(
 		const std::shared_ptr<Core::HErrorHandler>& errorHandler,

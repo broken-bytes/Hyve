@@ -1,8 +1,14 @@
 #include "parser/parsers/HInheritanceParser.hxx"
-#include "parser/nodes/HAstInheritanceNode.hxx"
+#include <ast/HAstNode.hxx>
+#include <ast/nodes/HAstInheritanceNode.hxx>
+#include <lexer/HToken.hxx>
+#include <lexer/HTokenType.hxx>
+#include <lexer/HTokenStream.hxx>
 #include <core/HErrorHandler.hxx>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	HInheritanceParser::HInheritanceParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler
 	) : _errorHandler(errorHandler) {}

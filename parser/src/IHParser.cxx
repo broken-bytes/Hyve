@@ -12,14 +12,19 @@
 #include "parser/parsers/HPrototypeParser.hxx"
 #include "parser/parsers/HStructParser.hxx"
 #include "parser/parsers/HVariableParser.hxx"
-#include "parser/nodes/HAstArrayNode.hxx"
-#include "parser/nodes/HAstInheritanceNode.hxx"
+#include <ast/HAstOperatorType.hxx>
+#include <ast/nodes/HAstArrayNode.hxx>
+#include <ast/nodes/HAstInheritanceNode.hxx>
+#include <ast/nodes/HAstLiteralNode.hxx>
+#include <lexer/HToken.hxx>
 #include <core/HCompilerError.hxx>
 #include <core/HErrorHandler.hxx>
 #include <sstream>
 #include <string_view>
 
 namespace Hyve::Parser {
+	using namespace AST;
+
 	void IHParser::Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) const {
 		if (stream.IsEmpty()) {
 			return;
@@ -96,26 +101,6 @@ namespace Hyve::Parser {
 
 		if (!CanBeInExpression(stream)) {
 			return false;
-		}
-
-		auto token = stream.PeekUntilNonLineBreak();
-
-		for (uint64_t x = _tokenIndex; x < _tokens.size(); x++) {
-			if (token.Type == DOT || token.Type == IDENTIFIER) {
-				// We have an identifier or member access, thus we need to proceed
-				continue;
-			}
-			else if (
-				token.Type == PLUS ||
-				token.Type == MINUS ||
-				token.Type == MULTIPLY ||
-				token.Type == DIVIDE
-				) {
-				// Binary expression, so this is an expression
-				return true;
-			}
-
-			token = stream.PeekUntilNonLineBreak();
 		}
 
 		return false;
