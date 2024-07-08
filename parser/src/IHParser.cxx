@@ -106,7 +106,7 @@ namespace Hyve::Parser {
 		// Followed by:
 		// - Operators(+, -, *, /, %)
 		// - Parentheses("(")
-		auto next = tokens.back();
+		const Lexer::HToken& next = tokens.back();
 
 		if (
 			auto type = next.Type; 
@@ -125,15 +125,23 @@ namespace Hyve::Parser {
 			return false;
 		}
 
-		auto token = tokens.front();
+		if(tokens.front().Type == VAR || tokens.front().Type == LET) {
+			return true;
+		}
 
-		// We only need to check for control structures and assignments
-		// TODO: Control structures
-		if (token.Type == IDENTIFIER) {
+		if (tokens.front().Type == IDENTIFIER) {
 			// Check if the next token is an assignment operator
-			auto next = tokens.back();
+			const Lexer::HToken& next = tokens.back();
 
 			if (next.Type == ASSIGNMENT) {
+				return true;
+			} else if(next.Type == PLUS_ASSIGN) {
+				return true;
+			} else if(next.Type == MINUS_ASSIGN) {
+				return true;
+			} else if(next.Type == MULTIPLY_ASSIGN) {
+				return true;
+			} else if(next.Type == DIVIDE_ASSIGN) {
 				return true;
 			}
 		}
