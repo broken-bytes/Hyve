@@ -11,5 +11,7 @@ public struct _Int16 {
 
     public fn add(lhs: _Int16, rhs: _Int16) -> _Int16 {
         var result = addInt16(a: lhs.value, b: rhs.value)
+
+        return result
     }
 }

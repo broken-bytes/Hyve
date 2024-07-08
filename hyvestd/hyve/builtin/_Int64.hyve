@@ -11,5 +11,7 @@ public struct _Int64 {
 
     public fn add(lhs: _Int64, rhs: _Int64) -> _Int64 {
         var result = addInt64(a: lhs.value, b: rhs.value)
+
+        return result
     }
 }

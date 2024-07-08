@@ -11,5 +11,7 @@ public struct _Double {
 
     public fn add(lhs: _Double, rhs: _Double) -> _Double {
         var result = addFloat(a: lhs.value, b: rhs.value)
+
+        return result
     }
 }

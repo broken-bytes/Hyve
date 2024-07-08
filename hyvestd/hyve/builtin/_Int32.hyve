@@ -11,5 +11,7 @@ public struct _Int32 {
 
     public fn add(lhs: _Int32, rhs: _Int32) -> _Int32 {
         var result = addInt32(a: lhs.value, b: rhs.value)
+
+         return result
     }
 }
