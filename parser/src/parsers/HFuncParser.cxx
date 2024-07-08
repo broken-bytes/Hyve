@@ -9,7 +9,11 @@
 namespace Hyve::Parser {
 	using namespace AST;
 
-	HFuncParser::HFuncParser(std::shared_ptr<Core::HErrorHandler> errorHandler) : _errorHandler(errorHandler) { }
+	HFuncParser::HFuncParser(
+		std::shared_ptr<Core::HErrorHandler> errorHandler,
+		std::shared_ptr<HExpressionParser> exprParser,
+		std::shared_ptr<HStatementParser> stmtParser
+	) : _errorHandler(errorHandler), _exprParser(exprParser), _stmtParser(stmtParser) { }
 
 	std::shared_ptr<HAstNode> HFuncParser::Parse(Lexer::HTokenStream& stream) {
 		using enum Core::HAccessLevel;
@@ -202,10 +206,19 @@ namespace Hyve::Parser {
 
 		token = stream.PeekUntilNonLineBreak();
 
+		auto tokens = stream.Peek(2);
+
 		// Parse statements and expressions one by one
 		while (token.Type != CURLY_RIGHT) {
-			// TODO: Implement statement and expression parsing
-			token = stream.Consume();
+			if (IsStatement({ tokens.front(), tokens.back() })) {
+				body->Children.push_back(_stmtParser->Parse(stream));
+			} else if(IsExpression({ tokens.front(), tokens.back() })) {
+				body->Children.push_back(_exprParser->Parse(stream));
+			} else {
+				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
+				Panic(stream, LINEBREAK);
+			}
+			token = stream.PeekUntilNonLineBreak();
 		}
 
 		return body;

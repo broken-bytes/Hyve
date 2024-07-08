@@ -79,6 +79,8 @@ namespace Hyve::Parser {
 			moduleNode = std::static_pointer_cast<HAstModuleDeclNode>(moduleNode->Children.back());
 		}
 
+		auto tokens = stream.Peek(2);
+
 		while (token.Type != END_OF_FILE) {
 			if (IsClass(stream)) {
 				moduleNode->Children.push_back(_classParser->Parse(stream));
@@ -94,7 +96,7 @@ namespace Hyve::Parser {
 				moduleNode->Children.push_back(_structParser->Parse(stream));
 			} else if(IsVariable(stream)) {
 				moduleNode->Children.push_back(_varParser->Parse(stream));
-			} else if (IsStatement(stream)) {
+			} else if (IsStatement({ tokens.front(), tokens.back() })) {
 				moduleNode->Children.push_back(_stmtParser->Parse(stream));
 			} else {
 				HandleErrorCase(stream);

@@ -10,8 +10,9 @@ namespace Hyve::Parser {
 
 	HStatementParser::HStatementParser(
 		std::shared_ptr<Core::HErrorHandler> errorHandler,
-		std::shared_ptr<HExpressionParser> exprParser
-	) : _errorHandler(errorHandler), _exprParser(exprParser) {}
+		std::shared_ptr<HExpressionParser> exprParser,
+		std::shared_ptr<HVariableParser> varParser
+	) : _errorHandler(errorHandler), _exprParser(exprParser), _varParser(varParser) {}
 
 	std::shared_ptr<HAstNode> HStatementParser::Parse(Lexer::HTokenStream& stream) {
 		using enum Lexer::HTokenType;

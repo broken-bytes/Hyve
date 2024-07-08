@@ -43,10 +43,8 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::CanStartStatement(Lexer::HTokenStream& stream) const {
+	bool IHParser::CanStartStatement(const Lexer::HToken& token) const {
 		using enum Lexer::HTokenType;
-
-		auto token = stream.PeekUntilNonLineBreak();
 
 		switch (token.Type) {
 			case RETURN:
@@ -60,10 +58,8 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::CanBeInExpression(Lexer::HTokenStream& stream) const {
+	bool IHParser::CanBeInExpression(const Lexer::HToken& token) const {
 		using enum Lexer::HTokenType;
-
-		auto token = stream.PeekUntilNonLineBreak();
 
 		switch (token.Type) {
 			case IDENTIFIER:
@@ -96,31 +92,46 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::IsExpression(Lexer::HTokenStream& stream) const {
+	bool IHParser::IsExpression(const std::array<Lexer::HToken, 2>& tokens) const {
 		using enum Lexer::HTokenType;
 
-		if (!CanBeInExpression(stream)) {
+		if (!CanBeInExpression(tokens.front())) {
 			return false;
 		}
 
-		// TODO: Implement proper expression parsing
-		return true;
+		// What is an expression?
+		// - Literals
+		// - Function calls
+		// - Identifiers
+		// Followed by:
+		// - Operators(+, -, *, /, %)
+		// - Parentheses("(")
+		auto next = tokens.back();
+
+		if (
+			auto type = next.Type; 
+			type == PLUS || type == MINUS || type == MULTIPLY || type == DIVIDE || type == MODULO
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
-	bool IHParser::IsStatement(Lexer::HTokenStream& stream) const {
+	bool IHParser::IsStatement(const std::array<Lexer::HToken, 2>& tokens) const {
 		using enum Lexer::HTokenType;
 
-		if (!CanStartStatement(stream)) {
+		if (!CanStartStatement(tokens.front())) {
 			return false;
 		}
 
-		auto token = stream.PeekUntilNonLineBreak();
+		auto token = tokens.front();
 
 		// We only need to check for control structures and assignments
 		// TODO: Control structures
 		if (token.Type == IDENTIFIER) {
 			// Check if the next token is an assignment operator
-			auto next = stream.Peek(2)[1];
+			auto next = tokens.back();
 
 			if (next.Type == ASSIGNMENT) {
 				return true;
@@ -574,13 +585,14 @@ namespace Hyve::Parser {
 		auto classParser = std::make_shared<HClassParser>();
 		auto enumParser = std::make_shared<HEnumParser>();
 		auto exprParser = std::make_shared<HExpressionParser>(errorHandler);
-		auto funcParser = std::make_shared<HFuncParser>(errorHandler);
+		auto varParser = std::make_shared<HVariableParser>(errorHandler, exprParser);
+		auto statementParser = std::make_shared<HStatementParser>(errorHandler, exprParser, varParser);
+		auto funcParser = std::make_shared<HFuncParser>(errorHandler, exprParser, statementParser);
 		auto inheritanceParser = std::make_shared<HInheritanceParser>(errorHandler);
 		auto initParser = std::make_shared<HInitParser>(errorHandler);
 		auto propParser = std::make_shared<HPropertyParser>(errorHandler, exprParser);
 		auto protocolParser = std::make_shared<HProtocolParser>();
 		auto prototypeParser = std::make_shared<HPrototypeParser>();
-		auto statementParser = std::make_shared<HStatementParser>(errorHandler, exprParser);
 		auto structParser = std::make_shared<HStructParser>(
 			errorHandler, 
 			funcParser, 
@@ -588,7 +600,6 @@ namespace Hyve::Parser {
 			initParser,
 			propParser
 		);
-		auto varParser = std::make_shared<HVariableParser>(errorHandler, exprParser);
 		auto moduleParser = std::make_shared<HModuleParser>(
 			errorHandler,
 			classParser,

@@ -40,11 +40,11 @@ namespace Hyve::Parser {
 		/// <param name=""></param>
 		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenType type) const;
 		void Panic(Lexer::HTokenStream& stream, Lexer::HTokenFamily family) const;
-		[[nodiscard]] bool CanStartStatement(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool CanBeInExpression(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool CanStartStatement(const Lexer::HToken& token) const;
+		[[nodiscard]] bool CanBeInExpression(const Lexer::HToken& token) const;
 		[[nodiscard]] bool IsAccessLevel(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsExpression(const std::array<Lexer::HToken, 2>& tokens) const;
+		[[nodiscard]] bool IsStatement(const std::array<Lexer::HToken, 2>& tokens) const;
 		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream) const;

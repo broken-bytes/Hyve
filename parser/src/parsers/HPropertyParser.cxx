@@ -62,10 +62,13 @@ namespace Hyve::Parser {
 
 		// If the next token is an equal sign, then we have an initializer
 		token = stream.PeekUntilNonLineBreak();
+
+		auto tokens = stream.Peek(2);
+
 		if (token.Type == EQUAL) {
 			stream.Consume();
 			
-			if (IsExpression(stream)) {
+			if (IsExpression({ tokens.front(), tokens.back() })) {
 				auto assignNode = _exprParser->Parse(stream);
 				propNode->Initializer = std::dynamic_pointer_cast<HAstExpressionNode>(assignNode);
 			} else {
