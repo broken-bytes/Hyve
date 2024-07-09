@@ -144,6 +144,8 @@ namespace Hyve::Parser {
 			} else if(next.Type == DIVIDE_ASSIGN) {
 				return true;
 			}
+		} else if(tokens.front().Type == RETURN) {
+			return true;
 		}
 
 		return false;
