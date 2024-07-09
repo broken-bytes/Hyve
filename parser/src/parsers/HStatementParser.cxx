@@ -26,6 +26,9 @@ namespace Hyve::Parser {
 				// Parse an assignment
 				return ParseAssignment(stream);
 			}
+		} else if (token.Type == VAR || token.Type == LET) {
+			// Parse a variable declaration
+			return _varParser->Parse(stream);
 		}
 
 		return nullptr;

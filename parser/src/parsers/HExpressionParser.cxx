@@ -37,7 +37,7 @@ namespace Hyve::Parser {
 			// We need to check if the next token is a dot operator
 			if (nextToken.Type == DOT) {
 				left = ParseMemberAccess(stream);
-			} else if(nextToken.Type == BRACKET_LEFT) {
+			} else if(nextToken.Type == PAREN_LEFT) {
 				left = ParseFuncCall(stream);
 			} else {
 				// Consume the identifier
