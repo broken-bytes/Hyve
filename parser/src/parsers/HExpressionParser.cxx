@@ -124,7 +124,7 @@ namespace Hyve::Parser {
 		// TODO: Parse the arguments
 		token = stream.Consume();
 
-		return funcCall;
+ 		return funcCall;
 	}
 
 	std::shared_ptr<HAstUnaryExpressionNode> HExpressionParser::ParseUnaryExpression(Lexer::HTokenStream& stream) const {

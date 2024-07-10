@@ -7,6 +7,7 @@
 
 namespace Hyve::AST {
     struct HAstReturnNode : HAstStatementNode {
+        std::shared_ptr<HAstExpressionNode> Value;
 
         HAstReturnNode() {
             StatementType = StatementType::Return;
