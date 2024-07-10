@@ -27,7 +27,7 @@ namespace Hyve::Parser {
 		// Primary expression parser
 		std::shared_ptr<AST::HAstExpressionNode> ParseExpression(Lexer::HTokenStream& stream, uint16_t precedence = 0);
 		// Func call parser
-		std::shared_ptr<AST::HAstFuncCallNode> ParseFuncCall(Lexer::HTokenStream& stream) const;
+		std::shared_ptr<AST::HAstFuncCallNode> ParseFuncCall(Lexer::HTokenStream& stream);
 		// Unary expression parser
 		std::shared_ptr<AST::HAstUnaryExpressionNode> ParseUnaryExpression(Lexer::HTokenStream& stream) const;
 		// Binary expression parser
@@ -35,6 +35,6 @@ namespace Hyve::Parser {
 		// Property and member access parser
 		std::shared_ptr<AST::HAstPropAccessNode> ParsePropAccess(Lexer::HTokenStream& stream) const;
 		// Member access parser
-		std::shared_ptr<AST::HAstExpressionNode> ParseMemberAccess(Lexer::HTokenStream& stream) const;
+		std::shared_ptr<AST::HAstExpressionNode> ParseMemberAccess(Lexer::HTokenStream& stream);
 	};
 }

@@ -83,7 +83,9 @@ namespace Hyve::Parser {
 		return left;
 	}
 
-	std::shared_ptr<HAstFuncCallNode> HExpressionParser::ParseFuncCall(Lexer::HTokenStream& stream) const {
+	std::shared_ptr<HAstFuncCallNode> HExpressionParser::ParseFuncCall(Lexer::HTokenStream& stream) {
+		using enum Lexer::HTokenType;
+
 		auto funcCall = std::make_shared<HAstFuncCallNode>();
 
 		// Consume the identifier
@@ -93,7 +95,31 @@ namespace Hyve::Parser {
 		funcCall->Target = identifierNode;
 
 		// Consume the left bracket
-		token = stream.Consume();
+		token = stream.Consume(PAREN_LEFT);
+
+		while(token.Type != PAREN_RIGHT) {
+			// Create the argument node
+			auto argNode = HAstCallArgument {};
+			// Get the name of the argument
+			token = stream.Consume(IDENTIFIER);
+			argNode.Name = token.Value;
+
+			// Consume the colon
+			token = stream.Consume(COLON);
+
+			// Parse the expression(Argument value)
+			auto argValue = ParseExpression(stream, 0);
+			argNode.Value = argValue;
+
+			// Add the argument to the function call
+			funcCall->Arguments.push_back(argNode);
+
+			token = stream.PeekUntilNonLineBreak();
+			if (token.Type == COMMA) {
+				stream.Consume();
+				token = stream.PeekUntilNonLineBreak();
+			}
+		}
 
 		// TODO: Parse the arguments
 		token = stream.Consume();
@@ -117,7 +143,7 @@ namespace Hyve::Parser {
 		return propAccess;
 	}
 
-	std::shared_ptr<HAstExpressionNode> HExpressionParser::ParseMemberAccess(Lexer::HTokenStream& stream) const {
+	std::shared_ptr<HAstExpressionNode> HExpressionParser::ParseMemberAccess(Lexer::HTokenStream& stream) {
 		using enum Lexer::HTokenType;
 		using enum Lexer::HTokenFamily;
 		using enum Core::HCompilerError::ErrorCode;

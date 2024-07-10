@@ -6,14 +6,14 @@
 #include <vector>
 
 namespace Hyve::AST {
-    struct HAstCallParamater {
+    struct HAstCallArgument {
         std::string Name;
         std::shared_ptr<HAstExpressionNode> Value;
     };
 
     struct HAstFuncCallNode : HAstExpressionNode {
         std::shared_ptr<HAstNode> Target;
-        std::vector<HAstCallParamater> Parameters;
+        std::vector<HAstCallArgument> Arguments;
 
         HAstFuncCallNode() {
             ExpressionType = ExpressionType::FunctionCall;
