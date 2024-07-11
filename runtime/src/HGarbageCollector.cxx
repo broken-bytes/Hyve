@@ -4,11 +4,12 @@
 #include <ranges>
 
 namespace Hyve::Runtime {
-	HGarbageCollector::HGarbageCollector(HGarbageCollectorConfig config) {
+	HGarbageCollector::HGarbageCollector(
+		HGarbageCollectorConfig config
+	) : _tickIntervalMs(config.TickIntervalMs), _ageThreshold(config.AgeThreshold) {
+		_lastTick = std::chrono::steady_clock::now().time_since_epoch().count();
+
 		_garbageCollectorThread = std::jthread([this, config]() {
-			_lastTick = std::chrono::steady_clock::now().time_since_epoch().count();
-			_tickIntervalMs = config.TickIntervalMs;
-			_ageThreshold = config.AgeThreshold;
 			Collect();
 			// Sleep for delay
 			std::this_thread::sleep_for(std::chrono::milliseconds(config.TickIntervalMs));
@@ -16,6 +17,28 @@ namespace Hyve::Runtime {
 	}
 
 	HGarbageCollector::~HGarbageCollector() {
+	}
+
+	uint64_t HGarbageCollector::RegiserTypeDescriptor(std::string_view name) {
+		auto id = _typeDescriptors.size();
+		auto descriptor = HTypeDescriptor {
+			.Name = std::string(name),
+			.Fields = {}
+		};
+		_typeDescriptors.push_back(descriptor);
+
+		return id;
+	}
+
+	uint64_t HGarbageCollector::RegisterField(uint64_t type, std::string_view name, size_t size) {
+		auto id = _typeDescriptors[type].Fields.size();
+		auto field = HFieldDescriptor {
+			.Name = std::string(name),
+			.Size = size
+		};
+		_typeDescriptors[type].Fields.push_back(field);
+
+		return id;
 	}
 
 	uint64_t HGarbageCollector::Allocate(size_t size) {
@@ -37,6 +60,7 @@ namespace Hyve::Runtime {
 	}
 	
 	void HGarbageCollector::Collect() {
+		// Mark phase
 		// Before we start the tick, we need to check if the tick interval has passed at all
 		// This way we don't have too many ticks in a short period of time
 		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
@@ -51,13 +75,7 @@ namespace Hyve::Runtime {
 			obj->Age++;
 		}
 
-		// Move objects that have reached the threshold to the old generation
-		for (auto* obj : _youngObjects) {
-			if (obj->Age >= _ageThreshold) {
-				_oldObjects.push_back(obj);
-				std::erase(_youngObjects, obj);
-			}
-		}
+		
 
 		// Set the last tick time
 		_lastTick = std::chrono::steady_clock::now().time_since_epoch().count();
@@ -90,4 +108,30 @@ namespace Hyve::Runtime {
 			_referenceTable.erase(obj);
 		}
 	}
+
+	void HGarbageCollector::Mark() {
+
+	}
+
+	void HGarbageCollector::Sweep() {
+
+	}
+
+	void HGarbageCollector::Promote() {
+		// Move objects that have reached the threshold to the old generation
+		for (auto* obj : _youngObjects) {
+			if (obj->Age >= _ageThreshold) {
+				_oldObjects.push_back(obj);
+				std::erase(_youngObjects, obj);
+			}
+		}
+	}
+
+	void HGarbageCollector::CollectYoung() {
+
+	}
+
+	void CollectOld()[
+
+	]
 }

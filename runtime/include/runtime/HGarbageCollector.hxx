@@ -3,8 +3,10 @@
 #include "runtime/HRuntime.hxx"
 #include "runtime/HMemory.hxx"
 #include "runtime/HObject.hxx"
+#include "runtime/HTypeDescriptor.hxx"
 #include <thread>
 #include <memory>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -19,18 +21,21 @@ namespace Hyve::Runtime {
 	public:
 		explicit HGarbageCollector(HGarbageCollectorConfig config);
 		~HGarbageCollector();
+		uint64_t RegiserTypeDescriptor(std::string_view name);
+		uint64_t RegisterField(uint64_t type, std::string_view name, size_t size);
 		void Collect();
 		uint64_t Allocate(size_t size);
 		void Track(uint64_t object, uint64_t target, ReferenceType refType);
 		void Untrack(uint64_t object, uint64_t target);
 
 	private:
+		std::vector<HTypeDescriptor> _typeDescriptors;
+
 		std::unordered_map<HObject*, std::vector<Reference>> _referenceTable;
 		std::vector<HObject*> _youngObjects;
 		std::vector<HObject*> _oldObjects;
 		uint64_t _lastTick;
 		uint64_t _tickIntervalMs;
-		uint64_t _lastNumAllocs;
 		uint64_t _ageThreshold;
 		std::jthread _garbageCollectorThread;
 
@@ -38,5 +43,11 @@ namespace Hyve::Runtime {
 		HMemory _youngMemory;
 		// Memory heap for old objects
 		HMemory _oldMemory;
+
+		void Mark();
+		void Sweep();
+		void Promote();
+		void CollectYoung();
+		void CollectOld();
 	};
 }
