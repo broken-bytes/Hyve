@@ -81,6 +81,14 @@ namespace Hyve::Runtime {
 		_lastTick = std::chrono::steady_clock::now().time_since_epoch().count();
 	}
 
+	void HGarbageCollector::TrackRoot(HVariable* root, uint64_t object) {
+		auto reference = RootReference {
+			.Variable = root,
+			.Object = (HObject*)object
+		};
+		_rootTable[root].push_back(reference);
+	}
+
 	void HGarbageCollector::Track(uint64_t object, uint64_t target, ReferenceType refType) {
 		Reference ref = { (HObject*)object, (HObject*)target, refType };
 		_referenceTable[(HObject*)object].push_back(ref);
@@ -131,7 +139,7 @@ namespace Hyve::Runtime {
 
 	}
 
-	void CollectOld()[
+	void CollectOld() {
 
-	]
+	}
 }

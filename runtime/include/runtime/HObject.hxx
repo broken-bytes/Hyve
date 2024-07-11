@@ -26,18 +26,4 @@ namespace Hyve::Runtime {
 		/// The color of the object
 		Color Color;
 	};
-
-	enum class ReferenceType {
-		STRONG,
-		WEAK
-	};
-
-	struct Reference {
-		// Where this reference comes from
-		HObject* From;
-		// Where this reference goes to
-		HObject* To;
-		// The type of reference
-		ReferenceType Type;
-	};
 }

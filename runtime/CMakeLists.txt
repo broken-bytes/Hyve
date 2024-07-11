@@ -13,7 +13,9 @@ SET(
     include/runtime/HAllocation.hxx
     include/runtime/HMemory.hxx
     include/runtime/HMemoryBlock.hxx
+    include/runtime/HReference.hxx
     include/runtime/HTypeDescriptor.hxx
+    include/runtime/HVariable.hxx
 )
 
 add_library(Runtime SHARED ${SRC} ${HEADERS})
