@@ -19,7 +19,6 @@ namespace Hyve::Runtime {
 	};
 
 	struct RootReference {
-		HVariable* Variable;
 		HObject* Object;
 	};
 }

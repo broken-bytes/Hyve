@@ -11,7 +11,7 @@ const std::unique_ptr<HGarbageCollector> GC = std::make_unique<HGarbageCollector
 );
 
 uint64_t GC_RegisterType(const char* name) {
-    return GC->RegiserTypeDescriptor(name);
+    return GC->RegisterTypeDescriptor(name);
 }
 
 uint64_t GC_RegisterField(uint64_t type, const char* name, size_t size) {

@@ -1,4 +1,5 @@
 #include "runtime/HGarbageCollector.hxx"
+#include "runtime/HStacktrace.hxx"
 #include <algorithm>
 #include <chrono>
 #include <ranges>
@@ -19,7 +20,7 @@ namespace Hyve::Runtime {
 	HGarbageCollector::~HGarbageCollector() {
 	}
 
-	uint64_t HGarbageCollector::RegiserTypeDescriptor(std::string_view name) {
+	uint64_t HGarbageCollector::RegisterTypeDescriptor(std::string_view name) {
 		auto id = _typeDescriptors.size();
 		auto descriptor = HTypeDescriptor {
 			.Name = std::string(name),
@@ -41,15 +42,21 @@ namespace Hyve::Runtime {
 		return id;
 	}
 
-	uint64_t HGarbageCollector::Allocate(size_t size) {
-		auto* memory = (uint64_t*)std::malloc(size);
-		if (memory == nullptr) {
+	uint64_t HGarbageCollector::Allocate(uint64_t type) {
+		// Get the size of the type
+		size_t size = 0;
+		for (const auto& field : _typeDescriptors[type].Fields) {
+			size += field.Size;
+		}
+
+		auto memory = _youngMemory.Allocate(size);
+
+		if (memory == 0) {
 			throw std::bad_alloc();
 		}
 
 		auto object = new HObject {
-			.Refs = {},
-			.Address = memory,
+			.Offset = memory,
 			.Size = size,
 			.Age = 0
 		};
@@ -60,33 +67,27 @@ namespace Hyve::Runtime {
 	}
 	
 	void HGarbageCollector::Collect() {
-		// Mark phase
-		// Before we start the tick, we need to check if the tick interval has passed at all
-		// This way we don't have too many ticks in a short period of time
-		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
-		
-		if (auto elapsed = now - _lastTick; elapsed < _tickIntervalMs) {
-			// Sleep for the remaining time
-			std::this_thread::sleep_for(std::chrono::milliseconds(_tickIntervalMs - elapsed));
-		}
-
 		// Increment the age of all objects
 		for (auto* obj : _youngObjects) {
 			obj->Age++;
 		}
 
-		
+		// Promote objects that have reached the age threshold
+		Promote();
 
-		// Set the last tick time
-		_lastTick = std::chrono::steady_clock::now().time_since_epoch().count();
+		// Mark all objects
+		Mark();
+		
+		// Sweep the young generation
+		Sweep();
 	}
 
-	void HGarbageCollector::TrackRoot(HVariable* root, uint64_t object) {
+	void HGarbageCollector::TrackRoot(uint64_t object) {
 		auto reference = RootReference {
-			.Variable = root,
 			.Object = (HObject*)object
 		};
-		_rootTable[root].push_back(reference);
+
+		_rootTable.push_back(reference);
 	}
 
 	void HGarbageCollector::Track(uint64_t object, uint64_t target, ReferenceType refType) {
@@ -117,12 +118,82 @@ namespace Hyve::Runtime {
 		}
 	}
 
-	void HGarbageCollector::Mark() {
+	void HGarbageCollector::ScanRoots() {
+		using enum Color;
 
+		// Fill the roottable with the contents of the call stack
+		auto stack = HStacktrace();
+		// Get each frame on the stack
+		for (const auto& frame : stack) {
+			// Get the object from the frame
+			// TODO: Scan the pointers in the frame to find objects
+			// Track the object as a root
+			//TrackRoot((uint64_t)object);
+		}
+
+		// Mark all objects reachable from the roots on the queue
+		for (const auto& root : _rootTable) {
+			// Mark the object as in progress(gray)
+			root.Object->Color = GRAY;
+
+			// Iterate over the references
+			for (const auto& refs = _referenceTable[root.Object]; const auto & objcRef : refs) {
+				// If the reference is not marked, mark it
+				if (objcRef.To->Color == WHITE) {
+					// Mark the object as reachable(black)
+					objcRef.To->Color = BLACK;
+				}
+			}
+
+			// Mark the object as reachable(black)
+			root.Object->Color = BLACK;
+		}
+	}
+
+	void HGarbageCollector::ScanReferences(HObject* object) {
+		using enum Color;
+		// Mark all objects reachable from the references
+		for (const auto& refs = _referenceTable[object]; const auto& objcRef : refs) {
+			// If the reference is not marked, mark it
+			if (objcRef.To->Color == WHITE) {
+				// Mark the object as reachable(black)
+				objcRef.To->Color = BLACK;
+
+				// Recursively scan the references of the object
+				ScanReferences(objcRef.To);
+			}
+		}
+	}
+
+
+	void HGarbageCollector::Mark() {
+		using enum Color;
+		// Mark all objects white first
+		for (auto* obj : _youngObjects) {
+			obj->Color = WHITE;
+		}
+
+		// Mark all objects reachable from the roots
+		ScanRoots();
+		
+		// For each object in the young generation that is reachable, scan its references
+		// These will be all objects referenced by obejcts reachable from the roots
+		for(auto* obj : _youngObjects) {
+			if (obj->Color == BLACK) {
+				ScanReferences(obj);
+			}
+		}
 	}
 
 	void HGarbageCollector::Sweep() {
+		using enum Color;
 
+		// Sweep the young generation
+		for (const auto* obj : _youngObjects) {
+			if (obj->Color == WHITE) {
+				_youngMemory.Free(obj->Offset);
+			}
+		}
 	}
 
 	void HGarbageCollector::Promote() {
@@ -139,7 +210,7 @@ namespace Hyve::Runtime {
 
 	}
 
-	void CollectOld() {
+	void HGarbageCollector::CollectOld() {
 
 	}
 }

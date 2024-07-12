@@ -9,16 +9,14 @@ namespace Hyve::Runtime {
 	enum class Color {
 		BLACK,	// The object is reachable
 		WHITE,	// The object is unreachable
-		GREY	// The object is being processed
+		GRAY	// The object is being processed
 	};
 
 	struct HObject {
-		/// The references this object holds
-		std::vector<HObject*> Refs;
-		/// The references to this object
-		std::vector<HObject*> BackRefs;
-		/// The address of the object
-		uint64_t* Address;
+		/// The type of the object
+		uint64_t TypeId;
+		/// The offset of the object in the heap it belongs to
+		uint64_t Offset;
 		/// The size of the object
 		size_t Size;
 		/// The age of the object

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <forward_list>
+#include <list>
 
 namespace Hyve::Runtime {
 	struct HMemoryBlock;
@@ -10,15 +10,27 @@ namespace Hyve::Runtime {
 		HMemory() = default;
 		~HMemory() = default;
 
-		void* Allocate(size_t size);
-		void Free(void* ptr);
-		void* Reallocate(void* ptr, size_t size);
+		/**
+		* @brief Allocate memory
+		* @param size Size of memory to allocate
+		* @return The offset of the allocated memory from the start of this heap
+		*/
+		uint64_t Allocate(size_t size);
+		/**
+		* @brief Free memory
+		* @param offset Offset of the memory to free from the start of this heap
+		*/
+		void Free(uint64_t offset);
 
 		void* Memory() const;
 		size_t Size() const;
 
 	private:
-		std::forward_list<HMemoryBlock*> _blocks;
-		std::forward_list<HMemoryBlock*> _freeBlocks;
+		std::list<HMemoryBlock*> _blocks;
+		std::list<HMemoryBlock*> _freeBlocks;
+
+		HMemoryBlock* MakeBlock(size_t size);
+		HMemoryBlock* FindBlock(uint64_t offset);
+		HMemoryBlock* FindBestFitBlock(size_t size);
 	};
 }

@@ -7,6 +7,7 @@
 #include "runtime/HTypeDescriptor.hxx"
 #include <thread>
 #include <memory>
+#include <queue>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
@@ -22,11 +23,11 @@ namespace Hyve::Runtime {
 	public:
 		explicit HGarbageCollector(HGarbageCollectorConfig config);
 		~HGarbageCollector();
-		uint64_t RegiserTypeDescriptor(std::string_view name);
+		uint64_t RegisterTypeDescriptor(std::string_view name);
 		uint64_t RegisterField(uint64_t type, std::string_view name, size_t size);
 		void Collect();
-		uint64_t Allocate(size_t size);
-		void TrackRoot(HVariable* root, uint64_t object);
+		uint64_t Allocate(uint64_t type);
+		void TrackRoot(uint64_t object);
 		void Track(uint64_t object, uint64_t target, ReferenceType refType);
 		void Untrack(uint64_t object, uint64_t target);
 
@@ -34,7 +35,7 @@ namespace Hyve::Runtime {
 		std::vector<HTypeDescriptor> _typeDescriptors;
 
 		// Root to object mapping
-		std::unordered_map<HVariable*, std::vector<RootReference>> _rootTable;
+		std::vector<RootReference> _rootTable;
 		// Object to references mapping
 		std::unordered_map<HObject*, std::vector<Reference>> _referenceTable;
 		std::vector<HObject*> _youngObjects;
@@ -49,6 +50,8 @@ namespace Hyve::Runtime {
 		// Memory heap for old objects
 		HMemory _oldMemory;
 
+		void ScanRoots();
+		void ScanReferences(HObject* object);
 		void Mark();
 		void Sweep();
 		void Promote();

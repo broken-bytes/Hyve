@@ -27,6 +27,7 @@ add_subdirectory(runtime)
 add_subdirectory(libhyve)
 add_subdirectory(cli)
 add_subdirectory(hyvec)
+add_subdirectory(tests)
 
 set_property(TARGET Core PROPERTY CXX_STANDARD 23)
 set_property(TARGET AST PROPERTY CXX_STANDARD 23)
