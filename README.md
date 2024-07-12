@@ -10,11 +10,14 @@
 Hyve is a modern, highly asynchronous programming language designed for building scalable and efficient software. Embracing the latest in concurrent programming paradigms, Hyve offers a unique blend of performance, simplicity, and flexibility for developers.
 
 ## Features
-- **Asynchronous by Nature**: At its core, Hyve is built to handle asynchronous operations seamlessly, making it ideal for IO-heavy tasks and high-load applications.
-- **Modern Syntax**: Hyve's syntax is clean and expressive, enabling developers to write more code with fewer lines and clear readability.
-- **Scalability**: Designed for scalability, Hyve can easily handle large-scale applications, from microservices to massive cloud-based systems.
-- **Strong Typing with Inference**: Hyve offers strong typing capabilities with intelligent type inference, reducing boilerplate while maintaining type safety.
-- **Cross-Platform Compatibility**: Write once, run anywhere. Hyve code is highly portable across various platforms.
+- 🧵 **Asynchronous by Nature**: At its core, Hyve is built to handle asynchronous operations seamlessly.
+- 🔮 **Modern Syntax**: Hyve's syntax is clean and expressive, enabling developers to write more code with fewer lines and clear readability.
+- 🎚️ **Scalability**: Hyve can easily handle large-scale applications - from microservices to massive cloud-based systems.
+- 🔗 **Strong Typing with Inference**: Hyve offers strong typing capabilities with intelligent type inference.
+- 🧊 **Immutability**: Hyve encourages immutable data structures to increase robustness and predictability. 
+- 🤝 **Cross-Platform Compatibility**: Write once, run anywhere. Hyve code is highly portable across various platforms.
+- 🔋 **Batteries included**: Hyve comes with a sophisticated standard library and first-class frameworks for various of tasks.
+- 🔒 **Secure by design**: Hyve has the highest standards on security, ensuring your apps are safe by default.
 
 ## Installation
 ```bash
