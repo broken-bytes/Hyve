@@ -12,6 +12,8 @@ TEST_CASE("HRuntime - Allocate", "Allocate an object of size x") {
 
     GC_Track(obj, obj2);
 
+    GC_Collect();
+
     while(true) {
         // Wait for a second
         std::this_thread::sleep_for(std::chrono::seconds(1));
