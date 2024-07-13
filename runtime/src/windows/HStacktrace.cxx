@@ -4,61 +4,97 @@
 #include <DbgHelp.h>
 
 namespace Hyve::Runtime {
-    std::vector<uintptr_t> getPointersInFrame(HANDLE process, DWORD64 frameInstructionPointer) {
+    std::vector<uintptr_t> GetPointersInFrame(HANDLE process, DWORD64 frameInstructionPointer) {
         std::vector<uintptr_t> pointers;
 
-        // Get context for the frame
-        CONTEXT context;
-        RtlCaptureContext(&context);
-        context.Rip = frameInstructionPointer; // Set the instruction pointer to the frame's IP
+        // Initialize symbol info structure
+        SYMBOL_INFO symbolInfo = {};
+        symbolInfo.SizeOfStruct = sizeof(SYMBOL_INFO);
+        symbolInfo.MaxNameLen = MAX_SYM_NAME;
 
-        // Get function information using SymFromAddr (error handling omitted for brevity)
-        SYMBOL_INFO symbolInfo = { sizeof(SYMBOL_INFO), MAX_SYM_NAME };
-        SymFromAddr(process, frameInstructionPointer, NULL, &symbolInfo);
-
-        // Get FPO data (Frame Pointer Omission) to determine frame boundaries
-        IMAGEHLP_MODULE64 imagehlpModuleInfo = { sizeof(IMAGEHLP_MODULE64) };
-        IMAGEHLP_STACK_FRAME imagehlpStackFrame = { 0 };
-        imagehlpStackFrame.InstructionOffset = context.Rip;
-        SymSetContext(process, &imagehlpStackFrame, &context);
-        DWORD imageType;
-        if (!SymGetModuleInfo64(process, symbolInfo.ModBase, &imagehlpModuleInfo)) {
-            // ... (handle error)
-        }
-        imageType = imagehlpModuleInfo.MachineType;
-
-        // Unwind the stack using StackWalk64
-        STACKFRAME64 stackFrame = { 0 };
-        while (StackWalk64(imageType, process, GetCurrentThread(), &stackFrame, &context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL)) {
+        if (!SymFromAddr(process, frameInstructionPointer, nullptr, &symbolInfo)) {
+            throw std::runtime_error("Failed to get symbol info");
         }
 
-        // ... (Handle possible stack walk errors)
+        // Get module information
+        IMAGEHLP_MODULE64 moduleInfo = {};
+        moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
+
+        if (!SymGetModuleInfo64(process, symbolInfo.ModBase, &moduleInfo)) {
+            throw std::runtime_error("Failed to get module info");
+        }
+
+        // Process frame data (e.g., pointers) as needed
+        // This part would depend on your specific requirements
 
         return pointers;
     }
 
-    HStacktrace::HStacktrace() {
-        std::stacktrace trace; // Capture the current stack trace
-        size_t stackSize = trace.size();
+    void WalkStack(HANDLE process, HANDLE thread) {
+        std::vector<HStackframe> stackFrames;
 
-        // Skip last frame - trace constructor (remove if you need to display that info)
-        stackSize = stackSize - 1;
-
-        _frames.reserve(stackSize); // Reserve space for efficiency
-
-        // Initialize symbol handling (needed to get function names and addresses)
-        HANDLE process = GetCurrentProcess();
-        SymInitialize(process, NULL, TRUE); // Load symbols for the current process
-
-        // Iterate over frames and extract information
-        for (HStackframe& frame : _frames) {
-            DWORD64 displacement = 0;
-            SYMBOL_INFO symbolInfo = { 0 };
-            if (SymFromAddr(process, frame.InstructionPointer, &displacement, &symbolInfo)) {
-                
-            }
+        CONTEXT context = {};
+        context.ContextFlags = CONTEXT_FULL;
+        if (!GetThreadContext(thread, &context)) {
+            throw std::runtime_error("Failed to get thread context");
         }
 
-        SymCleanup(process); // Clean up symbol handling
+        STACKFRAME64 stackFrame = {};
+        DWORD machineType;
+
+#ifdef _M_IX86
+        machineType = IMAGE_FILE_MACHINE_I386;
+        stackFrame.AddrPC.Offset = context.Eip;
+        stackFrame.AddrPC.Mode = AddrModeFlat;
+        stackFrame.AddrFrame.Offset = context.Ebp;
+        stackFrame.AddrFrame.Mode = AddrModeFlat;
+        stackFrame.AddrStack.Offset = context.Esp;
+        stackFrame.AddrStack.Mode = AddrModeFlat;
+#elif _M_X64
+        machineType = IMAGE_FILE_MACHINE_AMD64;
+        stackFrame.AddrPC.Offset = context.Rip;
+        stackFrame.AddrPC.Mode = AddrModeFlat;
+        stackFrame.AddrFrame.Offset = context.Rsp;
+        stackFrame.AddrFrame.Mode = AddrModeFlat;
+        stackFrame.AddrStack.Offset = context.Rsp;
+        stackFrame.AddrStack.Mode = AddrModeFlat;
+#elif _M_IA64
+        machineType = IMAGE_FILE_MACHINE_IA64;
+        stackFrame.AddrPC.Offset = context.StIIP;
+        stackFrame.AddrPC.Mode = AddrModeFlat;
+        stackFrame.AddrFrame.Offset = context.IntSp;
+        stackFrame.AddrFrame.Mode = AddrModeFlat;
+        stackFrame.AddrBStore.Offset = context.RsBSP;
+        stackFrame.AddrBStore.Mode = AddrModeFlat;
+        stackFrame.AddrStack.Offset = context.IntSp;
+        stackFrame.AddrStack.Mode = AddrModeFlat;
+#else
+#error "Platform not supported!"
+#endif
+
+        while (StackWalk64(machineType, process, thread, &stackFrame, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)) {
+            if (stackFrame.AddrPC.Offset == 0) {
+                break;
+            }
+
+            try {
+                auto stack = HStackframe();
+                stack.Addresses = GetPointersInFrame(process, stackFrame.AddrPC.Offset);
+            }
+            catch (const std::exception& ex) {
+            }
+        }
+    }
+
+    HStacktrace::HStacktrace() {
+        // Initialize symbol handling (needed to get function names and addresses)
+        HANDLE process = GetCurrentProcess();
+        HANDLE thread = GetCurrentThread();
+        if (!SymInitialize(process, nullptr, true)) {
+            throw std::runtime_error("Failed to initialize symbols");
+        }
+
+        // Walk the stack for the current thread
+        WalkStack(process, thread);
     }
 }

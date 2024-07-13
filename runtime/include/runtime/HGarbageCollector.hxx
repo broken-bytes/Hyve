@@ -13,6 +13,12 @@
 #include <vector>
 
 namespace Hyve::Runtime {
+	enum class GCAggressiveness {
+		Aggresive,
+		Normal,
+		Conservative
+	};
+
 	struct HGarbageCollectorConfig {
 	public:
 		uint64_t TickIntervalMs = 1000;
@@ -30,6 +36,10 @@ namespace Hyve::Runtime {
 		void TrackRoot(uint64_t object);
 		void Track(uint64_t object, uint64_t target, ReferenceType refType);
 		void Untrack(uint64_t object, uint64_t target);
+		
+		// --- Configuration ---
+		void SetAggressiveness(GCAggressiveness aggressiveness);
+		void SetTickInterval(uint64_t tickIntervalMs);
 
 	private:
 		std::vector<HTypeDescriptor> _typeDescriptors;

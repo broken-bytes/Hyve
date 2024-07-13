@@ -13,7 +13,7 @@ namespace Hyve::Runtime {
 		_garbageCollectorThread = std::jthread([this, config]() {
 			Collect();
 			// Sleep for delay
-			std::this_thread::sleep_for(std::chrono::milliseconds(config.TickIntervalMs));
+			std::this_thread::sleep_for(std::chrono::milliseconds(_tickIntervalMs));
 		});
 	}
 
@@ -118,6 +118,14 @@ namespace Hyve::Runtime {
 		}
 	}
 
+	void HGarbageCollector::SetAggressiveness(GCAggressiveness aggressiveness) {
+		// TODO: Implement
+	}
+
+	void HGarbageCollector::SetTickInterval(uint64_t tickIntervalMs) {
+		_tickIntervalMs = tickIntervalMs;
+	}
+
 	void HGarbageCollector::ScanRoots() {
 		using enum Color;
 
@@ -125,10 +133,7 @@ namespace Hyve::Runtime {
 		auto stack = HStacktrace();
 		// Get each frame on the stack
 		for (const auto& frame : stack) {
-			// Get the object from the frame
-			// TODO: Scan the pointers in the frame to find objects
-			// Track the object as a root
-			//TrackRoot((uint64_t)object);
+			 
 		}
 
 		// Mark all objects reachable from the roots on the queue

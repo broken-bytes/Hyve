@@ -45,6 +45,12 @@ extern "C" {
 	*/
 	EXPORT void GC_Collect();
 
+	/**
+	* @brief Changes the interval between garbage collection cycles.
+	* @param interval The interval in milliseconds.
+	*/
+	EXPORT void GC_SetInterval(uint64_t interval);
+
 #ifdef __cplusplus
 }
 #endif

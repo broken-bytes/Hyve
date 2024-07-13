@@ -33,3 +33,7 @@ void GC_Untrack(uint64_t object, uint64_t target) {
 void GC_Collect() {
     GC->Collect();
 }
+
+void GC_SetInterval(uint64_t interval) {
+    GC->SetTickInterval(interval);
+}
