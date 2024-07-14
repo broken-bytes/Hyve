@@ -2,6 +2,7 @@
 #include "runtime/HStacktrace.hxx"
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <ranges>
 
 namespace Hyve::Runtime {
@@ -133,8 +134,20 @@ namespace Hyve::Runtime {
 		auto stack = HStacktrace();
 		// Get each frame on the stack
 		for (const auto& frame : stack) {
-			 
-		}
+			 // For each frame check if each address is a root(points to an object)
+			for (const auto& address : frame.Addresses) {
+				// Check if the address is a root
+				auto potentialPointer = (uintptr_t*)address;
+
+				std::cout << "Potential pointer: " << potentialPointer << std::endl;
+
+				// Check if the value is a valid pointer to an allocated object
+				/*if (std::any_of(_youngObjects.begin(), _youngObjects.end(), [potentialPointer](HObject* obj) { return obj == potentialPointer; }) ||
+					std::any_of(_oldObjects.begin(), _oldObjects.end(), [potentialPointer](HObject* obj) { return obj == potentialPointer; })) {
+					_rootTable.push_back( RootReference{ .Object = potentialPointer });
+				}*/
+			}
+		} 
 
 		// Mark all objects reachable from the roots on the queue
 		for (const auto& root : _rootTable) {

@@ -1,5 +1,7 @@
 #include <runtime/HRuntime.hxx>
+#include <runtime/HObject.hxx>
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 #include <thread>
 
 TEST_CASE("HRuntime - Allocate", "Allocate an object of size x") {
@@ -13,7 +15,11 @@ TEST_CASE("HRuntime - Allocate", "Allocate an object of size x") {
     auto obj = GC_Allocate(type);
     auto obj2 = GC_Allocate(type);
 
-    GC_Track(obj, obj2);
+    auto objectRef = (Hyve::Runtime::HObject*)obj;
+
+    std::cout << "Object 1: " << objectRef->Age << std::endl;
+
+    GC_Collect();
 
     while(true) {
         // Wait for a second
@@ -26,5 +32,6 @@ TEST_CASE("HRuntime - Allocate", "Allocate an object of size x") {
     }
 
     // Check if GC cleared the object
-
+    REQUIRE(objectRef == nullptr);
+         
 }
