@@ -59,6 +59,9 @@ namespace Hyve::Lexer {
         else if (CheckMatchingSequence(source, KEYWORD_PRIVATE)) {
             return MAKE_TOKEN(PRIVATE, KEYWORD_PRIVATE);
         }
+        else if (CheckMatchingSequence(source, KEYWORD_STATIC)) {
+            return MAKE_TOKEN(STATIC, KEYWORD_STATIC);
+        }
         else if (CheckMatchingSequence(source, KEYWORD_INIT)) {
             return MAKE_TOKEN(INIT, KEYWORD_INIT);
         }

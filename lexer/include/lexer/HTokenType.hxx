@@ -36,6 +36,7 @@ namespace Hyve::Lexer {
         OPEN,
         PRIVATE,
         PUBLIC,
+        STATIC,
 
         // Variables & Constants
         LET,

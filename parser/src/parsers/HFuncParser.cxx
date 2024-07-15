@@ -22,8 +22,16 @@ namespace Hyve::Parser {
 		using enum Core::HCompilerError::ErrorCode;
 
 		auto accessLevel = ParseAccessLevel(stream);
+		bool isStatic = false;
 
 		auto token = stream.PeekUntilNonLineBreak();
+
+		// Check if the func is static
+		if (token.Type == STATIC) {
+			isStatic = true;
+			stream.Consume();
+			token = stream.PeekUntilNonLineBreak();
+		}
 
 		// Ensure the next token is either var or let
 		if (token.Type != FUNC) {
@@ -36,6 +44,7 @@ namespace Hyve::Parser {
 		// Create a new function node
 		auto funcNode = std::make_shared<HAstFuncDeclNode>();
 		funcNode->AccessLevel = accessLevel;
+		funcNode->IsStatic = isStatic;
 
 		// Parse the function name
 		if (token = stream.PeekUntilNonLineBreak(); token.Type != IDENTIFIER) {

@@ -19,8 +19,16 @@ namespace Hyve::Parser {
 		using enum Core::HCompilerError::ErrorCode;
 
 		auto accessLevel = ParseAccessLevel(stream);
+		bool isStatic = false;
 
 		auto token = stream.PeekUntilNonLineBreak();
+
+		// Check if the property is static
+		if (token.Type == STATIC) {
+			isStatic = true;
+			stream.Consume();
+			token = stream.PeekUntilNonLineBreak();
+		}
 
 		// Ensure the next token is either var or let
 		if (token.Type != VAR && token.Type != LET) {
@@ -31,6 +39,7 @@ namespace Hyve::Parser {
 		auto propNode = std::make_shared<HAstPropertyDeclNode>();
 		propNode->AccessLevel = accessLevel;
 		propNode->IsMutable = token.Type == VAR;
+		propNode->IsStatic = isStatic;
 
 		token = stream.Consume();
 		token = stream.PeekUntilNonLineBreak();

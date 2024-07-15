@@ -33,6 +33,7 @@ namespace Hyve::Lexer::Keywords {
     constexpr const char* KEYWORD_PUBLIC = "public";
     constexpr const char* KEYWORD_RETURN = "return";
     constexpr const char* KEYWORD_SELF = "self";
+    constexpr const char* KEYWORD_STATIC = "static";
     constexpr const char* KEYWORD_STRUCT = "struct";
     constexpr const char* KEYWORD_TASK = "task";
     constexpr const char* KEYWORD_THROW = "throw";

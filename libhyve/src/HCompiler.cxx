@@ -23,24 +23,24 @@ namespace Hyve {
         std::vector<std::shared_ptr<AST::HAstNode>> asts = {};
 
         for(const auto& file : files) {
-			auto source = LoadSourceFile(file);
-			auto tokens = _lexer->Tokenize(source, file);
-			auto ast = _parser->Parse(tokens);
+		    auto source = LoadSourceFile(file);
+		    auto tokens = _lexer->Tokenize(source, file);
+		    auto ast = _parser->Parse(tokens);
             asts.push_back(ast);
             auto symbolTable = _typeck->BuildSymbolTable(ast, nullptr);
 
             symbols.push_back(symbolTable);
-		}
+	    }
 
         auto symbolTable = _typeck->MergeSymbols(symbols);
 
-         for (auto& ast : asts) {
+        for (auto& ast : asts) {
             _typeck->InferTypes(symbolTable, ast);
-         }
+        }
 
-         for (auto& ast : asts) {
-             _generator->GenerateIR("", ast);
-         }
+        for (auto& ast : asts) {
+            _generator->GenerateIR("", ast);
+        }
 	}
 
 	std::string HCompiler::LoadSourceFile(const std::string& file) const {
