@@ -2,15 +2,16 @@
 
 namespace Hyve::Lexer::Keywords {
     constexpr const char* KEYWORD_ACTOR = "actor";
+    constexpr const char* KEYWORD_ALLOC = "alloc";
     constexpr const char* KEYWORD_AS = "as";
     constexpr const char* KEYWORD_ASYNC = "async";
     constexpr const char* KEYWORD_AWAIT = "await";
     constexpr const char* KEYWORD_BREAK = "break";
     constexpr const char* KEYWORD_CAPTURED = "captured";
     constexpr const char* KEYWORD_CATCH = "catch";
-    constexpr const char* KEYWORD_CLASS = "class";
     constexpr const char* KEYWORD_CONTINUE = "continue";
     constexpr const char* KEYWORD_CONTRACT = "contract";
+    constexpr const char* KEYWORD_DEALLOC = "dealloc";
     constexpr const char* KEYWORD_DEFER = "defer";
     constexpr const char* KEYWORD_DO = "do";
     constexpr const char* KEYWORD_ELSE = "else";
@@ -29,7 +30,6 @@ namespace Hyve::Lexer::Keywords {
     constexpr const char* KEYWORD_NULL = "null";
     constexpr const char* KEYWORD_OPEN = "open";
     constexpr const char* KEYWORD_PRIVATE = "private";
-    constexpr const char* KEYWORD_PROTOTYPE = "prototype";
     constexpr const char* KEYWORD_PUBLIC = "public";
     constexpr const char* KEYWORD_RETURN = "return";
     constexpr const char* KEYWORD_SELF = "self";

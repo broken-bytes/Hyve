@@ -45,13 +45,11 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsAccessLevel(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsExpression(const std::array<Lexer::HToken, 2>& tokens) const;
 		[[nodiscard]] bool IsStatement(const std::array<Lexer::HToken, 2>& tokens) const;
-		[[nodiscard]] bool IsClass(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsInit(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsProperty(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsContract(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool IsPrototype(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsStruct(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsVariable(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::int8_t GetOperatorPrecedence(AST::HAstOperatorType type) const;

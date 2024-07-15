@@ -151,26 +151,6 @@ namespace Hyve::Parser {
 		return false;
 	}
 
-	bool IHParser::IsClass(Lexer::HTokenStream& stream) const {
-		using enum Lexer::HTokenType;
-		auto token = stream.PeekUntilNonLineBreak();
-
-		if(token.Type == PUBLIC || token.Type == PRIVATE || token.Type == INTERNAL) {
-			// We need to skip the access modifier, as it is optional. Peek two tokens ahead
-			auto tokens = stream.Peek(2);
-
-			if (tokens[1].Type == CLASS) {
-				return true;
-			}
-		}
-
-		if (token.Type == CLASS) {
-			return true;
-		}
-
-		return false;
-	}
-
 	bool IHParser::IsEnum(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		
@@ -272,27 +252,6 @@ namespace Hyve::Parser {
 		}
 
 		if (token.Type == CONTRACT) {
-			return true;
-		}
-
-		return false;
-	}
-
-	bool IHParser::IsPrototype(Lexer::HTokenStream& stream) const {
-		using enum Lexer::HTokenType;
-		
-		auto token = stream.PeekUntilNonLineBreak();
-
-		if (token.Type == PUBLIC || token.Type == PRIVATE || token.Type == INTERNAL) {
-			// We need to skip the access modifier, as it is optional. Peek two tokens ahead
-			auto tokens = stream.Peek(2);
-
-			if (tokens[1].Type == PROTOTYPE) {
-				return true;
-			}
-		}
-
-		if (token.Type == PROTOTYPE) {
 			return true;
 		}
 

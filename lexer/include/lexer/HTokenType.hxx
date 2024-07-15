@@ -20,14 +20,15 @@ namespace Hyve::Lexer {
 
         // Keywords
         // Types
-        ACTOR,
-        CLASS,
         CONTRACT,
         ENUM,
         MODULE,
-        PROTOTYPE,
         SELF,
         STRUCT,
+
+        // Memory Management
+        ALLOC,
+        DEALLOC,
 
         // Access Modifiers
         FILEPRIVATE,
@@ -195,13 +196,14 @@ namespace Hyve::Lexer {
         case PAREN_LEFT:
         case PAREN_RIGHT:
             return GROUPING;
-        case ACTOR:
+        case ALLOC:
         case ASYNC:
         case AWAIT:
         case BREAK:
         case CATCH:
-        case CLASS:
         case CONTINUE:
+        case CONTRACT:
+        case DEALLOC:
         case DO:
         case ELSE:
         case ENUM:

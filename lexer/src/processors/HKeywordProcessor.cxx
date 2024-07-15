@@ -21,17 +21,19 @@ namespace Hyve::Lexer {
 		}
 
 		// Check if the keyword is a valid keyword
-        if (CheckMatchingSequence(source, KEYWORD_ASYNC)) {
+        if (CheckMatchingSequence(source, KEYWORD_ALLOC)) {
+            return MAKE_TOKEN(ALLOC, KEYWORD_ALLOC);
+        } else if (CheckMatchingSequence(source, KEYWORD_ASYNC)) {
             return MAKE_TOKEN(ASYNC, KEYWORD_ASYNC);
         }
         else if (CheckMatchingSequence(source, KEYWORD_AWAIT)) {
             return MAKE_TOKEN(AWAIT, KEYWORD_AWAIT);
         }
-        else if (CheckMatchingSequence(source, KEYWORD_CLASS)) {
-            return MAKE_TOKEN(CLASS, KEYWORD_CLASS);
-        }
         else if (CheckMatchingSequence(source, KEYWORD_CONTRACT)) {
             return MAKE_TOKEN(CONTRACT, KEYWORD_CONTRACT);
+        }
+        else if (CheckMatchingSequence(source, KEYWORD_DEALLOC)) {
+            return MAKE_TOKEN(DEALLOC, KEYWORD_DEALLOC);
         }
         else if (CheckMatchingSequence(source, KEYWORD_FUNC)) {
             return MAKE_TOKEN(FUNC, KEYWORD_FUNC);

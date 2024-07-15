@@ -82,16 +82,12 @@ namespace Hyve::Parser {
 		auto tokens = stream.Peek(2);
 
 		while (token.Type != END_OF_FILE) {
-			if (IsClass(stream)) {
-				moduleNode->Children.push_back(_classParser->Parse(stream));
-			} else if (IsFunc(stream)) {
+			if (IsFunc(stream)) {
 				moduleNode->Children.push_back(_funcParser->Parse(stream));
 			} else if(IsEnum(stream)) {
 				moduleNode->Children.push_back(_enumParser->Parse(stream));
 			} else if (IsContract(stream)) {
 				moduleNode->Children.push_back(_protocolParser->Parse(stream));
-			} else if(IsPrototype(stream)) {
-				moduleNode->Children.push_back(_prototypeParser->Parse(stream));
 			} else if (IsStruct(stream)) {
 				moduleNode->Children.push_back(_structParser->Parse(stream));
 			} else if(IsVariable(stream)) {
