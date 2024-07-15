@@ -6,7 +6,7 @@
 
 namespace Hyve::AST {
     struct HAstWithAccessLevelNode : public HAstStatementNode {
-        Core::HAccessLevel AccessLevel;
+        Core::HAccessLevel AccessLevel = Core::HAccessLevel::Internal;
         bool IsStatic = false;
 
         HAstWithAccessLevelNode() = default;

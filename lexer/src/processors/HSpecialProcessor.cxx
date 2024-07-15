@@ -15,7 +15,7 @@ namespace Hyve::Lexer {
 		}
 
 		if (source.front() == '\n') {
-			return MAKE_TOKEN(LINEBREAK, "\n\r");
+			return MAKE_TOKEN(LINEBREAK, "\n");
 		}
 
 		if(source.starts_with(SPECIAL_HARD_UNWRAP)) {

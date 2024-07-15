@@ -16,12 +16,6 @@
 #include <ast/nodes/HAstExpressionNode.hxx>
 #include <ast/nodes/HAstPropAccessNode.hxx>
 #include <ast/nodes/HAstLiteralNode.hxx>
-#include <ast/nodes/HAstClassNode.hxx>
-#include <ast/nodes/HAstClassBodyNode.hxx>
-#include <ast/nodes/HAstPrototypeNode.hxx>
-#include <ast/nodes/HAstPrototypeBodyNode.hxx>
-#include <ast/nodes/HAstProtocolNode.hxx>
-#include <ast/nodes/HAstProtocolBodyNode.hxx>
 #include <ast/nodes/HAstStructNode.hxx>
 #include <ast/nodes/HAstStructBodyNode.hxx>
 #include <ast/nodes/HAstInitNode.hxx>

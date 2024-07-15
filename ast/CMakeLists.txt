@@ -3,14 +3,13 @@ SET(
     include/ast/HAst.hxx
     include/ast/HAstNode.hxx
     include/ast/HAstNodeType.hxx
+    include/ast/HAstLiteralType.hxx
     include/ast/HAstOperatorType.hxx
     include/ast/HAstParameter.hxx
     include/ast/nodes/HAstArrayNode.hxx
     include/ast/nodes/HAstAssignmentNode.hxx
     include/ast/nodes/HAstBinaryExpressionNode.hxx
     include/ast/nodes/HAstBlockNode.hxx
-    include/ast/nodes/HAstClassBodyNode.hxx
-    include/ast/nodes/HAstClassNode.hxx
     include/ast/nodes/HAstExpressionNode.hxx
     include/ast/nodes/HAstFileNode.hxx
     include/ast/nodes/HAstFuncCallNode.hxx
@@ -26,10 +25,6 @@ SET(
     include/ast/nodes/HAstModuleDeclNode.hxx
     include/ast/nodes/HAstPropAccessNode.hxx
     include/ast/nodes/HAstPropertyDeclNode.hxx
-    include/ast/nodes/HAstProtocolBodyNode.hxx
-    include/ast/nodes/HAstProtocolNode.hxx
-    include/ast/nodes/HAstPrototypeBodyNode.hxx
-    include/ast/nodes/HAstPrototypeNode.hxx
     include/ast/nodes/HAstReturnNode.hxx
     include/ast/nodes/HAstStatementNode.hxx
     include/ast/nodes/HAstStructBodyNode.hxx

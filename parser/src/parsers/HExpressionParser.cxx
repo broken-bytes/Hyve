@@ -4,6 +4,7 @@
 #include <ast/nodes/HAstFuncCallNode.hxx>
 #include <ast/nodes/HAstPropAccessNode.hxx>
 #include <ast/nodes/HAstIdentifierNode.hxx>
+#include <ast/nodes/HAstLiteralNode.hxx>
 #include <ast/nodes/HAstMemberAccessNode.hxx>
 #include <ast/nodes/HAstUnaryExpressionNode.hxx>
 #include <lexer/HToken.hxx>
@@ -30,9 +31,13 @@ namespace Hyve::Parser {
 		auto token = stream.PeekUntilNonLineBreak();
 		std::shared_ptr<HAstExpressionNode> left;
 
-		if (IsUnaryOperator(GetOperatorType(token))) {
+		if (IsUnaryOperator(GetOperatorType(token)) && precedence == 0) {
 			left = ParseUnaryExpression(stream);
-		} else if (token.Type == IDENTIFIER) {
+		}
+		else if (IsBinaryOperator(GetOperatorType(token))) {
+			left = ParseBinaryExpression(stream);
+		} 
+		else if (token.Type == IDENTIFIER) {
 			auto nextToken = stream.Peek(2)[1];
 			// We need to check if the next token is a dot operator
 			if (nextToken.Type == DOT) {
@@ -47,6 +52,29 @@ namespace Hyve::Parser {
 
 				left = identifierNode;
 			}
+		}
+		else if (token.Family == LITERAL) {
+			token = stream.Consume();
+			auto literalNode = std::make_shared<HAstLiteralNode>();
+			literalNode->Value = token.Value;
+			switch (token.Type) {
+			case INTEGER:
+				literalNode->LiteralType = HAstLiteralType::Integer;
+				break;
+			case FLOAT:
+				literalNode->LiteralType = HAstLiteralType::Float;
+				break;
+			case STRING:
+				literalNode->LiteralType = HAstLiteralType::String;
+				break;
+			case BOOLEAN:
+				literalNode->LiteralType = HAstLiteralType::Boolean;
+				break;
+			default:
+				break;
+			}
+
+			left = literalNode;
 		}
 
 		token = stream.PeekUntilNonLineBreak();
@@ -97,6 +125,9 @@ namespace Hyve::Parser {
 		// Consume the left bracket
 		token = stream.Consume(PAREN_LEFT);
 
+		// Peek the next token
+		token = stream.PeekUntilNonLineBreak();
+
 		while(token.Type != PAREN_RIGHT) {
 			// Create the argument node
 			auto argNode = HAstCallArgument {};
@@ -127,11 +158,29 @@ namespace Hyve::Parser {
  		return funcCall;
 	}
 
-	std::shared_ptr<HAstUnaryExpressionNode> HExpressionParser::ParseUnaryExpression(Lexer::HTokenStream& stream) const {
-		return nullptr;
+	std::shared_ptr<HAstUnaryExpressionNode> HExpressionParser::ParseUnaryExpression(Lexer::HTokenStream& stream) {
+		using enum AST::HAstOperatorType;
+		
+		auto unaryNode = std::make_shared<HAstUnaryExpressionNode>();
+
+		// Get the operator
+		auto token = stream.Consume();
+		unaryNode->Operator = GetOperatorType(token);
+
+		// Edge cases: Subtract is actually a negation when inside a unary expression. Addition is ignored and we just return the expression
+		if (unaryNode->Operator == SUBTRACT) {
+			unaryNode->Operator = NEGATE;
+		} else if (unaryNode->Operator == ADD) {
+			unaryNode->Operator = NOOP;
+		}
+
+		// Parse the expression
+		unaryNode->Operand = ParseExpression(stream, 0);
+
+		return unaryNode;
 	}
 
-	std::shared_ptr<HAstBinaryExpressionNode> HExpressionParser::ParseBinaryExpression(Lexer::HTokenStream& stream) const {
+	std::shared_ptr<HAstBinaryExpressionNode> HExpressionParser::ParseBinaryExpression(Lexer::HTokenStream& stream) {
 		return nullptr;
 	}
 

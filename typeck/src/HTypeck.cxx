@@ -1,19 +1,16 @@
 #include "typeck/HTypeck.hxx"
 #include "typeck/HSymbolTable.hxx"
 #include "typeck/HSymbol.hxx"
-#include "typeck/symbols/HClassSymbol.hxx"
+#include "typeck/symbols/HContractSymbol.hxx"
 #include "typeck/symbols/HEnumSymbol.hxx"
 #include "typeck/symbols/HFileSymbol.hxx"
 #include "typeck/symbols/HFunctionSymbol.hxx"
 #include "typeck/symbols/HModuleSymbol.hxx"
 #include "typeck/symbols/HPropertySymbol.hxx"
-#include "typeck/symbols/HProtocolSymbol.hxx"
-#include "typeck/symbols/HPrototypeSymbol.hxx"
 #include "typeck/symbols/HStructSymbol.hxx"
 #include "typeck/symbols/HVariableSymbol.hxx"
 #include <ast/HAstNode.hxx>
 #include <ast/nodes/HAstTypeNode.hxx>
-#include <ast/nodes/HAstClassNode.hxx>
 #include <ast/nodes/HAstFileNode.hxx>
 #include <ast/nodes/HAstFuncDeclNode.hxx>
 #include <ast/nodes/HAstImportNode.hxx>
@@ -47,18 +44,12 @@ namespace Hyve::Typeck {
     using namespace AST;
     HSymbolType NodeTypeToSymbolType(HAstTypeKind type) {
         switch (type) {
-        case HAstTypeKind::Class:
-            return HSymbolType::Class;
         case HAstTypeKind::Enum:
             return HSymbolType::Enum;
         case HAstTypeKind::Function:
             return HSymbolType::Function;
-        case HAstTypeKind::Protocol:
-            return HSymbolType::Protocol;
         case HAstTypeKind::Struct:
             return HSymbolType::Struct;
-        case HAstTypeKind::Prototype:
-            return HSymbolType::Prototype;
         default:
             return HSymbolType::UnknownSymbol;
         }
@@ -66,8 +57,8 @@ namespace Hyve::Typeck {
 
     HAstTypeKind SymbolTypeToNodeType(HSymbolType type) {
 		switch (type) {
-		case HSymbolType::Class:
-			return HAstTypeKind::Class;
+        case HSymbolType::Contract:
+            return HAstTypeKind::Contract;
 		case HSymbolType::Enum:
 			return HAstTypeKind::Enum;
         case HSymbolType::File:
@@ -76,10 +67,6 @@ namespace Hyve::Typeck {
 			return HAstTypeKind::Function;
         case HSymbolType::Module:
             return HAstTypeKind::Module;
-		case HSymbolType::Protocol:
-			return HAstTypeKind::Protocol;
-		case HSymbolType::Prototype:
-			return HAstTypeKind::Prototype;
         case HSymbolType::Struct:
             return HAstTypeKind::Struct;
         case HSymbolType::Variable:
@@ -158,17 +145,11 @@ namespace Hyve::Typeck {
                 // Create a symbol as a unique_ptr
                 std::shared_ptr<HSymbol> symbol = nullptr;
 
-                if (typeNode->Kind == Class) {
-                    symbol = std::make_shared<HClassSymbol>();
+                if (typeNode->Kind == Contract) {
+                    symbol = std::make_shared<HContractSymbol>();
                 }
                 else if (typeNode->Kind == Enum) {
                     symbol = std::make_shared<HEnumSymbol>();
-                }
-                else if (typeNode->Kind == Protocol) {
-                    symbol = std::make_shared<HProtocolSymbol>();
-                }
-                else if (typeNode->Kind == Prototype) {
-                    symbol = std::make_shared<HPrototypeSymbol>();
                 }
                 else if (typeNode->Kind == Struct) {
                     symbol = std::make_shared<HStructSymbol>();
@@ -351,8 +332,8 @@ namespace Hyve::Typeck {
                 if (foundSymbol != nullptr) {
                     // We found the symbol, so we can continue
 					// We need to check if the symbol is a type or not
-					if (foundSymbol->SymbolType != HSymbolType::Class && foundSymbol->SymbolType != HSymbolType::Struct) {
-						throw std::runtime_error("Property type is not a class or struct");
+					if (foundSymbol->SymbolType != HSymbolType::Contract && foundSymbol->SymbolType != HSymbolType::Struct) {
+						throw std::runtime_error("Property type is not a contract or struct");
                     }
                     else {
                         // Assign the type to the symbol

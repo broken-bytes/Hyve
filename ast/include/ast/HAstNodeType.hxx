@@ -2,7 +2,9 @@
 
 namespace Hyve::AST {
     enum class HAstNodeType {
+        Allocation,
         Assignment,
+        Deallocation,
         Expression,
         Statement,
         NominalType,
@@ -32,12 +34,10 @@ namespace Hyve::AST {
     };
 
     enum class HAstTypeKind {
-        Class,
+        Contract,
         Enum,
         File,
         Module,
-        Protocol,
-        Prototype,
         Struct,
         Function,
         Variable,

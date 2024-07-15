@@ -228,6 +228,7 @@ namespace Hyve::Parser {
 				Panic(stream, LINEBREAK);
 			}
 			token = stream.PeekUntilNonLineBreak();
+			tokens = stream.Peek(2);
 		}
 
 		return body;

@@ -13,6 +13,7 @@
 #include "parser/parsers/HStructParser.hxx"
 #include "parser/parsers/HVariableParser.hxx"
 #include <ast/HAstOperatorType.hxx>
+#include <ast/HAstLiteralType.hxx>
 #include <ast/nodes/HAstArrayNode.hxx>
 #include <ast/nodes/HAstInheritanceNode.hxx>
 #include <ast/nodes/HAstLiteralNode.hxx>
@@ -52,6 +53,7 @@ namespace Hyve::Parser {
 			case LET:
 			case IDENTIFIER:
 			case SELF:
+			case DEALLOC:
 				return true;
 			default:
 				return false;
@@ -70,6 +72,7 @@ namespace Hyve::Parser {
 			case INTEGER:
 			case FLOAT:
 			case BOOLEAN:
+			case ALLOC:
 				return true;
 			default:
 				return false;
@@ -94,6 +97,7 @@ namespace Hyve::Parser {
 
 	bool IHParser::IsExpression(const std::array<Lexer::HToken, 2>& tokens) const {
 		using enum Lexer::HTokenType;
+		using enum Lexer::HTokenFamily;
 
 		if (!CanBeInExpression(tokens.front())) {
 			return false;
@@ -108,10 +112,12 @@ namespace Hyve::Parser {
 		// - Parentheses("(")
 		const Lexer::HToken& next = tokens.back();
 
-		if (
-			auto type = next.Type; 
-			type == PLUS || type == MINUS || type == MULTIPLY || type == DIVIDE || type == MODULO
-		) {
+		// Simple: If we start with an identifier or a literal this is an expression
+		if (tokens.front().Family == LITERAL || tokens.front().Type == IDENTIFIER) {
+			return true;
+		}
+
+		if(tokens.front().Type == ALLOC) {
 			return true;
 		}
 
@@ -125,7 +131,7 @@ namespace Hyve::Parser {
 			return false;
 		}
 
-		if(tokens.front().Type == VAR || tokens.front().Type == LET) {
+		if(tokens.front().Type == VAR || tokens.front().Type == LET || tokens.front().Type == RETURN) {
 			return true;
 		}
 
@@ -376,8 +382,11 @@ namespace Hyve::Parser {
 
 		switch (type) {
 			case NOT:
+			case ADD:
+			case SUBTRACT:
 			case INCREMENT:
 			case DECREMENT:
+			case NEGATE:
 				return true;
 			default:
 				return false;
@@ -438,25 +447,26 @@ namespace Hyve::Parser {
 
 	std::shared_ptr<HAstExpressionNode> IHParser::ParseLiteral(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
+		using enum AST::HAstLiteralType;
 
 		auto token = stream.Consume();
 		auto lit = std::make_shared<HAstLiteralNode>();
 		// Set the type
 		switch (token.Type) {
 			case INTEGER:
-				lit->LiteralType = "Integer";
+				lit->LiteralType = Integer;
 				break;
 			case FLOAT:
-				lit->LiteralType = "Float";
+				lit->LiteralType = Float;
 				break;
 			case BOOLEAN:
-				lit->LiteralType = "Boolean";
+				lit->LiteralType = Boolean;
 				break;
 			case STRING:
-				lit->LiteralType = "String";
+				lit->LiteralType = String;
 				break;
 			case NULL_LITERAL:
-				lit->LiteralType = "Null";
+				lit->LiteralType = Null;
 				break;
 			default:
 				throw Core::HCompilerError(
@@ -471,8 +481,11 @@ namespace Hyve::Parser {
 	}
 
 	std::shared_ptr<HAstLiteralNode> IHParser::ParseString(std::string_view literal) const {
+		using enum AST::HAstLiteralType;
+
+
 		auto ast = std::make_shared<HAstLiteralNode>();
-		ast->LiteralType = "String";
+		ast->LiteralType = String;
 		ast->Value = literal;
 
 		return ast;

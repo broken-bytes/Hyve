@@ -9,12 +9,8 @@
 #include <vector>
 
 namespace Hyve::AST {
-    struct HAstUnaryOperator {
-        HAstOperatorType Type;
-    };
-
     struct HAstUnaryExpressionNode : HAstExpressionNode {
-        HAstUnaryOperator Operator;
+        HAstOperatorType Operator;
         std::shared_ptr<HAstExpressionNode> Operand;
     };
 }

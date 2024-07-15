@@ -1,7 +1,6 @@
 #pragma once
 
 namespace Hyve::AST {
-
     enum class HAstOperatorType {
         ADD,
         SUBTRACT,
@@ -18,6 +17,7 @@ namespace Hyve::AST {
         OR,
         XOR,
         NOT,
+        NEGATE,
         BITWISE_AND,
         BITWISE_OR,
         BITWISE_XOR,
@@ -40,6 +40,7 @@ namespace Hyve::AST {
         BITWISE_RIGHT_SHIFT_ASSIGN,
         INCREMENT,
         DECREMENT,
-        INVALID_OPERATOR
+        INVALID_OPERATOR,
+        NOOP
     };
 }

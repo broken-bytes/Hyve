@@ -4,9 +4,9 @@
 #include "typeck/HSymbolType.hxx"
 
 namespace Hyve::Typeck {
-    struct HClassSymbol : public HSymbol {
-        HClassSymbol() {
-            SymbolType = HSymbolType::Class;
+    struct HContractSymbol : public HSymbol {
+        HContractSymbol() {
+            SymbolType = HSymbolType::Contract;
         }
     };
 }
