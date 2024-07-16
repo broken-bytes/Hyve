@@ -126,6 +126,9 @@ namespace Hyve::Parser {
 			token = stream.PeekUntilNonLineBreak();
 		}
 
+		// Consume the closing brace
+		token = stream.Consume();
+
 		return bodyNode;
 	}
 }

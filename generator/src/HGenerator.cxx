@@ -57,6 +57,7 @@ void LinkStandardLibrary(llvm::LLVMContext& context, llvm::Module* currentModule
 	// Link the low level standard library with the current module
 	if (Linker::linkModules(*currentModule, std::move(lowLevelModule))) {
 		errs() << "Error linking modules\n";
+
 		return;
 	}
 

@@ -1,6 +1,14 @@
 module App
 
+struct World {
+    fn hello() -> Int {
+        return 1
+    }
+}
+
 fn main() -> Int {
-    return 3
+    let world = World()
+
+    return world.hello()
 }
 

@@ -78,6 +78,8 @@ namespace Hyve::Parser {
 			body->Parent = funcNode;
 		}
 
+		token = stream.Consume();
+
 		return funcNode;
 	}
 
