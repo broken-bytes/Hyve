@@ -11,7 +11,11 @@
 namespace Hyve::AST {
     struct HAstBinaryExpressionNode : HAstExpressionNode {
         std::shared_ptr<HAstExpressionNode> LHS;
-        HAstOperatorType Operator;
+        HAstOperatorType Operator = HAstOperatorType::NOOP;
         std::shared_ptr<HAstExpressionNode> RHS;
+
+        HAstBinaryExpressionNode() {
+            ExpressionType = ExpressionType::BinaryOperation;
+        }
     };
 }

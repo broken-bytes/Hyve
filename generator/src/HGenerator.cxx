@@ -194,6 +194,9 @@ namespace Hyve::Generator {
 						builder.CreateRet(negatedValue);
 					}
 				}
+				else if (returnStmt->Value->ExpressionType == ExpressionType::BinaryOperation) {
+
+				}
 			}
 		}
 

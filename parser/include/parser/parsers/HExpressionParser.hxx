@@ -2,6 +2,7 @@
 
 #include "parser/IHParser.hxx"
 #include <core/HErrorHandler.hxx>
+#include <memory>
 
 namespace Hyve::AST {
 	struct HAstNode;
@@ -25,7 +26,10 @@ namespace Hyve::Parser {
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;
 
 		// Primary expression parser
-		std::shared_ptr<AST::HAstExpressionNode> ParseExpression(Lexer::HTokenStream& stream, uint16_t precedence = 0);
+		std::shared_ptr<AST::HAstExpressionNode> ParseExpression(
+			Lexer::HTokenStream& stream, 
+			uint16_t precedence = 0
+		);
 		// Func call parser
 		std::shared_ptr<AST::HAstFuncCallNode> ParseFuncCall(Lexer::HTokenStream& stream);
 		// Unary expression parser

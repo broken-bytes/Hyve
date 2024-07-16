@@ -9,5 +9,9 @@ namespace Hyve::AST {
     struct HAstLiteralNode : HAstExpressionNode {
         HAstLiteralType LiteralType;
         std::string Value;
+
+        HAstLiteralNode() {
+            ExpressionType = ExpressionType::Literal;
+        }
     };
 }

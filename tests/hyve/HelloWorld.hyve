@@ -1,6 +1,6 @@
 module App
 
 fn main() -> Int {
-    return 24 - 23
+    return 3
 }
 

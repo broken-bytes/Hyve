@@ -29,28 +29,26 @@ namespace Hyve::Parser {
 		using enum Lexer::HTokenFamily;
 
 		auto token = stream.PeekUntilNonLineBreak();
-		std::shared_ptr<HAstExpressionNode> left;
+
+		std::shared_ptr<HAstExpressionNode> node = nullptr;
 
 		if (IsUnaryOperator(GetOperatorType(token)) && precedence == 0) {
-			left = ParseUnaryExpression(stream);
+			node = ParseUnaryExpression(stream);
 		}
-		else if (IsBinaryOperator(GetOperatorType(token))) {
-			left = ParseBinaryExpression(stream);
-		} 
 		else if (token.Type == IDENTIFIER) {
 			auto nextToken = stream.Peek(2)[1];
 			// We need to check if the next token is a dot operator
 			if (nextToken.Type == DOT) {
-				left = ParseMemberAccess(stream);
+				node = ParseMemberAccess(stream);
 			} else if(nextToken.Type == PAREN_LEFT) {
-				left = ParseFuncCall(stream);
+				node = ParseFuncCall(stream);
 			} else {
 				// Consume the identifier
 				token = stream.Consume();
 				auto identifierNode = std::make_shared<HAstIdentifierNode>();
 				identifierNode->Name = token.Value;
 
-				left = identifierNode;
+				node = identifierNode;
 			}
 		}
 		else if (token.Family == LITERAL) {
@@ -74,41 +72,25 @@ namespace Hyve::Parser {
 				break;
 			}
 
-			left = literalNode;
+			node = literalNode;
 		}
 
 		token = stream.PeekUntilNonLineBreak();
 
-		// If the next token is not an operator, we return the left-hand side
-		if (token.Family != OPERATOR) {
-			return left;
-		}
-
-		while (true) {
-			token = stream.Peek();
-			// Safeguard, if we have reached the end of the stream
-			if (token.Type == Lexer::HTokenType::END_OF_FILE) {
-				break;
-			}
-			auto opType = GetOperatorType(token);
-			auto tokenPrecedence = GetOperatorPrecedence(opType);
-
-			if (tokenPrecedence < precedence) {
-				break;
-			}
-
-			stream.Consume(); // Consume the operator
-			auto right = ParseExpression(stream, tokenPrecedence + 1); // Parse right-hand side with higher precedence
+		// We have our node, now we check if the next token is a binary operator
+		if (IsBinaryOperator(GetOperatorType(token))) {
 			auto binaryNode = std::make_shared<HAstBinaryExpressionNode>();
-			binaryNode->Operator = opType;
-			binaryNode->LHS = left;
-			binaryNode->RHS = right;
+			binaryNode->LHS = node;
+			binaryNode->Operator = GetOperatorType(token);
+			// Consume the operator
+			stream.Consume();
 
-			left = binaryNode;
+			binaryNode->RHS = ParseExpression(stream, GetOperatorPrecedence(binaryNode->Operator));
 
+			node = binaryNode;
 		}
 
-		return left;
+		return node;
 	}
 
 	std::shared_ptr<HAstFuncCallNode> HExpressionParser::ParseFuncCall(Lexer::HTokenStream& stream) {
