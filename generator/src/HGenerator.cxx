@@ -87,7 +87,7 @@ namespace Hyve::Generator {
 
 		// Traverse each node and its children(For now we only support function declarations)
 		// Note: We can assume that the first child of the module declaration is always the file we processed
-		for (auto& node : astModule->Children.front()->Children) {
+		for (const auto& node : astModule->Children.front()->Children) {
 			if(node->Type == HAstNodeType::Func) {
 				auto function = std::dynamic_pointer_cast<HAstFuncDeclNode>(node);
 				GenerateFunction(context, currentModule.get(), function);
@@ -249,6 +249,8 @@ namespace Hyve::Generator {
 				return Type::getInt1Ty(context);
 			}
 		}
+
+		return nullptr;
 	}
 
 	ConstantData* HGenerator::GetConstantData(llvm::LLVMContext& context, std::shared_ptr<AST::HAstExpressionNode> node) const {
@@ -265,6 +267,7 @@ namespace Hyve::Generator {
 				return ConstantInt::get(context, APInt(1, std::stoi(literal->Value)));
 			}
 		}
-	}
 
+		return nullptr;
+	}
 }
