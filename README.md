@@ -10,14 +10,15 @@
 Hyve is a modern, highly asynchronous programming language designed for building scalable and efficient software. Embracing the latest in concurrent programming paradigms, Hyve offers a unique blend of performance, simplicity, and flexibility for developers.
 
 ## Features
+- 🔮 **Full control**: No nasty Garbage Collector, no heavy runtime. Just manual memory management made beautiful.
+- 🧊 **Immutability**: Immutable data structures and functions by default to increase robustness and predictability. 
 - 🧵 **Asynchronous by Nature**: At its core, Hyve is built to handle asynchronous operations seamlessly.
-- 🔮 **Modern Syntax**: Hyve's syntax is clean and expressive, enabling developers to write more code with fewer lines and clear readability.
-- 🎚️ **Scalability**: Hyve can easily handle large-scale applications - from microservices to massive cloud-based systems.
-- 🔗 **Strong Typing with Inference**: Hyve offers strong typing capabilities with intelligent type inference.
-- 🧊 **Immutability**: Hyve encourages immutable data structures to increase robustness and predictability. 
+- 🔮 **Modern Syntax**: Clean and expressive syntax, enabling developers to achieve more with fewer lines and clear readability.
+- 🎚️ **Scalability**: Stay small or go big. Hyve handles large-scale applications easily - from microservices to massive cloud-based systems.
+- 🔗 **Strong Typing with Inference**: Strong typing capabilities with intelligent type inference.
 - 🤝 **Cross-Platform Compatibility**: Write once, run anywhere. Hyve code is highly portable across various platforms.
-- 🔋 **Batteries included**: Hyve comes with a sophisticated standard library and first-class frameworks for various of tasks.
-- 🔒 **Secure by design**: Hyve has the highest standards on security, ensuring your apps are safe by default.
+- 🔋 **Batteries included**: Sophisticated standard library and first-class frameworks for various of tasks.
+- 🔒 **Secure by design**: Highest standards on security, ensuring your apps are safe by default.
 
 ## Installation
 ```bash
