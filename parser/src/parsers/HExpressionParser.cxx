@@ -6,6 +6,7 @@
 #include <ast/nodes/HAstIdentifierNode.hxx>
 #include <ast/nodes/HAstLiteralNode.hxx>
 #include <ast/nodes/HAstMemberAccessNode.hxx>
+#include <ast/nodes/HAstObjectLiteralNode.hxx>
 #include <ast/nodes/HAstUnaryExpressionNode.hxx>
 #include <lexer/HToken.hxx>
 #include <lexer/HTokenStream.hxx>
@@ -22,7 +23,7 @@ namespace Hyve::Parser {
 	}
 
 	std::shared_ptr<HAstExpressionNode> HExpressionParser::ParseExpression(
-		Lexer::HTokenStream& stream, 
+		Lexer::HTokenStream& stream,
 		uint16_t precedence
 	) {
 		using enum Lexer::HTokenType;
@@ -40,9 +41,14 @@ namespace Hyve::Parser {
 			// We need to check if the next token is a dot operator
 			if (nextToken.Type == DOT) {
 				node = ParseMemberAccess(stream);
-			} else if(nextToken.Type == PAREN_LEFT) {
+			}
+			else if (nextToken.Type == PAREN_LEFT) {
 				node = ParseFuncCall(stream);
-			} else {
+			}
+			else if (nextToken.Type == CURLY_LEFT) {
+				node = ParseObjectLiteral(stream);
+			}
+			else {
 				// Consume the identifier
 				token = stream.Consume();
 				auto identifierNode = std::make_shared<HAstIdentifierNode>();
@@ -110,9 +116,9 @@ namespace Hyve::Parser {
 		// Peek the next token
 		token = stream.PeekUntilNonLineBreak();
 
-		while(token.Type != PAREN_RIGHT) {
+		while (token.Type != PAREN_RIGHT) {
 			// Create the argument node
-			auto argNode = HAstCallArgument {};
+			auto argNode = HAstCallArgument{};
 			// Get the name of the argument
 			token = stream.Consume(IDENTIFIER);
 			argNode.Name = token.Value;
@@ -137,12 +143,59 @@ namespace Hyve::Parser {
 		// TODO: Parse the arguments
 		token = stream.Consume();
 
- 		return funcCall;
+		return funcCall;
+	}
+
+	std::shared_ptr<HAstObjectLiteralNode> HExpressionParser::ParseObjectLiteral(Lexer::HTokenStream& stream) {
+		using enum Lexer::HTokenType;
+
+		auto objectLiteral = std::make_shared<HAstObjectLiteralNode>();
+
+		// Consume the identifier
+		auto token = stream.Consume();
+		auto identifierNode = std::make_shared<HAstIdentifierNode>();
+		identifierNode->Name = token.Value;
+		objectLiteral->Object = identifierNode;
+
+		// Consume the left bracket
+		token = stream.Consume(CURLY_LEFT);
+
+		// Peek the next token
+		token = stream.PeekUntilNonLineBreak();
+
+		while (token.Type != CURLY_RIGHT) {
+			// Create the argument node
+			auto argNode = HAstLiteralArgument{};
+			// Get the name of the argument
+			token = stream.Consume(IDENTIFIER);
+			argNode.Name = token.Value;
+
+			// Consume the colon
+			token = stream.Consume(COLON);
+
+			// Parse the expression(Argument value)
+			auto argValue = ParseExpression(stream, 0);
+			argNode.Value = argValue;
+
+			// Add the argument to the function call
+			objectLiteral->Arguments.push_back(argNode);
+
+			token = stream.PeekUntilNonLineBreak();
+			if (token.Type == COMMA) {
+				stream.Consume();
+				token = stream.PeekUntilNonLineBreak();
+			}
+		}
+
+		// TODO: Parse the arguments
+		token = stream.Consume();
+
+		return objectLiteral;
 	}
 
 	std::shared_ptr<HAstUnaryExpressionNode> HExpressionParser::ParseUnaryExpression(Lexer::HTokenStream& stream) {
 		using enum AST::HAstOperatorType;
-		
+
 		auto unaryNode = std::make_shared<HAstUnaryExpressionNode>();
 
 		// Get the operator
@@ -152,7 +205,8 @@ namespace Hyve::Parser {
 		// Edge cases: Subtract is actually a negation when inside a unary expression. Addition is ignored and we just return the expression
 		if (unaryNode->Operator == SUBTRACT) {
 			unaryNode->Operator = NEGATE;
-		} else if (unaryNode->Operator == ADD) {
+		}
+		else if (unaryNode->Operator == ADD) {
 			unaryNode->Operator = NOOP;
 		}
 
@@ -191,14 +245,14 @@ namespace Hyve::Parser {
 		token = stream.Consume();
 
 		// Parse as long as we have a dot operator
-		while(token.Type == DOT) {
+		while (token.Type == DOT) {
 			// Consume the dot operator
 			token = stream.Consume();
 			// We need to make sure that the next token is an identifier
 			if (token.Type != IDENTIFIER) {
 				_errorHandler->AddError(INVALID_EXPRESSION, token.FileName, token.Line);
 				Panic(stream, KEYWORD);
-				
+
 				return memberAccess;
 			}
 
@@ -211,7 +265,8 @@ namespace Hyve::Parser {
 				auto memberNode = std::make_shared<HAstIdentifierNode>();
 				memberNode->Name = token.Value;
 				memberAccess->Member = memberNode;
-			} else {
+			}
+			else {
 				// Create a new member node
 				auto newMemberAccessNode = std::make_shared<HAstMemberAccessNode>();
 				auto memberNode = std::make_shared<HAstIdentifierNode>();
@@ -234,7 +289,8 @@ namespace Hyve::Parser {
 			funcCall->Target = memberAccess;
 
 			return funcCall;
-		} else {
+		}
+		else {
 			auto propAccess = std::make_shared<HAstPropAccessNode>();
 			propAccess->Target = memberAccess;
 

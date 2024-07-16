@@ -1,13 +1,15 @@
 module App
 
 struct World {
+    let index: Int
+
     fn hello() -> Int {
-        return 1
+        return index
     }
 }
 
 fn main() -> Int {
-    let world = World()
+    let world = World { index: 0 }
 
     return world.hello()
 }

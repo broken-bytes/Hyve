@@ -23,6 +23,7 @@ SET(
     include/ast/nodes/HAstLocalPropertyDeclNode.hxx
     include/ast/nodes/HAstMemberAccessNode.hxx
     include/ast/nodes/HAstModuleDeclNode.hxx
+    include/ast/nodes/HAstObjectLiteralNode.hxx
     include/ast/nodes/HAstPropAccessNode.hxx
     include/ast/nodes/HAstPropertyDeclNode.hxx
     include/ast/nodes/HAstReturnNode.hxx

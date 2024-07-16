@@ -11,6 +11,7 @@ namespace Hyve::AST {
 	struct HAstFuncCallNode;
 	struct HAstPropAccessNode;
 	struct HAstMemberAccessNode;
+	struct HAstObjectLiteralNode;
 	struct HAstUnaryExpressionNode;
 }
 
@@ -32,6 +33,8 @@ namespace Hyve::Parser {
 		);
 		// Func call parser
 		std::shared_ptr<AST::HAstFuncCallNode> ParseFuncCall(Lexer::HTokenStream& stream);
+		// Object literal parser
+		std::shared_ptr<AST::HAstObjectLiteralNode> ParseObjectLiteral(Lexer::HTokenStream& stream);
 		// Unary expression parser
 		std::shared_ptr<AST::HAstUnaryExpressionNode> ParseUnaryExpression(Lexer::HTokenStream& stream);
 		// Binary expression parser

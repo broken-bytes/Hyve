@@ -17,6 +17,7 @@ namespace Hyve::AST {
         SizeOf,
         ArrayAccess,
         MemberAccess,
+        ObjectLiteral,
         PointerAccess,
         PointerDereference,
         AddressOf,

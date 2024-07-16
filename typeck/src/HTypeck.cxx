@@ -327,6 +327,7 @@ namespace Hyve::Typeck {
             if (nodes->Children.empty()) {
                 return;
             }
+
             auto bodyNode = nodes->Children[0];
             for (const auto& node : bodyNode->Children) {
                 InferTypesWithSymbolTable(symbols, node);
