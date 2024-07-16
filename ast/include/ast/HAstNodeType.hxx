@@ -42,5 +42,6 @@ namespace Hyve::AST {
         Function,
         Variable,
         UnknownKind,
+        Primitive,
     };
 }

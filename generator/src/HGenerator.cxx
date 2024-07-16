@@ -1,5 +1,10 @@
 #include "generator/HGenerator.hxx"
 #include <ast/HAstNode.hxx>
+#include <ast/nodes/HAstFuncDeclNode.hxx>
+#include <ast/nodes/HAstLiteralNode.hxx>
+#include <ast/nodes/HAstModuleDeclNode.hxx>
+#include <ast/nodes/HAstReturnNode.hxx>
+#include <ast/nodes/HAstUnaryExpressionNode.hxx>
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -31,148 +36,235 @@ using namespace llvm;
 
 #ifdef HYVE_BOOTSTRAP
 std::unique_ptr<Module> LoadLowLevelStandardLibrary(llvm::LLVMContext& context) {
-    // Load the low level standard library LLVM IR code and link it with the current module
-    SMDiagnostic err;
-    auto path = std::filesystem::current_path() / "low_level.bc";
-    auto mod = parseIRFile(path.string(), err, context);
-    if (!mod) {
-        err.print("HyveCompiler", errs());
-        return nullptr;
-    }
+	// Load the low level standard library LLVM IR code and link it with the current module
+	SMDiagnostic err;
+	auto path = std::filesystem::current_path() / "low_level.bc";
+	auto mod = parseIRFile(path.string(), err, context);
+	if (!mod) {
+		err.print("HyveCompiler", errs());
+		return nullptr;
+	}
 
-    return mod;
+	return mod;
 }
 
 void LinkStandardLibrary(llvm::LLVMContext& context, llvm::Module* currentModule) {
-    auto lowLevelModule = LoadLowLevelStandardLibrary(context);
-    if (!lowLevelModule) {
-        return;
-    }
+	auto lowLevelModule = LoadLowLevelStandardLibrary(context);
+	if (!lowLevelModule) {
+		return;
+	}
 
-    // Link the low level standard library with the current module
-    if (Linker::linkModules(*currentModule, std::move(lowLevelModule))) {
-        errs() << "Error linking modules\n";
-        return;
-    }
+	// Link the low level standard library with the current module
+	if (Linker::linkModules(*currentModule, std::move(lowLevelModule))) {
+		errs() << "Error linking modules\n";
+		return;
+	}
 
-    // Print the module to stdout
-    currentModule->print(outs(), nullptr);
+	// Print the module to stdout
+	currentModule->print(outs(), nullptr);
 }
 #endif
 
 namespace Hyve::Generator {
-    using namespace AST;
+	using namespace AST;
 
 	std::string HGenerator::GenerateIR(std::string_view fileName, std::shared_ptr<HAstNode> nodes) const {
-        // Initialize the target registry etc.
-        InitializeNativeTarget();
-        InitializeNativeTargetAsmPrinter();
-        InitializeNativeTargetAsmParser();
+		// Initialize the target registry etc.
+		InitializeNativeTarget();
+		InitializeNativeTargetAsmPrinter();
+		InitializeNativeTargetAsmParser();
 
-        // Create a context to hold the LLVM constructs
-        LLVMContext context;
+		// Create a context to hold the LLVM constructs
+		LLVMContext context;
 
-        // Create a new module
-        auto currentModule = std::make_unique<Module>(fileName, context);
+		// Create a new module
+		auto currentModule = std::make_unique<Module>(fileName, context);
 
-        // Create a function type: int main()
-        FunctionType* mainType = FunctionType::get(Type::getInt32Ty(context), false);
+		// We can assume that the first node is a module declaration
+		auto astModule = std::dynamic_pointer_cast<HAstModuleDeclNode>(nodes);
 
-        // Create the main function: int main()
-        Function* mainFunction = Function::Create(mainType, Function::ExternalLinkage, "main", *currentModule);
+		std::string moduleName = astModule->Name;
 
-        // Create a basic block and attach it to the main function
-        BasicBlock* entryBlock = BasicBlock::Create(context, "entry", mainFunction);
+		// Traverse each node and its children(For now we only support function declarations)
+		// Note: We can assume that the first child of the module declaration is always the file we processed
+		for (auto& node : astModule->Children.front()->Children) {
+			if(node->Type == HAstNodeType::Func) {
+				auto function = std::dynamic_pointer_cast<HAstFuncDeclNode>(node);
+				GenerateFunction(context, currentModule.get(), function);
+			}
+		}
 
-        // Create an IR builder and set the insertion point to the entry block
-        IRBuilder<> builder(entryBlock);
+		// Print the module to stdout
+		currentModule->print(outs(), nullptr);
 
-        // Get the type for printf: int printf(const char *format, ...)
-        PointerType* printfArgType = PointerType::get(Type::getInt8Ty(context), 0);
-        FunctionType* printfType = FunctionType::get(builder.getInt32Ty(), printfArgType, true);
+		// Set up the target machine
+		std::string targetTriple = sys::getDefaultTargetTriple();
+		currentModule->setTargetTriple(targetTriple);
+		std::string Error;
+		const Target* Target = TargetRegistry::lookupTarget(targetTriple, Error);
 
-        // Create the printf function and add it to the module
-        FunctionCallee printf = currentModule->getOrInsertFunction("printf", printfType);
+		if (!Target) {
+			errs() << "Error: " << Error;
+			return "";
+		}
 
-        std::vector<Type*> funcArgTypes(2, Type::getInt32Ty(context));
-        FunctionType* externCFuncType = FunctionType::get(Type::getInt32Ty(context), funcArgTypes, false);
+		TargetOptions opt;
+		auto RM = std::optional<Reloc::Model>();
+		auto targetMachine = std::unique_ptr<TargetMachine>(
+			Target->createTargetMachine(targetTriple, "generic", "", opt, RM)
+		);
 
-        // Create the external C function: int CFunc(int, int)
-        Function* externCFunc = Function::Create(externCFuncType, Function::ExternalLinkage, "CFunc", *currentModule);
-        externCFunc->setCallingConv(CallingConv::C);
-
-        auto* arg1 = builder.getInt32(2);
-        auto* arg2 = builder.getInt32(0);
-        // Call the function: CFunc(2, 0)
-        auto* callResult = builder.CreateCall(externCFunc, { arg1, arg2 });
-
-        // Create two basic blocks for conditional branching
-        auto* evenBlock = BasicBlock::Create(context, "even", mainFunction);
-        auto* oddBlock = BasicBlock::Create(context, "odd", mainFunction);
-
-        // Create the conditional branch
-        auto* modResult = builder.CreateSRem(callResult, builder.getInt32(2));
-        auto* isOdd = builder.CreateICmpNE(modResult, builder.getInt32(0));
-        builder.CreateCondBr(isOdd, oddBlock, evenBlock);
-
-        // Set the insertion point to the even block
-        builder.SetInsertPoint(evenBlock);
-        auto* evenString = builder.CreateGlobalStringPtr("Even\n");
-        builder.CreateCall(printf, { evenString });
-        builder.CreateRet(builder.getInt32(0));
-
-        // Set the insertion point to the odd block
-        builder.SetInsertPoint(oddBlock);
-        auto* oddString = builder.CreateGlobalStringPtr("Odd\n");
-        builder.CreateCall(printf, { oddString });
-        builder.CreateRet(builder.getInt32(0));
-
-        // Print the module to stdout
-        currentModule->print(outs(), nullptr);
-
-        // Set up the target machine
-        std::string targetTriple = sys::getDefaultTargetTriple();
-        currentModule->setTargetTriple(targetTriple);
-        std::string Error;
-        const Target* Target = TargetRegistry::lookupTarget(targetTriple, Error);
-
-        if (!Target) {
-            errs() << "Error: " << Error;
-            return "";
-        }
-
-        TargetOptions opt;
-        auto RM = std::optional<Reloc::Model>();
-        auto targetMachine = std::unique_ptr<TargetMachine>(
-            Target->createTargetMachine(targetTriple, "generic", "", opt, RM)
-        );
-
-        currentModule->setDataLayout(targetMachine->createDataLayout());
+		currentModule->setDataLayout(targetMachine->createDataLayout());
 
 #ifdef HYVE_BOOTSTRAP
-        // Link the standard library
-        LinkStandardLibrary(context, currentModule.get());
+		// Link the standard library
+		//LinkStandardLibrary(context, currentModule.get());
 #endif
 
-        std::error_code EC;
-        raw_fd_ostream dest("hello.o", EC, sys::fs::OF_None);
+		std::error_code EC;
+		raw_fd_ostream dest(std::string(fileName) + ".o", EC, sys::fs::OF_None);
 
-        if (EC) {
-            errs() << "Could not open file: " << EC.message();
-            return "";
-        }
+		if (EC) {
+			errs() << "Could not open file: " << EC.message();
+			return "";
+		}
 
-        legacy::PassManager pass;
-        if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, CodeGenFileType::ObjectFile)) {
-            errs() << "TargetMachine can't emit a file of this type";
-            return "";
-        }
+		legacy::PassManager pass;
+		if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, CodeGenFileType::ObjectFile)) {
+			errs() << "TargetMachine can't emit a file of this type";
+			return "";
+		}
 
-        pass.run(*currentModule);
-        dest.flush();
+		pass.run(*currentModule);
+		dest.flush();
 
-        outs() << "Object file generated successfully\n";
+		outs() << "Object file generated successfully\n";
 
-        return "";
+		return "";
 	}
+
+	Function* HGenerator::GenerateFunction(LLVMContext& context, Module* llvmModule, std::shared_ptr<AST::HAstFuncDeclNode> func) const {
+		// Get the name of the function
+		std::string funcName = func->Name;
+
+		// Get the parameters of the function(For now, we only support primitive types)
+		// TODO: Add support for complex types, pointers, etc.
+		std::vector<Type*> funcArgTypes;
+
+		// Create a function type: ReturnType funcName
+		// Get the return type of the function(For now, we only support primitive types)
+		// TODO: Add support for complex types, pointers, etc.
+
+		auto returnType = GetType(context, func->ReturnType);
+
+		FunctionType* type = FunctionType::get(returnType, false);
+
+		// Create the main function: int main()
+		Function* function = Function::Create(type, Function::ExternalLinkage, func->Name, *llvmModule);
+
+		// Create a basic block and attach it to the main function
+		BasicBlock* block = BasicBlock::Create(context, "entry", function);
+
+		// Now parse each statement of the function one by one and attach it to the block
+		IRBuilder<> builder(block);
+
+		// The first children is the block of the function, so we take its children
+		for (auto& stmt : func->Children.front()->Children) {
+			// Check the type of the statement
+			if (stmt->Type == HAstNodeType::ReturnStatement) {
+				auto returnStmt = std::dynamic_pointer_cast<HAstReturnNode>(stmt);
+
+				// Check what kind of expression is being returned
+				if (returnStmt->Value->ExpressionType == ExpressionType::Literal) {
+					// Add the return statement to the block
+					builder.CreateRet(GetConstantData(context, returnStmt->Value));
+				}
+				else if (returnStmt->Value->ExpressionType == ExpressionType::UnaryOperation) {
+					auto unaryOp = std::dynamic_pointer_cast<HAstUnaryExpressionNode>(returnStmt->Value);
+
+					// Check the operator
+					if (unaryOp->Operator == HAstOperatorType::NEGATE) {
+						// Get the value of the expression
+						auto value = GetConstantData(context, unaryOp->Operand);
+
+						// Negate the value
+						auto negatedValue = builder.CreateNeg(value);
+
+						// Add the return statement to the block
+						builder.CreateRet(negatedValue);
+					}
+				}
+			}
+		}
+
+		// Add the function to the module
+		llvmModule->getOrInsertFunction(func->Name, type);
+
+		return function;
+	}
+
+	llvm::Type* HGenerator::GetType(llvm::LLVMContext& context, std::shared_ptr<AST::HAstTypeNode> type) const {
+		// Check for primitive types
+		if (type->Kind == HAstTypeKind::Primitive) {
+			if (type->Name == "Int") {
+				return Type::getInt32Ty(context);
+			}
+			else if (type->Name == "Int8") {
+				return Type::getInt8Ty(context);
+			}
+			else if (type->Name == "Int16") {
+				return Type::getInt16Ty(context);
+			}
+			else if (type->Name == "Int32") {
+				return Type::getInt32Ty(context);
+			}
+			else if (type->Name == "Int64") {
+				return Type::getInt64Ty(context);
+			}
+			else if (type->Name == "UInt") {
+				return Type::getInt32Ty(context);
+			}
+			else if (type->Name == "UInt8") {
+				return Type::getInt8Ty(context);
+			}
+			else if (type->Name == "UInt16") {
+				return Type::getInt16Ty(context);
+			}
+			else if (type->Name == "UInt32") {
+				return Type::getInt32Ty(context);
+			}
+			else if (type->Name == "UInt64") {
+				return Type::getInt64Ty(context);
+			}
+			else if (type->Name == "Float") {
+				return Type::getFloatTy(context);
+			}
+			else if (type->Name == "Double") {
+				return Type::getDoubleTy(context);
+			}
+			else if (type->Name == "Char") {
+				return Type::getInt8Ty(context);
+			}
+			else if (type->Name == "Bool") {
+				return Type::getInt1Ty(context);
+			}
+		}
+	}
+
+	ConstantData* HGenerator::GetConstantData(llvm::LLVMContext& context, std::shared_ptr<AST::HAstExpressionNode> node) const {
+		if (node->ExpressionType == ExpressionType::Literal) {
+			auto literal = std::dynamic_pointer_cast<AST::HAstLiteralNode>(node);
+
+			if (literal->LiteralType == HAstLiteralType::Integer) {
+				return ConstantInt::get(context, APInt(32, std::stoi(literal->Value)));
+			}
+			else if (literal->LiteralType == HAstLiteralType::Float) {
+				return ConstantFP::get(context, APFloat(std::stof(literal->Value)));
+			}
+			else if (literal->LiteralType == HAstLiteralType::Boolean) {
+				return ConstantInt::get(context, APInt(1, std::stoi(literal->Value)));
+			}
+		}
+	}
+
 }

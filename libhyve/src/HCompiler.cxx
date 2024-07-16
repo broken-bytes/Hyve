@@ -19,27 +19,29 @@ namespace Hyve {
         const std::vector<std::string>& files, 
         const std::vector<HCompilerArgument>& arguments
     ) {
-        std::vector<std::shared_ptr<Typeck::HSymbol>> symbols = {};
-        std::vector<std::shared_ptr<AST::HAstNode>> asts = {};
+        std::map<std::string_view, std::shared_ptr<Typeck::HSymbol>> symbols = {};
+        std::map<std::string_view, std::shared_ptr<AST::HAstNode>> asts = {};
 
         for(const auto& file : files) {
 		    auto source = LoadSourceFile(file);
 		    auto tokens = _lexer->Tokenize(source, file);
 		    auto ast = _parser->Parse(tokens);
-            asts.push_back(ast);
+            asts[file] = ast;
             auto symbolTable = _typeck->BuildSymbolTable(ast, nullptr);
 
-            symbols.push_back(symbolTable);
+            symbols[file] = symbolTable;
 	    }
 
-        auto symbolTable = _typeck->MergeSymbols(symbols);
+        auto symbolTable = _typeck->MergeSymbols(
+            symbols | std::views::values |std::ranges::to<std::vector<std::shared_ptr<Typeck::HSymbol>>>()
+        );
 
         for (auto& ast : asts) {
-            _typeck->InferTypes(symbolTable, ast);
+            _typeck->InferTypes(symbolTable, ast.second);
         }
 
         for (auto& ast : asts) {
-            _generator->GenerateIR("", ast);
+            _generator->GenerateIR(ast.first, ast.second);
         }
 	}
 

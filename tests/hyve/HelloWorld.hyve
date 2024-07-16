@@ -1,13 +1,6 @@
 module App
 
-struct Item {
-    let index: Int
-    let count: Int8
-}
-
 fn main() -> Int {
-    let item = Item()
-
-    return -1
+    return -23
 }
 

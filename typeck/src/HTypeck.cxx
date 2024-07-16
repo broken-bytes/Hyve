@@ -1,4 +1,5 @@
 #include "typeck/HTypeck.hxx"
+#include "typeck/HPrimitiveTypes.hxx"
 #include "typeck/HSymbolTable.hxx"
 #include "typeck/HSymbol.hxx"
 #include "typeck/symbols/HContractSymbol.hxx"
@@ -300,7 +301,7 @@ namespace Hyve::Typeck {
             for(const auto& node: nodes->Children) {
                 InferTypesWithSymbolTable(symbols, node);
 			}
-        } else if (nodes->Type == NominalType || nodes->Type == Func) {
+        } else if (nodes->Type == NominalType) {
             // Get the body node
             if (nodes->Children.empty()) {
                 return;
@@ -309,7 +310,29 @@ namespace Hyve::Typeck {
             for (const auto& node : bodyNode->Children) {
                 InferTypesWithSymbolTable(symbols, node);
             }
-        } else if (nodes->Type == PropertyDecl) {
+        }
+        else if (nodes->Type == Func) {
+            // Infer the parameters and return type
+            auto funcNode = std::dynamic_pointer_cast<HAstFuncDeclNode>(nodes);
+            // Check for the return type if it is a primitive type(like Int, Bool, etc)
+            if (funcNode->ReturnType != nullptr) {
+				// Check if the return type is a primitive type
+				if(std::ranges::contains(HPrimitiveTypes, funcNode->ReturnType->Name)) {
+					// Assign the type to the symbol
+					funcNode->ReturnType->Kind = HAstTypeKind::Primitive;
+				}
+			}
+
+            // Get the body node
+            if (nodes->Children.empty()) {
+                return;
+            }
+            auto bodyNode = nodes->Children[0];
+            for (const auto& node : bodyNode->Children) {
+                InferTypesWithSymbolTable(symbols, node);
+            }
+        }
+        else if (nodes->Type == PropertyDecl) {
             auto declNode = std::dynamic_pointer_cast<HAstPropertyDeclNode>(nodes);
 
             // We only infer the type if the type node is null and the initializer is not null

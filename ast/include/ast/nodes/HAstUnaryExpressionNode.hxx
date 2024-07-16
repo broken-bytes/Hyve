@@ -12,5 +12,9 @@ namespace Hyve::AST {
     struct HAstUnaryExpressionNode : HAstExpressionNode {
         HAstOperatorType Operator;
         std::shared_ptr<HAstExpressionNode> Operand;
+
+        HAstUnaryExpressionNode() {
+            ExpressionType = ExpressionType::UnaryOperation;
+        }
     };
 }

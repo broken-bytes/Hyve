@@ -11,6 +11,7 @@ namespace Hyve::AST {
 
         HAstReturnNode() {
             StatementType = StatementType::Return;
+            Type = HAstNodeType::ReturnStatement;
         }
     };
 }
