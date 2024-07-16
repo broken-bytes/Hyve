@@ -30,14 +30,16 @@ curl -sSL https://hyve-lang.org/install.sh | sh -s -- <version>
 A simple "Hello, World!" in Hyve:
 
 ```hyve
-class World {
-    init {
+struct World {
+  let name: String
 
-    }
+  init(name: String) {
+    self.name = name
+  }
 
-    fn hello() -> String {
-        "Hello World"
-    }
+  fn hello() -> String {
+    "Hello World"
+  }
 }
 
 fn main() {
