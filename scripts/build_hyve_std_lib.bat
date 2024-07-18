@@ -1,1 +1,0 @@
-hyvec.exe -c hyvestd\hyve\builtin\_Int8.hyve -c hyvestd\hyve\builtin\_Int16.hyve -c hyvestd\hyve\builtin\_Int32.hyve -c hyvestd\hyve\builtin\_Int64.hyve -c hyvestd\hyve\builtin\_Float.hyve -c D:hyvestd\hyve\builtin\_Double.hyve -m builtins
