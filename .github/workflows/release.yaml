@@ -11,12 +11,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Install Clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang
       - name: Get LLVM
         run: git clone https://github.com/llvm/llvm-project --depth 1 --branch main llvm-project
       - name: Make LLVM Project
         run: |
           cd llvm-project
-          cmake -G Ninja -S ./llvm -B build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release -Thost=x64
+          cmake -G Ninja -S ./llvm -B build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release
       - name: Build LLVM Project
         run: ninja -C build
       - name: Build Hyve
