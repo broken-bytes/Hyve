@@ -14,7 +14,7 @@ jobs:
       - name: Get LLVM
         run: git clone https://github.com/llvm/llvm-project --depth 1 --branch main llvm
       - name: Make LLVM Project
-        run: cd llvm-project & cmake -G Ninja -S llvm -B build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;compiler-rt;bolt" -DCMAKE_BUILD_TYPE=Release -A x64 -Thost=x64
+        run: cd llvm & cmake -G Ninja -S llvm -B build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;compiler-rt;bolt" -DCMAKE_BUILD_TYPE=Release -A x64 -Thost=x64
       - name: Build LLVM Project
         run: cd build & ninja
       - name: Build Hyve
