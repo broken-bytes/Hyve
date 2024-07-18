@@ -12,12 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Docker Build
-        run: docker build -t Hyve-Release -f Dockerfile .
+        run: docker build -t hyve -f Dockerfile .
       - name: Docker Run
         run: |
           docker run -v ${{ github.workspace }}:/project \
             -v ${{ github.workspace }}/build-output:/deploy \
-            Hyve-Release
+            hyve
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
