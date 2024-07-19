@@ -1,7 +1,6 @@
 #pragma once
 
 #include "parser/IHParser.hxx"
-#include "parser/parsers/HClassParser.hxx"
 #include "parser/parsers/HModuleParser.hxx"
 #include <lexer/HToken.hxx>
 #include <lexer/HTokenStream.hxx>

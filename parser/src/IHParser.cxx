@@ -1,6 +1,5 @@
 #include "parser/IHParser.hxx"
 #include "parser/HParser.hxx"
-#include "parser/parsers/HClassParser.hxx"
 #include "parser/parsers/HEnumParser.hxx"
 #include "parser/parsers/HExpressionParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
@@ -572,7 +571,6 @@ namespace Hyve::Parser {
 
 	std::unique_ptr<IHParser> Create() {
 		auto errorHandler = std::make_shared<Core::HErrorHandler>();
-		auto classParser = std::make_shared<HClassParser>();
 		auto enumParser = std::make_shared<HEnumParser>();
 		auto exprParser = std::make_shared<HExpressionParser>(errorHandler);
 		auto varParser = std::make_shared<HVariableParser>(errorHandler, exprParser);
@@ -592,7 +590,6 @@ namespace Hyve::Parser {
 		);
 		auto moduleParser = std::make_shared<HModuleParser>(
 			errorHandler,
-			classParser,
 			enumParser,
 			funcParser,
 			propParser,

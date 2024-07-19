@@ -1,7 +1,6 @@
 #pragma once
 
 #include "parser/IHParser.hxx"
-#include "parser/parsers/HClassParser.hxx"
 #include "parser/parsers/HEnumParser.hxx"
 #include "parser/parsers/HFuncParser.hxx"
 #include "parser/parsers/HPropertyParser.hxx"
@@ -17,7 +16,6 @@ namespace Hyve::Parser {
 	public:
 		HModuleParser(
 			const std::shared_ptr<Core::HErrorHandler>& errorHandler,
-			const std::shared_ptr<HClassParser>& classParser,
 			const std::shared_ptr<HEnumParser>& enumParser,
 			const std::shared_ptr<HFuncParser>& funcParser,
 			const std::shared_ptr<HPropertyParser>& propParser,
@@ -34,7 +32,6 @@ namespace Hyve::Parser {
 	private:
 		std::shared_ptr<Core::HErrorHandler> _errorHandler;
 		// Different parsers per context
-		std::shared_ptr<HClassParser> _classParser;
 		std::shared_ptr<HEnumParser> _enumParser;
 		std::shared_ptr<HFuncParser> _funcParser;
 		std::shared_ptr<HPropertyParser> _propParser;

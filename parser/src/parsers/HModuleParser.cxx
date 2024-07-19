@@ -2,6 +2,7 @@
 #include <ast/HAstNode.hxx>
 #include <ast/nodes/HAstModuleDeclNode.hxx>
 #include <lexer/HToken.hxx>
+#include <lexer/HTokenStream.hxx>
 #include <core/HCompilerError.hxx>
 #include <string_view>
 #include <vector>
@@ -12,7 +13,6 @@ namespace Hyve::Parser {
 	// NOSONAR disable brain-overload
 	HModuleParser::HModuleParser(
 		const std::shared_ptr<Core::HErrorHandler>& errorHandler,
-		const std::shared_ptr<HClassParser>& classParser,
 		const std::shared_ptr<HEnumParser>& enumParser,
 		const std::shared_ptr<HFuncParser>& funcParser,
 		const std::shared_ptr<HPropertyParser>& propParser,
@@ -22,7 +22,6 @@ namespace Hyve::Parser {
 		const std::shared_ptr<HStructParser>& structParser,
 		const std::shared_ptr<HVariableParser>& varParser
 	) : _errorHandler(errorHandler),
-		_classParser(classParser),
 		_enumParser(enumParser),
 		_funcParser(funcParser),
 		_propParser(propParser),
