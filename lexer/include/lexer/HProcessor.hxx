@@ -6,6 +6,7 @@
 #include "lexer/HTokenSpecials.hxx"
 #include <iostream>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <vector>
 

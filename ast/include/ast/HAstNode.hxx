@@ -59,5 +59,15 @@ namespace Hyve::AST {
 
 			return nodes;
 		}
+
+		static inline std::shared_ptr<HAstNode> Root(std::shared_ptr<HAstNode> node) {
+			auto currentNode = node;
+
+			while (currentNode->Parent.lock() != nullptr) {
+				currentNode = currentNode->Parent.lock();
+			}
+
+			return currentNode;
+		}
     };
 }
