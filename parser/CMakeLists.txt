@@ -2,7 +2,6 @@ SET(
     SRC
     src/HParser.cxx
     src/IHParser.cxx
-    src/parsers/HClassParser.cxx
     src/parsers/HEnumParser.cxx
     src/parsers/HExpressionParser.cxx
     src/parsers/HFuncParser.cxx
@@ -23,7 +22,6 @@ SET(
     include/parser/HParser.hxx
     include/parser/IHParser.hxx
     include/parser/HParserContext.hxx
-    include/parser/parsers/HClassParser.hxx
     include/parser/parsers/HEnumParser.hxx
     include/parser/parsers/HExpressionParser.hxx
     include/parser/parsers/HFuncParser.hxx
