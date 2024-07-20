@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: llvm-project/build
-          key: ${{ runner.os }}-llvm-build-${{ github.sha }}
+          key: ${{ runner.os }}-llvm-build-hyve
 
       - name: Build LLVM Project
         if: steps.cache-llvm.outputs.cache-hit != 'true'
