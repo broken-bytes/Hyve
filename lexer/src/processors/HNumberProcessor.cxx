@@ -52,7 +52,6 @@ namespace Hyve::Lexer {
 			}
 			else if (isalpha(c)) {
 				return HandleError(source, "Unexpected character in number literal.");
-				return std::nullopt;
 			}
 			else if (c == '.') {
 				// If a dot is found, the number might be a float so we return early.
@@ -88,12 +87,10 @@ namespace Hyve::Lexer {
 			}
 			else if (isalpha(c)) {
 				return HandleError(source, "Unexpected character in number literal.");
-				return std::nullopt;
 			}
 			else if (c == '.') {
 				if (hasDot) {
 					return HandleError(source, "Unexpected dot in number literal.");
-					return std::nullopt;
 				}
 				hasDot = true;
 				number.push_back(c);
@@ -162,7 +159,6 @@ namespace Hyve::Lexer {
 			}
 			else if (isalpha(source[i])) {
 				return HandleError(source, "Unexpected character in binary literal.");
-				return std::nullopt;
 			}
 			else if (IsOperator(source[i])) {
 				break;
