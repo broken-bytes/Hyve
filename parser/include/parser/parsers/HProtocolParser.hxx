@@ -5,7 +5,7 @@
 #include "parser/parsers/HVariableParser.hxx"
 
 namespace Hyve::Parser {
-	class HProtocolParser : public IHParser {
+	class HProtocolParser final : public IHParser {
 	public:
 		HProtocolParser() = default;
 		~HProtocolParser() final = default;

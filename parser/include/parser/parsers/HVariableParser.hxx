@@ -5,7 +5,7 @@
 #include <core/HErrorHandler.hxx>
 
 namespace Hyve::Parser {
-	class HVariableParser : public IHParser {
+	class HVariableParser final : public IHParser {
 	public:
 		HVariableParser(
 			std::shared_ptr<Core::HErrorHandler> errorHandler,

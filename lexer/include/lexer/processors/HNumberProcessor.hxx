@@ -4,7 +4,7 @@
 #include <optional>
 
 namespace Hyve::Lexer {
-	class HNumberProcessor : public HProcessor {
+	class HNumberProcessor final : public HProcessor {
 	public:
 		using HProcessor::HProcessor;
 		~HNumberProcessor() final = default;

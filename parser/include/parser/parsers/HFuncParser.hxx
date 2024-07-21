@@ -13,7 +13,7 @@ namespace Hyve::AST {
 }
 
 namespace Hyve::Parser {
-	class HFuncParser : public IHParser {
+	class HFuncParser final : public IHParser {
 	public:
 		explicit HFuncParser(
 			std::shared_ptr<Core::HErrorHandler> errorHandler,

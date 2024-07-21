@@ -12,7 +12,7 @@
 #include <core/HErrorHandler.hxx>
 
 namespace Hyve::Parser {
-	class HModuleParser : public IHParser {
+	class HModuleParser final : public IHParser {
 	public:
 		HModuleParser(
 			const std::shared_ptr<Core::HErrorHandler>& errorHandler,

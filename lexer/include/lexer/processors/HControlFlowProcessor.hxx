@@ -7,7 +7,7 @@
 namespace Hyve::Lexer {
 	struct HToken;
 
-	class HControlFlowProcessor : public HProcessor {
+	class HControlFlowProcessor final : public HProcessor {
 	public:
 		using HProcessor::HProcessor;
 		~HControlFlowProcessor() final = default;

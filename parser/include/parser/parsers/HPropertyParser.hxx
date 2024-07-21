@@ -6,7 +6,7 @@
 #include <core/HErrorHandler.hxx>
 
 namespace Hyve::Parser {
-	class HPropertyParser : public IHParser {
+	class HPropertyParser final : public IHParser {
 	public:
 		explicit HPropertyParser(
 			std::shared_ptr<Core::HErrorHandler> errorHandler,

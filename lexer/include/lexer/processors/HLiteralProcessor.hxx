@@ -6,7 +6,7 @@
 
 namespace Hyve::Lexer {
 	class HNumberProcessor;
-	class HLiteralProcessor : public HProcessor {
+	class HLiteralProcessor final : public HProcessor {
 	public:
 		explicit HLiteralProcessor(std::shared_ptr<HNumberProcessor> numberProcessor);
 		~HLiteralProcessor() final = default;

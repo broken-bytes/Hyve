@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace Hyve::Lexer {
-	class HPunctuationProcessor : public HProcessor {
+	class HPunctuationProcessor final : public HProcessor {
 	public:
 		using HProcessor::HProcessor;
 		~HPunctuationProcessor() final = default;

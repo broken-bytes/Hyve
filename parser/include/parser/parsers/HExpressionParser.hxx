@@ -16,7 +16,7 @@ namespace Hyve::AST {
 }
 
 namespace Hyve::Parser {
-	class HExpressionParser : public IHParser {
+	class HExpressionParser final : public IHParser {
 	public:
 		explicit HExpressionParser(std::shared_ptr<Core::HErrorHandler> errorHandler);
 		~HExpressionParser() final = default;

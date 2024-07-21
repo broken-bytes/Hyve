@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace Hyve::Lexer {
-	class HGroupingProcessor : public HProcessor {
+	class HGroupingProcessor final : public HProcessor {
 	public:
 		using HProcessor::HProcessor;
 		~HGroupingProcessor() final = default;

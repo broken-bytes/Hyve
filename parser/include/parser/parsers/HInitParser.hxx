@@ -10,7 +10,7 @@ namespace Hyve::AST {
 }
 
 namespace Hyve::Parser {
-	class HInitParser : public IHParser {
+	class HInitParser final : public IHParser {
 	public:
 		explicit HInitParser(std::shared_ptr<Core::HErrorHandler> errorHandler);
 		~HInitParser() final = default;

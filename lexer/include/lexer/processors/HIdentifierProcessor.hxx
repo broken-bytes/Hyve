@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace Hyve::Lexer {
-	class HIdentifierProcessor : public HProcessor {
+	class HIdentifierProcessor final : public HProcessor {
 	public:
 		using HProcessor::HProcessor;
 		~HIdentifierProcessor() final = default;

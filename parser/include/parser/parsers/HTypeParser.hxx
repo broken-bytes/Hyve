@@ -8,7 +8,7 @@ namespace Hyve::AST {
 }
 
 namespace Hyve::Parser {
-	class HTypeParser : public IHParser {
+	class HTypeParser final : public IHParser {
 	public:
 		HTypeParser() = default;
 		~HTypeParser() final = default;

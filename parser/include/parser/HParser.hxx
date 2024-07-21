@@ -18,7 +18,7 @@ namespace Hyve::AST {
 }
 
 namespace Hyve::Parser {
-    class HParser : public IHParser {
+    class HParser final : public IHParser {
         public:
         HParser(
             const std::shared_ptr<Core::HErrorHandler>& errorHandler,

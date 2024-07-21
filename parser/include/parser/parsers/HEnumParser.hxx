@@ -5,7 +5,7 @@
 #include "parser/parsers/HPropertyParser.hxx"
 
 namespace Hyve::Parser {
-	class HEnumParser : public IHParser {
+	class HEnumParser final : public IHParser {
 	public:
 		HEnumParser() = default;
 		~HEnumParser() final = default;

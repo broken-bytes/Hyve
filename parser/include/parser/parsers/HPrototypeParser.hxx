@@ -6,7 +6,7 @@
 #include <memory>
 
 namespace Hyve::Parser {
-	class HPrototypeParser : public IHParser {
+	class HPrototypeParser final : public IHParser {
 	public:
 		HPrototypeParser() = default;
 		~HPrototypeParser() final = default;
