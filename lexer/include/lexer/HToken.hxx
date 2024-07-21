@@ -14,5 +14,7 @@ namespace Hyve::Lexer {
         uint64_t ColumnStart;
         uint64_t ColumnEnd;
         std::string Error;
+
+        constexpr ~HToken() = default;
     };
 }
