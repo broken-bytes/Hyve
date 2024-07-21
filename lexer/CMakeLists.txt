@@ -38,6 +38,7 @@ SET(
 
 add_library(Lexer STATIC ${SRC} ${HEADERS})
 
+
 target_include_directories(Lexer PUBLIC include)
 target_include_directories(Lexer PUBLIC ${CMAKE_SOURCE_DIR}/core/include)
 
