@@ -2,7 +2,6 @@
 #include "cli/HCLIInvalidCommandException.hxx"
 #include <algorithm>
 #include <cstdio>
-#include <format>
 #include <iostream>
 #include <print>
 #include <ranges>
@@ -159,7 +158,7 @@ namespace Hyve::CLI {
     }
 
     void HCLI::Write(CLIColor color, const std::string& message) const {
-        std::print("\033[1;{}m{}\033[0m", static_cast<int>(color), message);
+        printf("\033[1;%dm%s\033[0m", static_cast<int>(color), message.c_str());
     }
 
     bool HCLI::CheckIfCommand(std::string_view str) const {
