@@ -3,6 +3,8 @@
 #include <parser/IHParser.hxx>
 #include <fstream>
 #include <map>
+#include <memory>
+#include <vector>
 
 // TESTING ONLY
 #include <generator/HGenerator.hxx>
@@ -33,7 +35,9 @@ namespace Hyve {
 	    }
 
         auto symbolTable = _typeck->MergeSymbols(
-            symbols | std::views::values |std::ranges::to<std::vector<std::shared_ptr<Typeck::HSymbol>>>()
+            std::vector<std::shared_ptr<Typeck::HSymbol>>{
+                std::ranges::begin(symbols | std::views::values), std::ranges::end(symbols | std::views::values)
+            }
         );
 
         for (auto& ast : asts) {

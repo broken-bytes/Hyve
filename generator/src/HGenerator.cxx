@@ -5,6 +5,7 @@
 #include <ast/nodes/HAstModuleDeclNode.hxx>
 #include <ast/nodes/HAstReturnNode.hxx>
 #include <ast/nodes/HAstUnaryExpressionNode.hxx>
+#include <llvm/ADT/APFloat.h>
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
