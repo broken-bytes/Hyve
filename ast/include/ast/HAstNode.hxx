@@ -37,7 +37,7 @@ namespace Hyve::AST {
 			}
 
 			// Reverse the scope so it is in the correct order since we went bottom up
-			std::ranges::reverse(scope.begin(), scope.end());
+			std::ranges::reverse(scope);
 
 			return scope;
 		}
