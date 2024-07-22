@@ -28,7 +28,7 @@ jobs:
           cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-19/cmake
           ninja -C build
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: hyve-release-deploy
-          path: build/hyvec
+          path: build/hyvec/hyvec
