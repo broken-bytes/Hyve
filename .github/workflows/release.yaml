@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: hyve-release-deploy
-          path: build
+          path: build/hyvec
 
   build-msvc:
     runs-on: windows-latest
@@ -54,4 +54,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: hyve-release-deploy
-          path: build
+          path: build/hyvec
