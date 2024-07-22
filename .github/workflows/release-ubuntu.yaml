@@ -32,26 +32,3 @@ jobs:
         with:
           name: hyve-release-deploy
           path: build/hyvec
-
-  build-msvc:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Get LLVM
-        shell: cmd
-        run: |
-          cd C:\
-          git clone https://github.com/llvm/llvm-project.git
-          cd llvm-project
-          cmake -G"Visual Studio 19 2022" -S .\llvm\ -B ./build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release
-          cmake --build
-      - name: Build Hyve
-        shell: cmd  # Use cmd for Windows commands
-        run: |
-          cmake -G "Visual Studio 19 2022" -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\llvm-project\build\lib\cmake"
-          cmake --build
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: hyve-release-deploy
-          path: build/hyvec
