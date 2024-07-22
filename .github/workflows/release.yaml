@@ -21,8 +21,8 @@ jobs:
 
       - name: Build Hyve
         run: |
-          export CC=/usr/bin/clang-18
-          export CXX=clang++
+          export CC=clang-18
+          export CXX=clang++-18
           cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release
           ninja -C build
       - name: Upload build artifacts
