@@ -7,17 +7,17 @@ on:
 
 jobs:
   build:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup Buildchain
         run: |
           sudo apt-get update
           sudo apt-get install -y ninja-build
-          sudo apt-get install -y clang-18
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh all
+          sudo apt-get install -y clang-18
 
       - name: Build Hyve
         run: |
