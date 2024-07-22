@@ -21,7 +21,7 @@ jobs:
 
       - name: Build Hyve
         run: |
-          SET CXX=clang++
+          CXX=clang++
           cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release
           ninja -C build
       - name: Upload build artifacts
