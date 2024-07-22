@@ -37,6 +37,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Buildchain
+        shell: powershell
+        run: |
+          winget install Ninja-build.Ninja
       - name: Get LLVM
         shell: cmd
         run: |
