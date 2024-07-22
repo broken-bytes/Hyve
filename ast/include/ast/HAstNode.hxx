@@ -19,7 +19,7 @@ namespace Hyve::AST {
         std::weak_ptr<HAstNode> Parent;
         std::vector<std::shared_ptr<HAstNode>> Children;
 
-        inline std::vector<std::string_view> CreateScopeString() const {
+        inline auto CreateScopeString() const {
 			std::vector<std::string_view> scope;
 
 			auto* currentNode = this;
@@ -37,9 +37,7 @@ namespace Hyve::AST {
 			}
 
 			// Reverse the scope so it is in the correct order since we went bottom up
-			std::ranges::reverse(scope);
-
-			return scope;
+			return std::ranges::reverse_view(scope);
 		}
 
 		static inline std::vector<std::shared_ptr<HAstNode>> FindNodesWithType(HAstNodeType type, std::shared_ptr<HAstNode> root) {
