@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
-#include <print>
 #include <ranges>
 #include <sstream>
 #include <utility>
