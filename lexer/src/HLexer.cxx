@@ -5,6 +5,7 @@
 #include "lexer/HTokenSymbols.hxx"
 #include "lexer/HTokenType.hxx"
 #include <core/HCompilerError.hxx>
+#include <cstring>
 #include <exception>
 #include <optional>
 #include <ranges>

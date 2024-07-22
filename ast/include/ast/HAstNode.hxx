@@ -21,7 +21,7 @@ namespace Hyve::AST {
 
         inline std::vector<std::string_view> CreateScopeString() const {
 			std::vector<std::string_view> scope;
-			
+
 			auto* currentNode = this;
 
 			while (currentNode != nullptr) {
@@ -35,9 +35,9 @@ namespace Hyve::AST {
 				scope.push_back(currentNode->Name);
 				currentNode = currentNode->Parent.lock().get();
 			}
-			
+
 			// Reverse the scope so it is in the correct order since we went bottom up
-			std::reverse(scope.begin(), scope.end());
+			std::ranges::reverse(scope.begin(), scope.end());
 
 			return scope;
 		}
