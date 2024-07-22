@@ -15,26 +15,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang
           sudo apt-get install -y ninja-build
-      - name: Get LLVM
-        run: git clone https://github.com/llvm/llvm-project --depth 1 --branch main llvm-project
-      # Caching for LLVM Build
-      - name: Cache LLVM Build
-        id: cache-llvm
-        uses: actions/cache@v4
-        with:
-          path: llvm-project/build
-          key: ${{ runner.os }}-llvm-build-hyve
-
-      - name: Build LLVM Project
-        if: steps.cache-llvm.outputs.cache-hit != 'true'
-        run: |
-          cd llvm-project
-          cmake -G Ninja -S ./llvm -B build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release
-          ninja -C build
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh all
 
       - name: Build Hyve
         run: |
-          cmake -G Ninja -B build -S ./ -DCMAKE_PREFIX_PATH="./llvm-project/build/lib/cmake/llvm" -DCMAKE_BUILD_TYPE=Release
+          cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release
           ninja -C build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
