@@ -26,9 +26,10 @@ namespace Hyve::Generator {
 		~HGenerator() = default;
 
 		std::string GenerateIR(std::string_view fileName, std::shared_ptr<AST::HAstNode> nodes) const;
-
-		llvm::Function* GenerateFunction(llvm::LLVMContext& context, llvm::Module* llvmModule, std::shared_ptr<AST::HAstFuncDeclNode> func) const;
-		llvm::Type* GetType(llvm::LLVMContext& context, std::shared_ptr<AST::HAstTypeNode> type) const;
-		llvm::ConstantData* GetConstantData(llvm::LLVMContext& context, std::shared_ptr<AST::HAstExpressionNode> node) const;
+	
+	private:
+		llvm::Function* GenerateFunction(llvm::LLVMContext* context, llvm::Module* llvmModule, std::shared_ptr<AST::HAstFuncDeclNode> func) const;
+		llvm::Type* GetType(llvm::LLVMContext* context, std::shared_ptr<AST::HAstTypeNode> type) const;
+		llvm::ConstantData* GetConstantData(llvm::LLVMContext* context, std::shared_ptr<AST::HAstExpressionNode> node) const;
 	};
 }

@@ -18,6 +18,7 @@ jobs:
           chmod +x llvm.sh
           sudo ./llvm.sh 19
           sudo apt-get install -y clang-19
+          sudo apt-get install -y libstdc++-11-dev
 
       - name: Build Hyve
         run: |

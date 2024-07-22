@@ -31,6 +31,7 @@
 #include <llvm/Support/InitLLVM.h>
 #include <llvm/Linker/Linker.h>
 #include <filesystem>
+#include <memory>
 #include <optional>
 
 using namespace llvm;
@@ -145,7 +146,7 @@ namespace Hyve::Generator {
 		return "";
 	}
 
-	Function* HGenerator::GenerateFunction(LLVMContext& context, Module* llvmModule, std::shared_ptr<AST::HAstFuncDeclNode> func) const {
+	Function* HGenerator::GenerateFunction(LLVMContext* context, Module* llvmModule, std::shared_ptr<AST::HAstFuncDeclNode> func) const {
 		// Get the name of the function
 		std::string funcName = func->Name;
 
@@ -165,7 +166,7 @@ namespace Hyve::Generator {
 		Function* function = Function::Create(type, Function::ExternalLinkage, func->Name, *llvmModule);
 
 		// Create a basic block and attach it to the main function
-		BasicBlock* block = BasicBlock::Create(context, "entry", function);
+		BasicBlock* block = BasicBlock::Create(*context, "entry", function);
 
 		// Now parse each statement of the function one by one and attach it to the block
 		IRBuilder<> builder(block);
@@ -208,68 +209,68 @@ namespace Hyve::Generator {
 		return function;
 	}
 
-	llvm::Type* HGenerator::GetType(llvm::LLVMContext& context, std::shared_ptr<AST::HAstTypeNode> type) const {
+	llvm::Type* HGenerator::GetType(llvm::LLVMContext* context, std::shared_ptr<AST::HAstTypeNode> type) const {
 		// Check for primitive types
 		if (type->Kind == HAstTypeKind::Primitive) {
 			if (type->Name == "Int") {
-				return Type::getInt32Ty(context);
+				return Type::getInt32Ty(*context);
 			}
 			else if (type->Name == "Int8") {
-				return Type::getInt8Ty(context);
+				return Type::getInt8Ty(*context);
 			}
 			else if (type->Name == "Int16") {
-				return Type::getInt16Ty(context);
+				return Type::getInt16Ty(*context);
 			}
 			else if (type->Name == "Int32") {
-				return Type::getInt32Ty(context);
+				return Type::getInt32Ty(*context);
 			}
 			else if (type->Name == "Int64") {
-				return Type::getInt64Ty(context);
+				return Type::getInt64Ty(*context);
 			}
 			else if (type->Name == "UInt") {
-				return Type::getInt32Ty(context);
+				return Type::getInt32Ty(*context);
 			}
 			else if (type->Name == "UInt8") {
-				return Type::getInt8Ty(context);
+				return Type::getInt8Ty(*context);
 			}
 			else if (type->Name == "UInt16") {
-				return Type::getInt16Ty(context);
+				return Type::getInt16Ty(*context);
 			}
 			else if (type->Name == "UInt32") {
-				return Type::getInt32Ty(context);
+				return Type::getInt32Ty(*context);
 			}
 			else if (type->Name == "UInt64") {
-				return Type::getInt64Ty(context);
+				return Type::getInt64Ty(*context);
 			}
 			else if (type->Name == "Float") {
-				return Type::getFloatTy(context);
+				return Type::getFloatTy(*context);
 			}
 			else if (type->Name == "Double") {
-				return Type::getDoubleTy(context);
+				return Type::getDoubleTy(*context);
 			}
 			else if (type->Name == "Char") {
-				return Type::getInt8Ty(context);
+				return Type::getInt8Ty(*context);
 			}
 			else if (type->Name == "Bool") {
-				return Type::getInt1Ty(context);
+				return Type::getInt1Ty(*context);
 			}
 		}
 
 		return nullptr;
 	}
 
-	ConstantData* HGenerator::GetConstantData(llvm::LLVMContext& context, std::shared_ptr<AST::HAstExpressionNode> node) const {
+	ConstantData* HGenerator::GetConstantData(llvm::LLVMContext* context, std::shared_ptr<AST::HAstExpressionNode> node) const {
 		if (node->ExpressionType == ExpressionType::Literal) {
 			auto literal = std::dynamic_pointer_cast<AST::HAstLiteralNode>(node);
 
 			if (literal->LiteralType == HAstLiteralType::Integer) {
-				return ConstantInt::get(context, APInt(32, std::stoi(literal->Value)));
+				return ConstantInt::get(*context, APInt(32, std::stoi(literal->Value)));
 			}
 			else if (literal->LiteralType == HAstLiteralType::Float) {
-				return ConstantFP::get(context, APFloat(std::stof(literal->Value)));
+				return ConstantFP::get(*context, APFloat(std::stof(literal->Value)));
 			}
 			else if (literal->LiteralType == HAstLiteralType::Boolean) {
-				return ConstantInt::get(context, APInt(1, std::stoi(literal->Value)));
+				return ConstantInt::get(*context, APInt(1, std::stoi(literal->Value)));
 			}
 		}
 
