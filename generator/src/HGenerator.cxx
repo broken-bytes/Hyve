@@ -93,7 +93,7 @@ namespace Hyve::Generator {
 		for (const auto& node : astModule->Children.front()->Children) {
 			if(node->Type == HAstNodeType::Func) {
 				auto function = std::dynamic_pointer_cast<HAstFuncDeclNode>(node);
-				GenerateFunction(context, currentModule.get(), function);
+				GenerateFunction(&context, currentModule.get(), function);
 			}
 		}
 

@@ -24,6 +24,7 @@ jobs:
         run: |
           export CC=clang-19
           export CXX=clang++-19
+          export CXXFLAGS="-std=gnu++23"
           cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release
           ninja -C build
       - name: Upload build artifacts
