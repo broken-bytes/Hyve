@@ -37,19 +37,19 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup LLVM and MSVC Build Tools
-        uses: ilammy/msvc-dev-cmd@v1 # Use this action to setup MSVC compiler environment
-      - name: Install LLVM 19
-        shell: powershell
+      - name: Get LLVM
+        shell: cmd
         run: |
-          Invoke-WebRequest -Uri https://apt.llvm.org/llvm.sh -OutFile llvm.sh
-          Set-ExecutionPolicy Unrestricted -Scope Process -Force # Allow script execution
-          ./llvm.sh 19 # Run the LLVM install script (without sudo)
+          cd C:\
+          git clone https://github.com/llvm/llvm-project.git
+          cd llvm-project
+          cmake -G"Ninja" -S .\llvm\ -B ./build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release
+          ninja -C build
       - name: Build Hyve
         shell: cmd  # Use cmd for Windows commands
         run: |
-          cmake -G "Ninja" -B build -S . -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release # Build with Ninja
+          cmake -G "Ninja" -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\llvm-project\build\lib\cmake"
+          ninja -C build
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:

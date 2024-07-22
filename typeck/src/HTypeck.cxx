@@ -317,7 +317,7 @@ namespace Hyve::Typeck {
             // Check for the return type if it is a primitive type(like Int, Bool, etc)
             if (funcNode->ReturnType != nullptr) {
 				// Check if the return type is a primitive type
-				if(std::ranges::contains(HPrimitiveTypes, funcNode->ReturnType->Name)) {
+				if(std::ranges::find_if(HPrimitiveTypes, funcNode->ReturnType->Name) != HPrimitiveTypes.end()) {
 					// Assign the type to the symbol
 					funcNode->ReturnType->Kind = HAstTypeKind::Primitive;
 				}
