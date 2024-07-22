@@ -20,40 +20,36 @@ jobs:
           sudo apt-get install -y clang-19
           sudo apt-get install -y llvm-19-dev
           sudo apt-get install -y libstdc++-11-dev
-
+          sudo apt-get install libc++-dev libc++abi-dev
       - name: Build Hyve
         run: |
           export CC=clang-19
           export CXX=clang++-19
-          export CXXFLAGS="-std=gnu++23"
-          cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-19/cmake
+          cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-19/cmake -DCMAKE_CXX_STANDARD_LIBRARIES="c++"
           ninja -C build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: hyve-release-deploy
           path: build
+
   build-msvc:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Buildchain
-        shell: powershell
-        run: |
-          winget install Ninja-build.Ninja
       - name: Get LLVM
         shell: cmd
         run: |
           cd C:\
           git clone https://github.com/llvm/llvm-project.git
           cd llvm-project
-          cmake -G"Ninja" -S .\llvm\ -B ./build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release
-          ninja -C build
+          cmake -G"Visual Studio 19 2022" -S .\llvm\ -B ./build -DLLVM_TARGETS_TO_BUILD="X86;ARM;AArch64" -DLLVM_ENABLE_PROJECTS="llvm;lldb;clang;clang-tools-extra;bolt" -DCMAKE_BUILD_TYPE=Release
+          cmake --build
       - name: Build Hyve
         shell: cmd  # Use cmd for Windows commands
         run: |
-          cmake -G "Ninja" -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\llvm-project\build\lib\cmake"
-          ninja -C build
+          cmake -G "Visual Studio 19 2022" -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\llvm-project\build\lib\cmake"
+          cmake --build
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
