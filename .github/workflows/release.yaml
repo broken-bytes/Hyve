@@ -14,13 +14,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ninja-build
+          sudo apt-get install -y clang-18
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh all
 
       - name: Build Hyve
         run: |
-          export CC=clang
+          export CC=/usr/bin/clang-18
           export CXX=clang++
           cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release
           ninja -C build
