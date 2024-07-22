@@ -17,12 +17,12 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh all
-          sudo apt-get install -y clang-18
+          sudo apt-get install -y clang-19
 
       - name: Build Hyve
         run: |
-          export CC=clang-18
-          export CXX=clang++-18
+          export CC=clang-19
+          export CXX=clang++-19
           cmake -G Ninja -B build -S ./ -DCMAKE_BUILD_TYPE=Release
           ninja -C build
       - name: Upload build artifacts
