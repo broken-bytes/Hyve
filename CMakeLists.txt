@@ -6,6 +6,8 @@ SET(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+project(Hyve C CXX)
+
 include(CheckCXXCompilerFlag)
 if(MSVC)
     # Special handling for MSVC
@@ -20,8 +22,6 @@ else()
         add_compile_options("-std=c++23")
     endif()
 endif()
-
-project(Hyve)
 
 set_property(GLOBAL PROPERTY CXX_STANDARD 23)
 
