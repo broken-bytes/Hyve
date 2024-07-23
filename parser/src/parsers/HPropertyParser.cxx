@@ -77,7 +77,7 @@ namespace Hyve::Parser {
 		if (token.Type == EQUAL) {
 			stream.Consume();
 			
-			if (IsExpression({ tokens.front(), tokens.back() })) {
+			if (IsExpression(stream)) {
 				auto assignNode = _exprParser->Parse(stream);
 				propNode->Initializer = std::dynamic_pointer_cast<HAstExpressionNode>(assignNode);
 			} else {

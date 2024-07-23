@@ -10,6 +10,7 @@ namespace Hyve {
 		struct HAstNode;
 		struct HAstExpressionNode;
 		struct HAstLiteralNode;
+		struct HAstMemberAccessNode;
 		struct HAstTypeNode;
 		enum class HAstOperatorType;
 	}
@@ -27,6 +28,12 @@ namespace Hyve {
 }
 
 namespace Hyve::Parser {
+	enum class MemberAccessType {
+		EXPESSION,
+		STATEMENT,
+		NONE
+	};
+
 	class IHParser {
 	public:
 		IHParser() = default;
@@ -43,8 +50,9 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool CanStartStatement(const Lexer::HToken& token) const;
 		[[nodiscard]] bool CanBeInExpression(const Lexer::HToken& token) const;
 		[[nodiscard]] bool IsAccessLevel(Lexer::HTokenStream& stream) const;
-		[[nodiscard]] bool IsExpression(const std::array<Lexer::HToken, 2>& tokens) const;
-		[[nodiscard]] bool IsStatement(const std::array<Lexer::HToken, 2>& tokens) const;
+		[[nodiscard]] MemberAccessType CheckMemberAccess(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsExpression(Lexer::HTokenStream& stream) const;
+		[[nodiscard]] bool IsStatement(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsEnum(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsFunc(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] bool IsInit(Lexer::HTokenStream& stream) const;
@@ -58,6 +66,7 @@ namespace Hyve::Parser {
 		[[nodiscard]] bool IsUnaryOperator(AST::HAstOperatorType type) const;
 		[[nodiscard]] bool IsBinaryOperator(AST::HAstOperatorType type) const;
 		[[nodiscard]] AST::HAstOperatorType GetOperatorType(const Lexer::HToken& token) const;
+		[[nodiscard]] std::shared_ptr<AST::HAstMemberAccessNode> ParseMemberAccess(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::shared_ptr<AST::HAstExpressionNode> ParseLiteral(Lexer::HTokenStream& stream) const;
 		[[nodiscard]] std::shared_ptr<AST::HAstLiteralNode> ParseString(std::string_view literal) const;
 		[[nodiscard]] Core::HAccessLevel ParseAccessLevel(Lexer::HTokenStream& stream) const;

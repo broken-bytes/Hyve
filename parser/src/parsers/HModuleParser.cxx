@@ -91,7 +91,7 @@ namespace Hyve::Parser {
 				moduleNode->Children.push_back(_structParser->Parse(stream));
 			} else if(IsVariable(stream)) {
 				moduleNode->Children.push_back(_varParser->Parse(stream));
-			} else if (IsStatement({ tokens.front(), tokens.back() })) {
+			} else if (IsStatement(stream)) {
 				moduleNode->Children.push_back(_stmtParser->Parse(stream));
 			} else {
 				HandleErrorCase(stream);

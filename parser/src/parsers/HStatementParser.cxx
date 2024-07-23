@@ -24,6 +24,7 @@ namespace Hyve::Parser {
 		if (token.Type == IDENTIFIER) {
 			// Check if the next token is an assignment operator
 			auto nextToken = stream.Peek(2)[1];
+
 			if (nextToken.Type == ASSIGNMENT) {
 				// Parse an assignment
 				return ParseAssignment(stream);

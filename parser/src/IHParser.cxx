@@ -11,11 +11,13 @@
 #include "parser/parsers/HPrototypeParser.hxx"
 #include "parser/parsers/HStructParser.hxx"
 #include "parser/parsers/HVariableParser.hxx"
-#include <ast/HAstOperatorType.hxx>
 #include <ast/HAstLiteralType.hxx>
+#include <ast/HAstOperatorType.hxx>
 #include <ast/nodes/HAstArrayNode.hxx>
+#include <ast/nodes/HAstIdentifierNode.hxx>
 #include <ast/nodes/HAstInheritanceNode.hxx>
 #include <ast/nodes/HAstLiteralNode.hxx>
+#include <ast/nodes/HAstMemberAccessNode.hxx>
 #include <lexer/HToken.hxx>
 #include <core/HCompilerError.hxx>
 #include <core/HErrorHandler.hxx>
@@ -94,9 +96,42 @@ namespace Hyve::Parser {
 		}
 	}
 
-	bool IHParser::IsExpression(const std::array<Lexer::HToken, 2>& tokens) const {
+	MemberAccessType IHParser::CheckMemberAccess(Lexer::HTokenStream& stream) const {
+		using enum Lexer::HTokenType;
+
+		if (auto token = stream.PeekUntilNonLineBreak(); token.Type != IDENTIFIER) {
+			return MemberAccessType::NONE;
+		}
+
+		size_t tokensToPeek = 2;
+
+		auto tokens = stream.Peek(tokensToPeek);
+
+		while (tokens.back().Type == DOT) {
+			tokens = stream.Peek(++tokensToPeek);
+		}
+
+		// Now read the next token
+		tokens = stream.Peek(tokensToPeek + 1);
+
+		auto opType = GetOperatorType(tokens.back());
+
+		if (IsStatementOperator(opType)) {
+			return MemberAccessType::STATEMENT;
+		} else if (IsBinaryOperator(opType)) {
+			return MemberAccessType::EXPESSION;
+		} else if (IsUnaryOperator(opType)) {
+			return MemberAccessType::EXPESSION;
+		} else {
+			return MemberAccessType::NONE;
+		}
+	}
+
+	bool IHParser::IsExpression(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
 		using enum Lexer::HTokenFamily;
+
+		auto tokens = stream.Peek(2);
 
 		if (!CanBeInExpression(tokens.front())) {
 			return false;
@@ -120,11 +155,18 @@ namespace Hyve::Parser {
 			return true;
 		}
 
+		if(CheckMemberAccess(stream) == MemberAccessType::EXPESSION) {
+			return true;
+		}
+
 		return false;
 	}
 
-	bool IHParser::IsStatement(const std::array<Lexer::HToken, 2>& tokens) const {
+	bool IHParser::IsStatement(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;
+
+		stream.PeekUntilNonLineBreak();
+		auto tokens = stream.Peek(2);
 
 		if (!CanStartStatement(tokens.front())) {
 			return false;
@@ -150,6 +192,10 @@ namespace Hyve::Parser {
 				return true;
 			}
 		} else if(tokens.front().Type == RETURN) {
+			return true;
+		}
+
+		if(CheckMemberAccess(stream) == MemberAccessType::STATEMENT) {
 			return true;
 		}
 
@@ -440,6 +486,14 @@ namespace Hyve::Parser {
 		using enum Lexer::HTokenType;
 
 		switch (token.Type) {
+			case ASSIGNMENT:
+				return HAstOperatorType::ASSIGN;
+			case PLUS_ASSIGN:
+				return HAstOperatorType::ADD_ASSIGN;
+			case MINUS_ASSIGN:
+				return HAstOperatorType::SUBTRACT_ASSIGN;
+			case MULTIPLY_ASSIGN:
+				return HAstOperatorType::MULTIPLY_ASSIGN;
 			case MULTIPLY:
 				return HAstOperatorType::MULTIPLY;
 			case DIVIDE:
@@ -461,6 +515,59 @@ namespace Hyve::Parser {
 		}
 	}
 
+	std::shared_ptr<AST::HAstMemberAccessNode> IHParser::ParseMemberAccess(Lexer::HTokenStream& stream) const {
+		using enum Lexer::HTokenType;
+		using enum Lexer::HTokenFamily;
+		using enum Core::HCompilerError::ErrorCode;
+
+		// Consume the identifier
+		auto token = stream.Consume();
+
+		auto memberAccess = std::make_shared<HAstMemberAccessNode>();
+		auto target = std::make_shared<HAstIdentifierNode>();
+		target->Name = token.Value;
+		memberAccess->Target = target;
+
+		// Now parse the member -> Consume the dot operator
+		token = stream.Consume();
+
+		// Parse as long as we have a dot operator
+		while (token.Type == DOT) {
+			token = stream.PeekUntilNonLineBreak();
+			// We need to make sure that the next token is an identifier
+			if (token.Type != IDENTIFIER) {
+				Panic(stream, KEYWORD);
+
+				return memberAccess;
+			}
+
+			// We need to check if the current memberAccess has a member.
+			// If it does, we need to create a new member node and set it as the member of the current memberAccess
+			// If it doesn't, we need to set the current memberAccess as the member of the new member node
+
+			if (memberAccess->Member == nullptr) {
+				// Create a new member node
+				auto memberNode = std::make_shared<HAstIdentifierNode>();
+				memberNode->Name = token.Value;
+				memberAccess->Member = memberNode;
+			}
+			else {
+				// Create a new member node
+				auto newMemberAccessNode = std::make_shared<HAstMemberAccessNode>();
+				auto memberNode = std::make_shared<HAstIdentifierNode>();
+				memberNode->Name = token.Value;
+				newMemberAccessNode->Member = memberNode;
+				memberAccess->Member = newMemberAccessNode;
+				// Set the new node as the current memberAccess, so that we can continue to add members
+				memberAccess = newMemberAccessNode;
+			}
+
+			// Peek the next token
+			token = stream.Consume();
+		}
+
+		return memberAccess;
+	}
 
 	std::shared_ptr<HAstExpressionNode> IHParser::ParseLiteral(Lexer::HTokenStream& stream) const {
 		using enum Lexer::HTokenType;

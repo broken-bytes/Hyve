@@ -229,9 +229,9 @@ namespace Hyve::Parser {
 
 		// Parse statements and expressions one by one
 		while (token.Type != CURLY_RIGHT) {
-			if (IsStatement({ tokens.front(), tokens.back() })) {
+			if (IsStatement(stream)) {
 				body->Children.push_back(_stmtParser->Parse(stream));
-			} else if(IsExpression({ tokens.front(), tokens.back() })) {
+			} else if(IsExpression(stream)) {
 				body->Children.push_back(_exprParser->Parse(stream));
 			} else {
 				_errorHandler->AddError(UnexpectedToken, token.FileName, token.Line);
