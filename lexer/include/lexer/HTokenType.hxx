@@ -59,6 +59,7 @@ namespace Hyve::Lexer {
         IMPORT,
         IN,
         INIT,
+        MUTATING,
         OF,
         RETURN,
         THROW,

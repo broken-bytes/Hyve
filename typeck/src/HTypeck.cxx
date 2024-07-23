@@ -368,7 +368,19 @@ namespace Hyve::Typeck {
                         // Then we take the first part of the scope string
                         auto moduleSymbol = scope.front();
                     }
-				}
+                }
+                else {
+                    // We did not find the symbol, check if it is a primitive type(Int, Bool, etc)
+                    if (std::ranges::find(HPrimitiveTypes, declNode->TypeNode->Name) != HPrimitiveTypes.end()) {
+						// Assign the type to the symbol
+						declNode->TypeNode->Kind = HAstTypeKind::Primitive;
+                        declNode->TypeNode->Module = "hyve.core";
+					}
+                    else {
+                        // We did not find the symbol, so we need to throw an error
+                        throw std::runtime_error("Property type not found in symbol table");
+                    }
+                }
             }
         }
     }

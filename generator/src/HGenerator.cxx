@@ -259,7 +259,10 @@ namespace Hyve::Generator {
 		return nullptr;
 	}
 
-	ConstantData* HGenerator::GetConstantData(llvm::LLVMContext* context, std::shared_ptr<AST::HAstExpressionNode> node) const {
+	ConstantData* HGenerator::GetConstantData(
+		llvm::LLVMContext* context, 
+		std::shared_ptr<AST::HAstExpressionNode> node
+	) const {
 		if (node->ExpressionType == ExpressionType::Literal) {
 			auto literal = std::dynamic_pointer_cast<AST::HAstLiteralNode>(node);
 

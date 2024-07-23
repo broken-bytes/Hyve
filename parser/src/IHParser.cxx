@@ -183,15 +183,33 @@ namespace Hyve::Parser {
 
 		if (token.Type == PUBLIC || token.Type == PRIVATE || token.Type == INTERNAL) {
 			// We need to skip the access modifier, as it is optional. Peek two tokens ahead
-			auto tokens = stream.Peek(3);
+			auto tokens = stream.Peek(4);
 
-			if (tokens[1].Type == FUNC) {
+			if (tokens[1].Type == FUNC || (tokens[1].Type == MUTATING && tokens[2].Type == FUNC)) {
+				return true;
+			}
+
+			if (tokens[1].Type == STATIC && tokens[2].Type == MUTATING && tokens[3].Type == FUNC) {
 				return true;
 			}
 
 			if (tokens[1].Type == STATIC && tokens[2].Type == FUNC) {
 				return true;
 			}
+		}
+
+		auto tokens = stream.Peek(3);
+
+		if (tokens[0].Type == FUNC || (tokens[0].Type == MUTATING && tokens[1].Type == FUNC)) {
+			return true;
+		}
+
+		if (tokens[0].Type == STATIC && tokens[1].Type == MUTATING && tokens[2].Type == FUNC) {
+			return true;
+		}
+
+		if (tokens[0].Type == STATIC && tokens[1].Type == FUNC) {
+			return true;
 		}
 
 		if (token.Type == FUNC) {

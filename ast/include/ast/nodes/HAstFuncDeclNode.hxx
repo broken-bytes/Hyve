@@ -13,8 +13,10 @@ namespace Hyve::AST {
         bool InferReturnType;
         std::shared_ptr<HAstTypeNode> ReturnType;
         std::vector<HAstParamater> Parameters;
+        bool IsMutating;
 
         HAstFuncDeclNode() {
+            IsMutating = false;
             Type = HAstNodeType::Func;
             InferReturnType = true;
             ReturnType = nullptr;

@@ -41,6 +41,9 @@ namespace Hyve::Lexer {
         else if (CheckMatchingSequence(source, KEYWORD_LET)) {
             return MAKE_TOKEN(LET, KEYWORD_LET);
         }
+        else if (CheckMatchingSequence(source, KEYWORD_MUT)) {
+            return MAKE_TOKEN(MUTATING, KEYWORD_MUT);
+        }
         else if (CheckMatchingSequence(source, KEYWORD_STRUCT)) {
             return MAKE_TOKEN(STRUCT, KEYWORD_STRUCT);
         }

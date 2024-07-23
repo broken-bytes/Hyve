@@ -39,10 +39,10 @@ namespace Hyve::Parser {
 			stream.Consume();
 
 			// Parse the return value(if any)
-			// First, peek the next token and check if it is a keyword. If so, return an empty return statement
+			// First, peek the next token and check if it is a keyword or a brace. If so, return an empty return statement
 			token = stream.PeekUntilNonLineBreak();
 
-			if (token.Family == KEYWORD) {
+			if (token.Family == KEYWORD || token.Family == GROUPING) {
 				return returnNode;
 			}
 

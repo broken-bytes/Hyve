@@ -246,8 +246,7 @@ namespace Hyve::Parser {
 
 		// Parse as long as we have a dot operator
 		while (token.Type == DOT) {
-			// Consume the dot operator
-			token = stream.Consume();
+			token = stream.PeekUntilNonLineBreak();
 			// We need to make sure that the next token is an identifier
 			if (token.Type != IDENTIFIER) {
 				_errorHandler->AddError(INVALID_EXPRESSION, token.FileName, token.Line);
@@ -278,13 +277,14 @@ namespace Hyve::Parser {
 			}
 
 			// Peek the next token
-			token = stream.Peek();
+			token = stream.Consume();
 		}
 
+		token = stream.PeekUntilNonLineBreak();
 		// We only need to check if the next token is a left bracket
 		// If it is, we need to parse the function call
 		// If it is not we return a prop access node
-		if (token.Type == BRACKET_LEFT) {
+		if (token.Type == PAREN_LEFT) {
 			auto funcCall = ParseFuncCall(stream);
 			funcCall->Target = memberAccess;
 

@@ -23,12 +23,19 @@ namespace Hyve::Parser {
 
 		auto accessLevel = ParseAccessLevel(stream);
 		bool isStatic = false;
+		bool isMutating = false;
 
 		auto token = stream.PeekUntilNonLineBreak();
 
 		// Check if the func is static
 		if (token.Type == STATIC) {
 			isStatic = true;
+			stream.Consume();
+			token = stream.PeekUntilNonLineBreak();
+		}
+
+		if(token.Type == MUTATING) {
+			isMutating = true;
 			stream.Consume();
 			token = stream.PeekUntilNonLineBreak();
 		}
@@ -45,6 +52,7 @@ namespace Hyve::Parser {
 		auto funcNode = std::make_shared<HAstFuncDeclNode>();
 		funcNode->AccessLevel = accessLevel;
 		funcNode->IsStatic = isStatic;
+		funcNode->IsMutating = isMutating;
 
 		// Parse the function name
 		if (token = stream.PeekUntilNonLineBreak(); token.Type != IDENTIFIER) {

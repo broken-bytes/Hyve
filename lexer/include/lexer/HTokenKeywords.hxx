@@ -27,6 +27,7 @@ namespace Hyve::Lexer::Keywords {
     constexpr const char* KEYWORD_INTERNAL = "internal";
     constexpr const char* KEYWORD_LET = "let";
     constexpr const char* KEYWORD_MODULE = "module";
+    constexpr const char* KEYWORD_MUT = "mut";
     constexpr const char* KEYWORD_NULL = "null";
     constexpr const char* KEYWORD_OPEN = "open";
     constexpr const char* KEYWORD_PRIVATE = "private";
