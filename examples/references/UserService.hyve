@@ -1,9 +1,0 @@
-protocol UserService {
-    fn getUser(username: String) -> User
-}
-
-class UserServiceImpl: UserService {
-    fn getUser(username: String) -> User {
-        return User(username: username, age: 20)
-    }
-}
