@@ -41,7 +41,5 @@ namespace Hyve::Parser {
 		std::shared_ptr<AST::HAstBinaryExpressionNode> ParseBinaryExpression(Lexer::HTokenStream& stream);
 		// Property and member access parser
 		std::shared_ptr<AST::HAstPropAccessNode> ParsePropAccess(Lexer::HTokenStream& stream) const;
-		// Member access parser
-		std::shared_ptr<AST::HAstExpressionNode> ParseMemberAccess(Lexer::HTokenStream& stream);
 	};
 }
