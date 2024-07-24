@@ -1,6 +1,10 @@
 module App
 
-struct World {
+contract Worldable {
+    fn hello()
+}
+
+struct World: Worldable {
     var index: Int
 
     fn hello() -> Int {
@@ -12,8 +16,14 @@ struct World {
     }
 }
 
+/*
+This is a multiline comment
+*/
 fn main() -> Int {
+    // This is a comment
     var world = World { index: 0 }
+    val world2 = world
+    let world3 = world
 
     return world.hello()
 }
