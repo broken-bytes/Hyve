@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://broken-bytes.github.io/blog</id>
+    <id>https://hyve-lang.org/blog</id>
     <title>hyve-lang Blog</title>
     <updated>2024-01-07T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://broken-bytes.github.io/blog"/>
+    <link rel="alternate" href="https://hyve-lang.org/blog"/>
     <subtitle>hyve-lang Blog</subtitle>
-    <icon>https://broken-bytes.github.io/img/favicon.ico</icon>
+    <icon>https://hyve-lang.org/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[Hyve is now under active development]]></title>
-        <id>https://broken-bytes.github.io/blog/start-of-development</id>
-        <link href="https://broken-bytes.github.io/blog/start-of-development"/>
+        <id>https://hyve-lang.org/blog/start-of-development</id>
+        <link href="https://hyve-lang.org/blog/start-of-development"/>
         <updated>2024-01-07T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Hyve is an exciting project that has entered the active development phase. I am thrilled to announce that I am working hard to bring you the best features and functionalities.]]></summary>
         <content type="html"><![CDATA[<p>Hyve is an exciting project that has entered the active development phase. I am thrilled to announce that I am working hard to bring you the best features and functionalities.</p>
