@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkhyve_lang=self.webpackChunkhyve_lang||[]).push([[472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Hyve is now under active development","permalink":"/Hyve/blog/start-of-development","unlisted":false}]}')}}]);
