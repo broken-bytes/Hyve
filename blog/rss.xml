@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>hyve-lang Blog</title>
-        <link>https://hyve-lang.org/blog</link>
+        <link>https://broken-bytes.github.io/Hyve/blog</link>
         <description>hyve-lang Blog</description>
         <lastBuildDate>Sun, 07 Jan 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
@@ -10,8 +10,8 @@
         <language>en</language>
         <item>
             <title><![CDATA[Hyve is now under active development]]></title>
-            <link>https://hyve-lang.org/blog/start-of-development</link>
-            <guid>https://hyve-lang.org/blog/start-of-development</guid>
+            <link>https://broken-bytes.github.io/Hyve/blog/start-of-development</link>
+            <guid>https://broken-bytes.github.io/Hyve/blog/start-of-development</guid>
             <pubDate>Sun, 07 Jan 2024 00:00:00 GMT</pubDate>
             <description><![CDATA[Hyve is an exciting project that has entered the active development phase. I am thrilled to announce that I am working hard to bring you the best features and functionalities.]]></description>
             <content:encoded><![CDATA[<p>Hyve is an exciting project that has entered the active development phase. I am thrilled to announce that I am working hard to bring you the best features and functionalities.</p>

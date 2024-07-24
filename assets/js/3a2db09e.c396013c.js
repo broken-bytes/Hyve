@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkhyve_lang=self.webpackChunkhyve_lang||[]).push([[121],{8070:n=>{n.exports=JSON.parse('{"tags":[{"label":"announcement","permalink":"/blog/tags/announcement","description":"Announcement tag description","count":1}]}')}}]);
