@@ -65,5 +65,3 @@ Hyve is open-sourced under the MIT License. See the [LICENSE](https://github.com
 ---
 
 Happy Coding with Hyve!
-
-Remember, since Hyve is a hobbyist language, expect missing features and bugs.
